@@ -615,7 +615,7 @@ def admin_send_all_sms():
         encoded_phone = urllib.parse.quote_plus(phone_number)
 
         # Construct the full URL using the configured WEBSITE_DOMAIN
-        results_link = f"{WEBSITE_DOMAIN}}"
+        results_link = f"{WEBSITE_DOMAIN}{url_for('student_result_pdf', name=encoded_name, phone=encoded_phone)}"
         print(f"Generated results_link URL for {student_name}: {results_link}") # Debug print for URL generation
 
         # Combine message body and link

@@ -65,11 +65,7 @@ ARKESEL_SENDER_ID = "GyeduTech" # e.g., "MySchool"
 
 # --- Website Domain Configuration ---
 # IMPORTANT: Replace with your actual website domain (e.g., 'https://your-school-website.com')
-<<<<<<< HEAD
 WEBSITE_DOMAIN = "https://flask-sms-app.onrender.com/" # Replace with your actual domain in production
-=======
-WEBSITE_DOMAIN = "https://flask-sms-app.onrender.com" # Replace with your actual domain in production
->>>>>>> origin/main
 
 # --- Admin Password Hashing ---
 # Hash for the password 'gyedu2025'
@@ -204,7 +200,38 @@ SUBJECT_DETAILS = {
             'Class Score': 'english_class_score', # Replace with actual column header
             'Total Score': 'english_total', # Replace with actual column header
             'Remarks': 'english_remark'
-        }# Add more Semester 1 subjects here
+        },
+        'Social': {
+            'Exams Score': 'social', # Replace with actual column header
+            'Class Score': 'social_class_score', # Replace with actual column header
+            'Total Score': 'social_total', # Replace with actual column header
+            'Remarks': 'social_remark'
+        },
+        'Entrepreneur': {
+            'Exams Score': 'entrepreneur', # Replace with actual column header
+            'Class Score': 'entrepreneur_class_score', # Replace with actual column header
+            'Total Score': 'entrepreneur_total', # Replace with actual column header
+            'Remarks': 'entrepreneur_remark'
+        },
+        'ICT': {
+            'Exams Score': 'ict', # Replace with actual column header
+            'Class Score': 'ict_class_score', # Replace with actual column header
+            'Total Score': 'ict_total', # Replace with actual column header
+            'Remarks': 'ict_remark'
+        },
+        'Technical Drawing': {
+            'Exams Score': 'td', # Replace with actual column header
+            'Class Score': 'td_class_score', # Replace with actual column header
+            'Total Score': 'td_total', # Replace with actual column header
+            'Remarks': 'td_remark'
+        },
+        'Elective Course': {
+            'Exams Score': 'electivecourse', # Replace with actual column header
+            'Class Score': 'electivecourse_class_score', # Replace with actual column header
+            'Total Score': 'electivecourse_total', # Replace with actual column header
+            'Remarks': 'electivecourse_remark'
+        },
+        # Add more Semester 1 subjects here
     },
     
     'Semester 2': {
@@ -220,12 +247,49 @@ SUBJECT_DETAILS = {
             'Total Score': 'science_total', # Replace with actual column header
             'Remarks': 'science_remark'           # Replace with actual column header
         },
+        # 'English': {
+        #     'Exams Score': 'english', # Replace with actual column header
+        #     'Class Score': 'english_class_score', # Replace with actual column header
+        #     'Total Score': 'english_total', # Replace with actual column header
+        #     'Remarks': 'english_remark'
+        # },
         'English': {
             'Exams Score': 'english', # Replace with actual column header
             'Class Score': 'english_class_score', # Replace with actual column header
             'Total Score': 'english_total', # Replace with actual column header
             'Remarks': 'english_remark'
-        }# Add more Semester 2 subjects here
+        },
+        'Social': {
+            'Exams Score': 'social', # Replace with actual column header
+            'Class Score': 'social_class_score', # Replace with actual column header
+            'Total Score': 'social_total', # Replace with actual column header
+            'Remarks': 'social_remark'
+        },
+        'Entrepreneur': {
+            'Exams Score': 'entrepreneur', # Replace with actual column header
+            'Class Score': 'entrepreneur_class_score', # Replace with actual column header
+            'Total Score': 'entrepreneur_total', # Replace with actual column header
+            'Remarks': 'entrepreneur_remark'
+        },
+        'ICT': {
+            'Exams Score': 'ict', # Replace with actual column header
+            'Class Score': 'ict_class_score', # Replace with actual column header
+            'Total Score': 'ict_total', # Replace with actual column header
+            'Remarks': 'ict_remark'
+        },
+        'Technical Drawing': {
+            'Exams Score': 'td', # Replace with actual column header
+            'Class Score': 'td_class_score', # Replace with actual column header
+            'Total Score': 'td_total', # Replace with actual column header
+            'Remarks': 'td_remark'
+        },
+        'Elective Course': {
+            'Exams Score': 'electivecourse', # Replace with actual column header
+            'Class Score': 'electivecourse_class_score', # Replace with actual column header
+            'Total Score': 'electivecourse_total', # Replace with actual column header
+            'Remarks': 'electivecourse_remark'
+        },
+        # Add more Semester 2 subjects here
     },
     # Add more semesters here following the same structure
 }

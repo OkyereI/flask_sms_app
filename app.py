@@ -65,7 +65,7 @@ ARKESEL_SENDER_ID = "GyeduTech" # e.g., "MySchool"
 
 # --- Website Domain Configuration ---
 # IMPORTANT: Replace with your actual website domain (e.g., 'https://your-school-website.com')
-WEBSITE_DOMAIN = "http://127.0.0.1:5000" # Replace with your actual domain in production
+WEBSITE_DOMAIN = "https://flask-sms-app.onrender.com/" # Replace with your actual domain in production
 
 # --- Admin Password Hashing ---
 # Hash for the password 'gyedu2025'

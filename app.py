@@ -187,48 +187,57 @@ SUBJECT_DETAILS = {
             'Exams Score': 'mathematics', # Replace 'Math Exams Score' with the actual column header
             'Class Score': 'math_class_score', # Replace 'Math Class Score' with the actual column header
             'Total Score': 'math_total', # Replace 'Math Total Score' with the actual column header
+            'Grade' : 'math_grade',
             'Remarks': 'math_remark'               # Replace with actual column header
         },
         'Science': {
             'Exams Score': 'science', # Replace with actual column header
             'Class Score': 'science_class_score', # Replace with actual column header
             'Total Score': 'science_total', # Replace with actual column header
+            'Grade' : 'science_grade',
             'Remarks': 'science_remark'          # Replace with actual column header
         },
         'English': {
             'Exams Score': 'english', # Replace with actual column header
             'Class Score': 'english_class_score', # Replace with actual column header
             'Total Score': 'english_total', # Replace with actual column header
+            'Grade' : 'english_grade',
             'Remarks': 'english_remark'
         },
         'Social': {
             'Exams Score': 'social', # Replace with actual column header
             'Class Score': 'social_class_score', # Replace with actual column header
             'Total Score': 'social_total', # Replace with actual column header
+            'Grade' : 'social_grade',
             'Remarks': 'social_remark'
         },
         'Entrepreneur': {
             'Exams Score': 'entrepreneur', # Replace with actual column header
             'Class Score': 'entrepreneur_class_score', # Replace with actual column header
             'Total Score': 'entrepreneur_total', # Replace with actual column header
+            'Grade' : 'entrepreneur_grade',
             'Remarks': 'entrepreneur_remark'
         },
         'ICT': {
             'Exams Score': 'ict', # Replace with actual column header
             'Class Score': 'ict_class_score', # Replace with actual column header
             'Total Score': 'ict_total', # Replace with actual column header
+            'Grade' : 'ict_grade',
             'Remarks': 'ict_remark'
         },
         'Technical Drawing': {
             'Exams Score': 'td', # Replace with actual column header
             'Class Score': 'td_class_score', # Replace with actual column header
             'Total Score': 'td_total', # Replace with actual column header
+            'Grade' : 'technical_grade',
             'Remarks': 'td_remark'
         },
         'Elective Course': {
             'Exams Score': 'electivecourse', # Replace with actual column header
             'Class Score': 'electivecourse_class_score', # Replace with actual column header
             'Total Score': 'electivecourse_total', # Replace with actual column header
+            'Elective Course': 'elective_course',
+            'Grade': 'elective_grade',
             'Remarks': 'electivecourse_remark'
         },
         # Add more Semester 1 subjects here
@@ -239,12 +248,14 @@ SUBJECT_DETAILS = {
             'Exams Score': 'mathematics', # Replace 'Math Exams Score' with the actual column header
             'Class Score': 'math_class_score', # Replace 'Math Class Score' with the actual column header
             'Total Score': 'math_total', # Replace 'Math Total Score' with the actual column header
+            ' Grade': 'math_grade',
             'Remarks': 'math_remark'             # Replace with actual column header
         },
         'Science': {
             'Exams Score': 'science', # Replace with actual column header
             'Class Score': 'science_class_score', # Replace with actual column header
             'Total Score': 'science_total', # Replace with actual column header
+            'Grade': 'science_grade',
             'Remarks': 'science_remark'           # Replace with actual column header
         },
         # 'English': {
@@ -257,36 +268,42 @@ SUBJECT_DETAILS = {
             'Exams Score': 'english', # Replace with actual column header
             'Class Score': 'english_class_score', # Replace with actual column header
             'Total Score': 'english_total', # Replace with actual column header
+            'Grade': 'english_grade',
             'Remarks': 'english_remark'
         },
         'Social': {
             'Exams Score': 'social', # Replace with actual column header
             'Class Score': 'social_class_score', # Replace with actual column header
             'Total Score': 'social_total', # Replace with actual column header
+            'Grade': 'social_grade',
             'Remarks': 'social_remark'
         },
         'Entrepreneur': {
             'Exams Score': 'entrepreneur', # Replace with actual column header
             'Class Score': 'entrepreneur_class_score', # Replace with actual column header
             'Total Score': 'entrepreneur_total', # Replace with actual column header
+            'Grade': 'entrepreneur_grade',
             'Remarks': 'entrepreneur_remark'
         },
         'ICT': {
             'Exams Score': 'ict', # Replace with actual column header
             'Class Score': 'ict_class_score', # Replace with actual column header
             'Total Score': 'ict_total', # Replace with actual column header
+            'Grade' : 'ict_grade',
             'Remarks': 'ict_remark'
         },
         'Technical Drawing': {
             'Exams Score': 'td', # Replace with actual column header
             'Class Score': 'td_class_score', # Replace with actual column header
             'Total Score': 'td_total', # Replace with actual column header
+            'Grade' : 'td_grade',
             'Remarks': 'td_remark'
         },
         'Elective Course': {
             'Exams Score': 'electivecourse', # Replace with actual column header
             'Class Score': 'electivecourse_class_score', # Replace with actual column header
             'Total Score': 'electivecourse_total', # Replace with actual column header
+            'Grade' : 'electivecourse_grade',
             'Remarks': 'electivecourse_remark'
         },
         # Add more Semester 2 subjects here

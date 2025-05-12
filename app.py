@@ -236,7 +236,7 @@ SUBJECT_DETAILS = {
             'Exams Score': 'electivecourse', # Replace with actual column header
             'Class Score': 'electivecourse_class_score', # Replace with actual column header
             'Total Score': 'electivecourse_total', # Replace with actual column header
-            'Elective Course': 'elective_course',
+            # 'Elective Course': 'elective_course',
             'Grade': 'elective_grade',
             'Remarks': 'electivecourse_remark'
         },

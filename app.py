@@ -195,8 +195,14 @@ SUBJECT_DETAILS = {
             'Total Score': 'science_total', # Replace with actual column header
             'Remarks': 'science_remark'          # Replace with actual column header
         },
-        # Add more Semester 1 subjects here
+        'English': {
+            'Exams Score': 'english', # Replace with actual column header
+            'Class Score': 'english_class_score', # Replace with actual column header
+            'Total Score': 'english_total', # Replace with actual column header
+            'Remarks': 'english_remark'
+        }# Add more Semester 1 subjects here
     },
+    
     'Semester 2': {
         'Math': {
             'Exams Score': 'mathematics', # Replace 'Math Exams Score' with the actual column header
@@ -210,7 +216,12 @@ SUBJECT_DETAILS = {
             'Total Score': 'science_total', # Replace with actual column header
             'Remarks': 'science_remark'           # Replace with actual column header
         },
-        # Add more Semester 2 subjects here
+        'English': {
+            'Exams Score': 'english', # Replace with actual column header
+            'Class Score': 'english_class_score', # Replace with actual column header
+            'Total Score': 'english_total', # Replace with actual column header
+            'Remarks': 'english_remark'
+        }# Add more Semester 2 subjects here
     },
     # Add more semesters here following the same structure
 }

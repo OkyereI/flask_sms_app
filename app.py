@@ -32,11 +32,11 @@ except ImportError:
 
 # Import the google_search tool
 # Ensure you have the google_search tool available in your environment
-try:
-    # from google_search import search
-except ImportError:
-    search = None
-    print("Warning: google_search tool not available. Web search functionality will be limited.")
+# try:
+#     from google_search import search
+# except ImportError:
+#     search = None
+#     print("Warning: google_search tool not available. Web search functionality will be limited.")
 
 
 app = Flask(__name__)
@@ -236,7 +236,7 @@ SUBJECT_DETAILS = {
             'Exams Score': 'electivecourse', # Replace with actual column header
             'Class Score': 'electivecourse_class_score', # Replace with actual column header
             'Total Score': 'electivecourse_total', # Replace with actual column header
-            # 'Elective Course': 'elective_course',
+            'Elective Course': 'elective_course',
             'Grade': 'elective_grade',
             'Remarks': 'electivecourse_remark'
         },

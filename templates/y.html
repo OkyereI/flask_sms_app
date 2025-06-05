@@ -11,28 +11,7 @@ from datetime import datetime # Import datetime for PDF timestamp
 import os # Import os for file path operations
 from werkzeug.utils import secure_filename # Import secure_filename for safe file uploads
 
-# Import libraries for reading document content (install these: pip install pypdf python-docx openpyxl)
-try:
-    import pypdf # Use pypdf as PyPDF2 is deprecated
-except ImportError:
-    pypdf = None
-    print("Warning: pypdf not installed. PDF content will not be available to AI Assistant.")
-
-try:
-    import docx # Use python-docx
-except ImportError:
-    docx = None
-    print("Warning: python-docx not installed. Word document content will not be available to AI Assistant.")
-
-try:
-    import openpyxl
-except ImportError:
-    openpyxl = None
-    print("Warning: openpyxl not installed. Excel document content will not be available to AI Assistant.")
-
-# Import the google_search tool
-from googlesearch import search # Assuming google_search is available as a tool
-
+# No longer importing pypdf, docx, openpyxl, or google_search as AI Assistant is removed.
 
 app = Flask(__name__)
 # --- Security Note: In a real application, use a strong, random secret key ---
@@ -41,7 +20,7 @@ app.secret_key = 'your_very_secret_key_replace_this' # Required for flashing mes
 
 # --- Configuration ---
 # Replace with your actual Google Sheet URL
-GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1JYs4ZtUKfklu-bEqdYOeeKu6nF7rM5I55EQZb-yrs-A/edit?gid=0#gid=0"
+GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1JYs4ZtUKfklu-bEqdYOeeKu6nF7rM5I5I55EQZb-yrs-A/edit?usp=sharing"
 # Extract the sheet ID from the URL
 SHEET_ID = GOOGLE_SHEET_URL.split('/d/')[1].split('/')[0]
 # Construct the export URL for CSV. Assuming the sheet name is 'Sheet1'.
@@ -56,7 +35,7 @@ ARKESEL_API_KEY = "b0FrYkNNVlZGSmdrendVT3hwUHk"
 ARKESEL_SMS_URL = "https://sms.arkesel.com/sms/api"
 # IMPORTANT: Replace with your registered Arkesel Sender ID.
 # Verify this Sender ID is registered and approved in your Arkesel account.
-ARKESEL_SENDER_ID = "Gyeduech" # e.g., "MySchool"
+ARKESEL_SENDER_ID = "GyedTuech" # e.g., "MySchool"
 
 # --- Website Domain Configuration ---
 # IMPORTANT: Replace with your actual website domain (e.g., 'https://your-school-website.com')
@@ -80,71 +59,6 @@ ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# --- Document Content Reading Functions ---
-def read_pdf(filepath):
-    if not pypdf:
-        return "PDF reading library not available."
-    try:
-        with open(filepath, 'rb') as f:
-            reader = pypdf.PdfReader(f)
-            text = ''
-            for page_num in range(len(reader.pages)):
-                text += reader.pages[page_num].extract_text() + '\n'
-            return text
-    except Exception as e:
-        print(f"Error reading PDF {filepath}: {e}")
-        return f"Error reading PDF file: {e}"
-
-def read_docx(filepath):
-    if not docx:
-        return "Word document reading library not available."
-    try:
-        doc = docx.Document(filepath)
-        text = ''
-        for paragraph in doc.paragraphs:
-            text += paragraph.text + '\n'
-        return text
-    except Exception as e:
-        print(f"Error reading DOCX {filepath}: {e}")
-        return f"Error reading Word document file: {e}"
-
-def read_excel(filepath):
-    if not openpyxl:
-        return "Excel reading library not available."
-    try:
-        workbook = openpyxl.load_workbook(filepath)
-        text = ''
-        for sheet_name in workbook.sheetnames:
-            sheet = workbook[sheet_name]
-            text += f"--- Sheet: {sheet_name} ---\n"
-            for row in sheet.iter_rows():
-                row_values = [str(cell.value) if cell.value is not None else '' for cell in row]
-                text += '\t'.join(row_values) + '\n'
-            text += '\n'
-        return text
-    except Exception as e:
-        print(f"Error reading Excel {filepath}: {e}")
-        return f"Error reading Excel file: {e}"
-
-def get_document_content(filename):
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if not os.path.exists(filepath):
-        return None # File not found
-
-    file_extension = filename.rsplit('.', 1)[1].lower()
-
-    if file_extension == 'pdf':
-        return read_pdf(filepath)
-    elif file_extension == 'docx':
-        return read_docx(filepath)
-    elif file_extension == 'doc': # Basic handling for .doc (might not work for all formats without additional libraries)
-         return "Reading .doc files is not fully supported without additional libraries."
-    elif file_extension in ['xls', 'xlsx']:
-        return read_excel(filepath)
-    else:
-        return "Unsupported file type for reading."
-
 
 # Define the column mapping from your sheet.
 # The keys are internal identifiers, the values MUST EXACTLY MATCH the column headers in your Google Sheet.
@@ -170,45 +84,66 @@ COLUMN_MAPPING = {
 # The inner keys are the Subject Names you want to display.
 # The innermost values are dictionaries mapping the type of score/remark to the EXACT column header in your Google Sheet.
 # IMPORTANT: UPDATE THIS DICTIONARY TO MATCH YOUR GOOGLE SHEET HEADERS AND SEMESTER/SUBJECT STRUCTURE.
+# Semester keys now include the year (e.g., '2023 - Semester 1')
 SUBJECT_DETAILS = {
-    'Semester 1': {
+    '2024 - Semester 1': {
         'Math': {
-            'Exams Score': 'mathematics', # Replace 'Math Exams Score' with the actual column header
-            'Class Score': 'math_class_score', # Replace 'Math Class Score' with the actual column header
-            'Total Score': 'math_total', # Replace 'Math Total Score' with the actual column header
-            'Remarks': 'math_remark'               # Replace with actual column header
+            'Exams Score': 'Math Exams Score - 2023 Sem 1', # Replace with actual column header
+            'Class Score': 'Math Class Score - 2023 Sem 1', # Replace with actual column header
+            'Total Score': 'Math Total Score - 2023 Sem 1', # Replace with actual column header
+            'Remarks': 'Math Remarks - 2023 Sem 1'          # Replace with actual column header
         },
         'Science': {
-            'Exams Score': 'science', # Replace with actual column header
-            'Class Score': 'science_class_score', # Replace with actual column header
-            'Total Score': 'science_total', # Replace with actual column header
-            'Remarks': 'science_remark'          # Replace with actual column header
+            'Exams Score': 'Science Exams Score - 2023 Sem 1', # Replace with actual column header
+            'Class Score': 'Science Class Score - 2023 Sem 1', # Replace with actual column header
+            'Total Score': 'Science Total Score - 2023 Sem 1', # Replace with actual column header
+            'Remarks': 'Science Remarks - 2023 Sem 1'          # Replace with actual column header
         },
-        # Add more Semester 1 subjects here
+        # Add more 2023 Semester 1 subjects here
     },
-    'Semester 2': {
+    '2024 - Semester 1': {
         'Math': {
-            'Exams Score': 'mathematics', # Replace 'Math Exams Score' with the actual column header
-            'Class Score': 'math_class_score', # Replace 'Math Class Score' with the actual column header
-            'Total Score': 'math_total', # Replace 'Math Total Score' with the actual column header
-            'Remarks': 'math_remark'             # Replace with actual column header
+            'Exams Score': 'Math Exams Score - 2024 Sem 1', # Replace with actual column header
+            'Class Score': 'Math Class Score - 2024 Sem 1', # Replace with actual column header
+            'Total Score': 'Math Total Score - 2024 Sem 1', # Replace with actual column header
+            'Remarks': 'Math Remarks - 2024 Sem 1'          # Replace with actual column header
         },
         'Science': {
-            'Exams Score': 'science', # Replace with actual column header
-            'Class Score': 'science_class_score', # Replace with actual column header
-            'Total Score': 'science_total', # Replace with actual column header
-            'Remarks': 'science_remark'           # Replace with actual column header
+            'Exams Score': 'Science Exams Score - 2024 Sem 1', # Replace with actual column header
+            'Class Score': 'Science Class Score - 2024 Sem 1', # Replace with actual column header
+            'Total Score': 'Science Total Score - 2024 Sem 1', # Replace with actual column header
+            'Remarks': 'Science Remarks - 2024 Sem 1'          # Replace with actual column header
         },
-        # Add more Semester 2 subjects here
+        # Add more 2024 Semester 1 subjects here
     },
-    # Add more semesters here following the same structure
+    '2024 - Semester 2': {
+        'Math': {
+            'Exams Score': 'Math Exams Score - 2024 Sem 2', # Replace with actual column header
+            'Class Score': 'Math Class Score - 2024 Sem 2', # Replace with actual column header
+            'Total Score': 'Math Total Score - 2024 Sem 2', # Replace with actual column header
+            'Remarks': 'Math Remarks - 2024 Sem 2'          # Replace with actual column header
+        },
+        'Science': {
+            'Exams Score': 'Science Exams Score - 2024 Sem 2', # Replace with actual column header
+            'Class Score': 'Science Class Score - 2024 Sem 2', # Replace with actual column header
+            'Total Score': 'Science Total Score - 2024 Sem 2', # Replace with actual column header
+            'Remarks': 'Science Remarks - 2024 Sem 2'          # Replace with actual column header
+        },
+        # Add more 2024 Semester 2 subjects here
+    },
+    # Add more years and semesters here following the same structure
 }
+
+# Define available years and semesters for dropdowns in student login
+AVAILABLE_YEARS = sorted(list(set([s.split(' - ')[0] for s in SUBJECT_DETAILS.keys()])))
+AVAILABLE_SEMESTERS = sorted(list(set([s.split(' - ')[1] for s in SUBJECT_DETAILS.keys()])))
+
 
 # Populate COLUMN_MAPPING with subject-specific columns based on SUBJECT_DETAILS
 for semester, subjects in SUBJECT_DETAILS.items():
     for subject, details in subjects.items():
         for key, col_name in details.items():
-             # Create a unique internal key (e.g., 'Semester 1 - Math Exams Score')
+             # Create a unique internal key (e.g., '2024 - Semester 1 - Math Exams Score')
             COLUMN_MAPPING[f'{semester} - {subject} {key}'] = col_name
 
 
@@ -244,6 +179,10 @@ def load_results_from_sheet():
 
         # --- Verify essential columns exist immediately after loading ---
         essential_cols = [COLUMN_MAPPING['Student ID'], COLUMN_MAPPING['Student Name'], COLUMN_MAPPING['Parent Phone']]
+        # Add Student Department to essential columns check
+        if 'Student Department' in COLUMN_MAPPING:
+            essential_cols.append(COLUMN_MAPPING['Student Department'])
+
         if not all(col in df.columns for col in essential_cols):
             missing = [col for col in essential_cols if col not in df.columns]
             print(f"Error: Missing ESSENTIAL columns in sheet: {missing}")
@@ -354,28 +293,45 @@ def student_login():
     if request.method == 'POST':
         student_name = request.form.get('student_name')
         parent_phone = request.form.get('parent_phone')
+        selected_year = request.form.get('year_select') # Get selected year from form
+        selected_semester = request.form.get('semester_select') # Get selected semester from form
 
-        print(f"Student login attempt: Name='{student_name}', Phone='{parent_phone}'") # Debug print
+        print(f"Student login attempt: Name='{student_name}', Phone='{parent_phone}', Year='{selected_year}', Semester='{selected_semester}'") # Debug print
 
         if not student_name or not parent_phone:
             flash("Please enter both student name and parent contact.", 'warning')
-            return render_template('student_login.html') # Render the student login form
+            return render_template('student_login.html',
+                                   available_years=AVAILABLE_YEARS,
+                                   available_semesters=AVAILABLE_SEMESTERS,
+                                   selected_year=selected_year,
+                                   selected_semester=selected_semester) # Render the student login form
 
         df = load_results_from_sheet()
         if df.empty:
              flash("Could not load results data. Please try again later.", 'danger')
              print("Error: Dataframe is empty after load_results_from_sheet in student_login.") # Debug print
-             return render_template('student_login.html') # Render the student login form
+             return render_template('student_login.html',
+                                   available_years=AVAILABLE_YEARS,
+                                   available_semesters=AVAILABLE_SEMESTERS,
+                                   selected_year=selected_year,
+                                   selected_semester=selected_semester) # Render the student login form
 
         # Find the student by matching name and phone number
         # Use case-insensitive comparison for name, strip whitespace
         # Use stripped phone number for comparison, including cleaning .0
         required_student_cols = [COLUMN_MAPPING['Student Name'], COLUMN_MAPPING['Parent Phone']]
+        if 'Student Department' in COLUMN_MAPPING: # Check if department column is mapped
+            required_student_cols.append(COLUMN_MAPPING['Student Department'])
+
         if not all(col in df.columns for col in required_student_cols):
              missing_cols = [col for col in required_student_cols if col not in df.columns]
              flash(f"Required columns for verification not found in sheet: {missing_cols}.", 'danger')
              print(f"Error: Missing required student login columns: {missing_cols} in student_login.") # Debug print
-             return render_template('student_login.html')
+             return render_template('student_login.html',
+                                   available_years=AVAILABLE_YEARS,
+                                   available_semesters=AVAILABLE_SEMESTERS,
+                                   selected_year=selected_year,
+                                   selected_semester=selected_semester)
 
         df['_temp_name'] = df[COLUMN_MAPPING['Student Name']].astype(str).str.strip().str.lower()
         df['_temp_phone'] = df[COLUMN_MAPPING['Parent Phone']].astype(str).str.strip().replace(" ", "").replace("-", "").replace(".0", "", regex=False)
@@ -392,7 +348,11 @@ def student_login():
         if student_row.empty:
             flash("Invalid student name or parent contact.", 'danger')
             print(f"Student not found for Name='{student_name}', Phone='{parent_phone}' in student_login.") # Debug print
-            return render_template('student_login.html') # Render the student login form
+            return render_template('student_login.html',
+                                   available_years=AVAILABLE_YEARS,
+                                   available_semesters=AVAILABLE_SEMESTERS,
+                                   selected_year=selected_year,
+                                   selected_semester=selected_semester) # Render the student login form
 
         # Assuming the first match is the correct student
         student_data = student_row.iloc[0].to_dict()
@@ -402,33 +362,59 @@ def student_login():
         display_results = {
             'Student Name': student_data.get(COLUMN_MAPPING['Student Name'], 'N/A'),
             'Student ID': student_data.get(COLUMN_MAPPING['Student ID'], 'N/A'),
+            'Student Department': student_data.get(COLUMN_MAPPING.get('Student Department'), 'N/A'), # Get student department
             'Semesters': {} # Nested dictionary for semesters
         }
 
         # Populate subject details per semester for display
-        for semester, subjects in SUBJECT_DETAILS.items():
-            display_results['Semesters'][semester] = {} # Create nested dictionary for semester
+        for semester_key, subjects in SUBJECT_DETAILS.items(): # Iterate through the full semester keys (e.g., '2024 - Semester 1')
+            display_results['Semesters'][semester_key] = {} # Create nested dictionary for semester
+            has_data_for_semester = False
             for subject, details in subjects.items():
                 subject_info = {}
                 for key, col_name in details.items():
                      # Check if the column exists before trying to get the value
                      if col_name in student_data:
-                        subject_info[key] = student_data.get(col_name, 'N/A')
+                        value = student_data.get(col_name, 'N/A')
+                        subject_info[key] = value
+                        if value not in ['N/A', 'Column Missing', '', None]: # Check if there's actual data
+                            has_data_for_semester = True
                      else:
                         subject_info[key] = 'Column Missing' # Indicate missing column in data
-                        print(f"Warning: Column '{col_name}' for subject '{subject}' in semester '{semester}' not found in student data.") # Debug print
+                        print(f"Warning: Column '{col_name}' for subject '{subject}' in semester '{semester_key}' not found in student data.") # Debug print
 
-                display_results['Semesters'][semester][subject] = subject_info
+                display_results['Semesters'][semester_key][subject] = subject_info
+
+            # If no actual data was found for any subject in this semester, mark it as not available
+            if not has_data_for_semester:
+                display_results['Semesters'][semester_key] = 'Not Available'
+
+        # --- Filter by selected year and semester if provided ---
+        if selected_year and selected_semester:
+            queried_semester_key = f"{selected_year} - {selected_semester}"
+            if queried_semester_key in display_results['Semesters']:
+                # Only keep the queried semester
+                display_results['Semesters'] = {queried_semester_key: display_results['Semesters'][queried_semester_key]}
+            else:
+                # If the specific queried semester is not found, clear semesters and show a message
+                flash(f"Results for {selected_semester} of {selected_year} are not available for {student_name}.", 'info')
+                display_results['Semesters'] = {} # Clear all semesters if the specific one is not found
+        # --- End filter ---
+
 
         print(f"Prepared display_results for student: {display_results.get('Student Name')}") # Debug print
 
 
         # Redirect to the results page (or render it directly)
         # For simplicity, let's render the results page directly after successful login
-        return render_template('results.html', student_data=display_results)
+        return render_template('results.html', student_data=display_results,
+                               selected_year=selected_year,
+                               selected_semester=selected_semester)
 
     # Handle GET request - display student login form
-    return render_template('student_login.html')
+    return render_template('student_login.html',
+                           available_years=AVAILABLE_YEARS,
+                           available_semesters=AVAILABLE_SEMESTERS)
 
 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -461,6 +447,15 @@ def admin_dashboard():
     if df.empty:
         return render_template('admin.html', error="Could not load results data for admin view. Check sheet access.")
 
+    # --- Search functionality for admin dashboard ---
+    search_query = request.args.get('search_query')
+    if search_query:
+        # Filter DataFrame by student name (case-insensitive)
+        if COLUMN_MAPPING['Student Name'] in df.columns:
+            df = df[df[COLUMN_MAPPING['Student Name']].astype(str).str.contains(search_query, case=False, na=False)]
+        else:
+            flash(f"Warning: Student Name column '{COLUMN_MAPPING['Student Name']}' not found for search.", 'warning')
+
     # Convert DataFrame to list of dictionaries for easy rendering in HTML
     # Include all mapped columns for admin view
     display_columns = list(COLUMN_MAPPING.values())
@@ -471,7 +466,7 @@ def admin_dashboard():
 
     # Flash messages are handled by the base template
 
-    return render_template('admin.html', results=results_list)
+    return render_template('admin.html', results=results_list, search_query=search_query)
 
 
 @app.route('/admin/logout')
@@ -509,8 +504,22 @@ def admin_send_single_sms(student_id):
     message_lines = [f"Dear Parent of {student_name},"] # Start with the greeting
 
     # Iterate through semesters defined in SUBJECT_DETAILS
-    for semester, subjects in SUBJECT_DETAILS.items():
-        message_lines.append(f"\n--- {semester} ---") # Add semester header
+    for semester_key, subjects in SUBJECT_DETAILS.items(): # Iterate through the full semester keys (e.g., '2024 - Semester 1')
+        # Check if the semester is marked as 'Not Available'
+        # Note: 'Not Available' is set during display_results preparation, not directly in SUBJECT_DETAILS
+        # So here, we just check if any data exists for this semester in the student_data
+        has_data_for_semester_in_student = False
+        for subject, details in subjects.items():
+            col_name = details.get('Total Score') # Check total score as an indicator
+            if col_name and student_data.get(col_name) not in ['N/A', 'Column Missing', '', None]:
+                has_data_for_semester_in_student = True
+                break
+
+        if not has_data_for_semester_in_student:
+            message_lines.append(f"\n--- {semester_key} (No data available) ---")
+            continue # Skip to the next semester
+
+        message_lines.append(f"\n--- {semester_key} ---") # Add semester header
 
         # Iterate through subjects within this semester
         for subject, details in subjects.items():
@@ -536,9 +545,15 @@ def admin_send_single_sms(student_id):
     results_link = f"{WEBSITE_DOMAIN}{url_for('student_result_pdf', name=encoded_name, phone=encoded_phone)}"
     print(f"Generated results_link URL: {results_link}") # Debug print for URL generation
 
+    # --- Add student login credentials to the SMS ---
+    message_lines.append(f"\nYour login credentials to view results online:")
+    message_lines.append(f"Website: {WEBSITE_DOMAIN}{url_for('student_login')}")
+    message_lines.append(f"Student Name: {student_name}")
+    message_lines.append(f"Parent Phone: {phone_number}")
+    message_lines.append(f"Direct Results Link: {results_link}")
+    # --- End of added login credentials ---
 
-    # Combine message body and link
-    full_message = f"{message_body}\n\nView PDF results: {results_link}" # Added extra newline for separation
+    full_message = "\n".join(message_lines) # Re-join all lines including new credentials
     print(f"Generated SMS: {full_message}") # Print the full message to console
 
 
@@ -580,8 +595,22 @@ def admin_send_all_sms():
         message_lines = [f"Dear Parent of {student_name},"] # Start with the greeting
 
         # Iterate through semesters defined in SUBJECT_DETAILS
-        for semester, subjects in SUBJECT_DETAILS.items():
-            message_lines.append(f"\n--- {semester} ---") # Add semester header
+        for semester_key, subjects in SUBJECT_DETAILS.items(): # Iterate through the full semester keys (e.g., '2024 - Semester 1')
+            # Check if the semester is marked as 'Not Available'
+            # Note: 'Not Available' is set during display_results preparation, not directly in SUBJECT_DETAILS
+            # So here, we just check if any data exists for this semester in the student_data
+            has_data_for_semester_in_student = False
+            for subject, details in subjects.items():
+                col_name = details.get('Total Score') # Check total score as an indicator
+                if col_name and student_data.get(col_name) not in ['N/A', 'Column Missing', '', None]:
+                    has_data_for_semester_in_student = True
+                    break
+
+            if not has_data_for_semester_in_student:
+                message_lines.append(f"\n--- {semester_key} (No data available) ---")
+                continue # Skip to the next semester
+
+            message_lines.append(f"\n--- {semester_key} ---") # Add semester header
 
             # Iterate through subjects within this semester
             for subject, details in subjects.items():
@@ -607,8 +636,15 @@ def admin_send_all_sms():
         results_link = f"{WEBSITE_DOMAIN}{url_for('student_result_pdf', name=encoded_name, phone=encoded_phone)}"
         print(f"Generated results_link URL for {student_name}: {results_link}") # Debug print for URL generation
 
-        # Combine message body and link
-        full_message = f"{message_body}\n\nView PDF results: {results_link}" # Added extra newline for separation
+        # --- Add student login credentials to the SMS ---
+        message_lines.append(f"\nYour login credentials to view results online:")
+        message_lines.append(f"Website: {WEBSITE_DOMAIN}{url_for('student_login')}")
+        message_lines.append(f"Student Name: {student_name}")
+        message_lines.append(f"Parent Phone: {phone_number}")
+        message_lines.append(f"Direct Results Link: {results_link}")
+        # --- End of added login credentials ---
+
+        full_message = "\n".join(message_lines) # Re-join all lines including new credentials
         print(f"Generated SMS for {student_name}: {full_message}") # Print the full message to console
 
 
@@ -667,23 +703,32 @@ def student_result_pdf():
     display_results = {
         'Student Name': student_data.get(COLUMN_MAPPING['Student Name'], 'N/A'),
         'Student ID': student_data.get(COLUMN_MAPPING['Student ID'], 'N/A'),
+        'Student Department': student_data.get(COLUMN_MAPPING.get('Student Department'), 'N/A'), # Get student department
         'Semesters': {} # Nested dictionary for semesters
     }
 
     # Populate subject details per semester for display
-    for semester, subjects in SUBJECT_DETAILS.items():
-        display_results['Semesters'][semester] = {} # Create nested dictionary for semester
+    for semester_key, subjects in SUBJECT_DETAILS.items(): # Iterate through the full semester keys (e.g., '2024 - Semester 1')
+        display_results['Semesters'][semester_key] = {} # Create nested dictionary for semester
+        has_data_for_semester = False
         for subject, details in subjects.items():
             subject_info = {}
             for key, col_name in details.items():
                  # Check if the column exists before trying to get the value
                  if col_name in student_data:
-                    subject_info[key] = student_data.get(col_name, 'N/A')
+                    value = student_data.get(col_name, 'N/A')
+                    subject_info[key] = value
+                    if value not in ['N/A', 'Column Missing', '', None]: # Check if there's actual data
+                        has_data_for_semester = True
                  else:
                     subject_info[key] = 'Column Missing' # Indicate missing column in data
-                    print(f"Warning: Column '{col_name}' for subject '{subject}' in semester '{semester}' not found in student data for PDF.") # Debug print
+                    print(f"Warning: Column '{col_name}' for subject '{subject}' in semester '{semester_key}' not found in student data for PDF.") # Debug print
 
-            display_results['Semesters'][semester][subject] = subject_info
+            display_results['Semesters'][semester_key][subject] = subject_info
+
+        # If no actual data was found for any subject in this semester, mark it as not available
+        if not has_data_for_semester:
+            display_results['Semesters'][semester_key] = 'Not Available'
 
 
     # Render the HTML template designed for PDF
@@ -702,71 +747,13 @@ def student_result_pdf():
 
     return response
 
-@app.route('/ai_assistant', methods=['GET', 'POST'])
-def ai_assistant():
-    """AI Assistant page for student research."""
-    search_results = None
-    answer = None
-    query = request.form.get('query') if request.method == 'POST' else None
-    document_content = None # Placeholder for document content
-
-    if request.method == 'POST' and query:
-        print(f"AI Assistant received query: {query}")
-
-        # --- Simulate using document content (requires parsing libraries) ---
-        # In a real scenario, you would process the query and potentially search
-        # within the uploaded documents if the query is relevant.
-        # For this simulation, we'll just list available documents.
-        available_documents = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if allowed_file(f)]
-        if available_documents:
-            document_content = "Available documents in library: " + ", ".join(available_documents)
-            # In a real AI, you would send relevant document chunks to the LLM based on the query.
-        # --- End simulation of document content usage ---
-
-
-        # --- Perform web search using the tool ---
-        try:
-            # The search tool returns a list of SearchResults objects
-            search_results_list = search(queries=[query])
-            if search_results_list and search_results_list[0].results:
-                search_results = search_results_list[0].results
-                print(f"Search results: {search_results}")
-
-                # --- Simulate LLM processing of search results and document content ---
-                # This is a basic simulation. A real LLM would process the query,
-                # search results, and relevant document content to generate an answer.
-                answer_lines = [f"AI Assistant response to: '{query}'"]
-                if document_content:
-                    answer_lines.append(f"\n(Note: Considered information from the library: {document_content})")
-
-                if search_results:
-                    answer_lines.append("\nBased on web search results:")
-                    for i, res in enumerate(search_results[:3]): # Limit to top 3 results for brevity
-                        answer_lines.append(f"{i+1}. {res.snippet or 'No snippet available'} ({res.source_title or 'Unknown Source'})")
-                else:
-                    answer_lines.append("Could not find relevant information from web search.")
-
-                # Combine simulated answer parts
-                answer = "\n".join(answer_lines)
-                # --- End simulation ---
-
-            else:
-                answer = "Could not find relevant information from web search."
-                print("No search results returned.")
-
-        except Exception as e:
-            print(f"Error during AI Assistant search: {e}")
-            answer = f"An error occurred during search: {e}"
-
-
-    return render_template('ai_assistant.html', search_results=search_results, answer=answer, query=query)
-
 @app.route('/library', methods=['GET', 'POST'])
 def library():
-    """Library page for admin uploads and student access (admin protected for upload)."""
+    """Library page for admin uploads and student access."""
     files = []
     try:
-        files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f))]
+        # List only allowed files in the uploads directory
+        files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f)) and allowed_file(f)]
     except Exception as e:
         print(f"Error listing files in library: {e}")
         flash(f"Error loading library files: {e}", 'danger')
@@ -774,7 +761,12 @@ def library():
     # Check if admin is logged in for upload functionality
     is_admin = session.get('admin_logged_in', False)
 
-    if request.method == 'POST' and is_admin:
+    if request.method == 'POST':
+        # Only process upload if admin is logged in
+        if not is_admin:
+            flash('You do not have permission to upload files.', 'danger')
+            return redirect(url_for('library'))
+
         # Handle file upload
         if 'file' not in request.files:
             flash('No file part in the request.', 'warning')
@@ -801,13 +793,17 @@ def library():
         # Redirect back to the library page after upload
         return redirect(url_for('library'))
 
-    # Handle GET request or POST without admin login
+    # Handle GET request
     return render_template('library.html', files=files, is_admin=is_admin)
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     """Serve uploaded files."""
     try:
+        # Ensure the requested file is within the allowed extensions before serving
+        if not allowed_file(filename):
+             return "File type not allowed.", 403 # Forbidden
+
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     except FileNotFoundError:
         return "File not found.", 404

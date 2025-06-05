@@ -16,7 +16,7 @@ app.secret_key = 'your_very_secret_key_replace_this' # Required for flashing mes
 
 # --- Configuration ---
 # Replace with your actual Google Sheet URL
-GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1JYs4ZtUKfklu-bEqdYOeeKu6nF7rM5I55EQZb-yrs-A/edit?usp=sharing"
+GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/168zURh3hUBgVmTq4dskZe3HQ9o_CagzHow6koVXdiZw/edit?gid=0#gid=0"
 # Extract the sheet ID from the URL
 SHEET_ID = GOOGLE_SHEET_URL.split('/d/')[1].split('/')[0]
 # Construct the export URL for CSV. Assuming the sheet name is 'Sheet1'.
@@ -35,7 +35,7 @@ ARKESEL_SENDER_ID = "GyedTuech" # e.g., "MySchool"
 
 # --- Website Domain Configuration ---
 # IMPORTANT: Replace with your actual website domain (e.g., 'https://your-school-website.com')
-WEBSITE_DOMAIN = "https://flask-sms-app.onrender.com" # Replace with your actual domain in production
+WEBSITE_DOMAIN = "http://127.0.0.1:5000" # Replace with your actual domain in production
 
 # --- Admin Password Hashing ---
 # Hash for the password 'gyedu2025'
@@ -86,7 +86,7 @@ ELECTIVE_SUBJECT_NAMES_BY_DEPARTMENT = {
     'fashion': ['Garment design', 'Garment construction', 'practicals'],
     'plumbing': ['Plumbing Principles', 'Plumbing Technology','practicals'],
     'Catering': ['Catering Principles', 'Catering Production','practicals'],
-    'building': ['Construction Practice', 'Construction Materials','practicals'],
+    'building': ['Building Principles', 'Building Technology','practicals'],
     'wood': ['Wood Principles', 'Wood Technology','practicals'],
 }
 

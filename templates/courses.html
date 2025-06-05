@@ -1,175 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="css/style.css" rel="stylesheet">
-        
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our School Courses</title>
     <style>
-    *{
-        margin:0;
-        padding:0;
-       
-    }
-    body{
-        font-family: arial;
-        width:1000px;
-    }
-    .head{
-        width:900px;
-        height:50px;
-        background: #d4d4d6;
-        box-shadow:2px solid rgb(125,125,125);
-        margin:20px 40px;
-        border-radius: 8px ;
-        text-align:center;
-    }
-    h1{
-        font-family:arial;
-        color:red;
-        margin:5px auto;
-
-
-    }
-    .wrapper{
-        margin: 0 20px 0;
-        width:100%;
-
-        background-image:url(img7.jpg);
-         background-repeat:no-repeat;
-
-    }
-    .img-student{
-
-        width:100px;
-        height:100%;
-        margin:650px auto;
-       
-        
-        
-    }
-    nav{
-        margin: 30px auto;
-        width:100%;
-        height:80%;
-        border: 5px solid #000;
-        background: pink;
-
-    }
-    nav ul{
-        margin: 19px 20px;
-
-    }
-    ul li{
-        list-style:none;
-        margin:5px auto;
-    }
-     ul li a{
-        text-decoration:none;
-        font-weight: bold;
-        font-size:700;
-        margin-left:40px;
-    }
-    footer{
-   
-    width:1250px;
-    height:220px;
-     background: radial-gradient(100% 100% at 100% 100%, #A060FF 0%, #CB30E3 33.18%, #FFA84E 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius:20px;
-    margin-top:650px;
-}
-.ending{
-    display:flex;
-    margin:20px auto;
-}
-.media{
-    display:flex;
-    justify-content:space-between;
-    margin:20px auto;
-    
-}
-.facebook,.twitter, .instagram{
-    margin:20px 30px;
-}
-.info{
-    margin:40px auto;
-    width:230px;
-    height:100px;
-    text-align:center;
-
-
-}
-.info p{
-    color :blue;
-    margin:5px auto;
-}
-fieldset{
-    background:green;
-     margin:1px 40px;
-}
-fieldset p{
-    color: white;
-    margin: 4px 40px;
-}
-fieldset:last-of-type a{
-  color:white;
-  margin:1px 40px;
-}
-
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .navbar {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+        .navbar-links a:hover {
+            color: #ccc;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .course-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .course-card {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .course-card h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .course-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        .course-images-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .course-images-section h2 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        .course-image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .course-image-item {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 280px; /* Fixed width for consistency */
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-image-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .course-image-item img {
+            max-width: 100%;
+            height: 180px; /* Fixed height for images */
+            object-fit: cover; /* Ensures images cover the area without distortion */
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .course-image-item h3 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .course-image-item a {
+            display: inline-block;
+            background-color: #612fd4;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .course-image-item a:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            transition: text-decoration 0.3s ease;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
     </style>
-    <h1 class='head'>COURSES AVAILABLE IN THE SCHOOL</h1>
-    <div class='wrapper'>
-        <nav>
-            <ul>
-                <li><a href="electricals.html">ELECTRICALS</a></li>
-                 <li><a href="plumbing. html">PLUMBING AND GAS FITTING</a></li>
-                  <li><a href="welding.html">WELDING FABRICATION TECHNOLOGY</a></li>
-                   <li><a href="fashion.html">FASHION DESIGN TECHNOLOGY</a></li>
-                    <li><a href="catering.html">HOSPITALITY AND CATERING </a></li>
-                     <li><a href="building-construction.html">BUILDING CONSTRUCTION</a></li>
-                      <li><a href="wood.html">WOOD CONSTRUCTION TECHNOLOGY</a></li>
-            </ul>
-           
-        </nav>
-         <img class='img-student' src="#" alt="">
-    
-    </div>
-    <fieldset>
-    <img src="MOE-logo.png" alt="">
-        <h1>FREE CTVET</h1>
-        <p>Skills Learning Center</p>
-        <a href="https://moe.gov.gh/index.php/the-technical-vocational-and-skill-training/" style='text-decoration:none'>
-        Technical and Vocational Education and Training (TVET)
-
-
-        </a>
-    </fieldset>
-
-    <footer>
-    <div class="ending">
-            <div class='media'>
-            <div class='facebook'>
-             <img src="icon-facebook.svg" alt="">
-             </div>
-             <div class='twitter'>
-             <img src="icon-twitter.svg" alt="">
-             </div>
-             <div class ='instagram'>
-             <img src="icon-instagram.svg" alt="">
-             
-             </div>
-             </div>
-             <div class='info'>
-             <p>Gyedu Technical Institute</p>
-             <p>P.O. Box 28</p>
-             <p>Gyedu, Asutifi North- Ahafo Region</p>
-             <p>Tel:+233</p>
-             </div>
+</head>
+<body>
+    <div class="navbar">
+        <h1>GTI</h1>
+        <div class="navbar-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('student_login') }}">Student Login</a>
+            <a href="{{ url_for('admin_login') }}">Admin Login</a>
+            <a href="{{ url_for('library') }}">Library</a>
+            <a href="{{ url_for('courses') }}">Courses</a>
+            {% if session.get('admin_logged_in') %}
+                 <a href="{{ url_for('admin_logout') }}">Logout</a>
+            {% endif %}
         </div>
-</footer>
-    </body>
+    </div>
+
+    <div class="container">
+                    <img src="/static/LOGO_G.png" alt="School Logo" style="max-width: 150px; margin-bottom: 20px;">
+
+        <h1>Our Academic and Vocational Courses</h1>
+
+        <div class="course-list">
+            {% if courses %}
+                {% for course in courses %}
+                    <div class="course-card">
+                        <h2>{{ course.name }}</h2>
+                        <p>{{ course.description }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="grid-column: 1 / -1; text-align: center;">No courses available at the moment. Please check back later!</p>
+            {% endif %}
+        </div>
+
+        <div class="course-images-section">
+            <h2>Explore Our Vocational Programs</h2>
+            <div class="course-image-gallery">
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='electricals.jpg') }}" alt="Electricals Course">
+                    <h3>Electricals</h3>
+                    <a href="{{ url_for('static', filename='electricals.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='catering.jpg') }}" alt="Catering Course">
+                    <h3>Catering</h3>
+                    <a href="{{ url_for('static', filename='catering.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='welding.jpg') }}" alt="Welding Course">
+                    <h3>Welding</h3>
+                    <a href="{{ url_for('static', filename='welding.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='plumbing.jpg') }}" alt="Plumbing Course">
+                    <h3>Plumbing</h3>
+                    <a href="{{ url_for('static', filename='plumbing.html') }}">Learn More</a>
+                </div>
+                 <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='building.jpg') }}" alt="Plumbing Course">
+                    <h3>Building & Construction Technology</h3>
+                    <a href="{{ url_for('static', filename='building.html') }}">Learn More</a>
+                </div>
+                 <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='fashion.jpg') }}" alt="Plumbing Course">
+                    <h3>Fashion Design Technology</h3>
+                    <a href="{{ url_for('static', filename='fashion.html') }}">Learn More</a>
+                </div>
+                </div>
+        </div>
+
+        <p class="back-link"><a href="{{ url_for('index') }}">Back to Home</a></p>
+    </div>
+</body>
 </html>

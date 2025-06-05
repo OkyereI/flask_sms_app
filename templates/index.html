@@ -130,6 +130,103 @@ function carousel() {
         .login-option a:hover {
             background-color: #218838;
         }
+        .course-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .course-card {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .course-card h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .course-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        .course-images-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .course-images-section h2 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        .course-image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .course-image-item {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 280px; /* Fixed width for consistency */
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-image-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .course-image-item img {
+            max-width: 100%;
+            height: 180px; /* Fixed height for images */
+            object-fit: cover; /* Ensures images cover the area without distortion */
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .course-image-item h3 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .course-image-item a {
+            display: inline-block;
+            background-color: #612fd4;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .course-image-item a:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            transition: text-decoration 0.3s ease;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -321,7 +418,7 @@ Making every student employable. Our focus is to train with technical knowledge 
 <hr>
 
 
-<div style='margin-top:140px;'>
+<!-- <div style='margin-top:140px;'>
     
 <h1 class='text-center'>Our Courses</h1>
 <div class='row' style='margin-left:1em'>
@@ -333,7 +430,7 @@ Making every student employable. Our focus is to train with technical knowledge 
     </div>   <p> 
 We offer 
 </p>
-<p><a href="electricals.html">Electricals Engineering Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Electricals Engineering Technology</a></p> 
 </div>
    <div class="col">
     <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
@@ -341,7 +438,7 @@ We offer
     </div> 
         We offer 
 </p>
-<p><a href="building-construction.html">Building and construction Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Building and construction Technology</a></p> 
    </div> 
     <div class="col">
         <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
@@ -349,7 +446,7 @@ We offer
         </div> 
         We offer 
 </p>
-<p><a href="welding.html">Welding and fabrication Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Welding and fabrication Technology</a></p> 
    </div>
    <div class="col">
     <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
@@ -357,7 +454,7 @@ We offer
     </div> 
         We offer 
 </p>
-<p><a href="plumbing.html">Plumbing and Gas fitting Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Plumbing and Gas fitting Technology</a></p> 
    </div>
    <div class="col">
     <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
@@ -365,7 +462,7 @@ We offer
     </div> 
         We offer 
 </p>
-<p><a href="fashion.html">Fashing  Design  Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Fashing  Design  Technology</a></p> 
    </div>
    <div class="col">
     <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
@@ -373,7 +470,7 @@ We offer
     </div> 
         We offer 
 </p>
-<p><a href="wood.html">Wood Construction Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Wood Construction Technology</a></p> 
    </div>
    <div class="col">
     
@@ -383,11 +480,65 @@ We offer
         </div> 
         We offer 
 </p>
-<p><a href="catrering.html">Hospitality and Catering Technology</a></p> 
+<p><a href="{{ url_for('courses') }}">Hospitality and Catering Technology</a></p> 
 </div>
    </div>
 </div>
-</div>
+</div> -->
+<div class="container">
+        <h1>Our Academic and Vocational Courses</h1>
+
+        <div class="course-list">
+            {% if courses %}
+                {% for course in courses %}
+                    <div class="course-card">
+                        <h2>{{ course.name }}</h2>
+                        <p>{{ course.description }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="grid-column: 1 / -1; text-align: center;">No courses available at the moment. Please check back later!</p>
+            {% endif %}
+        </div>
+
+        <div class="course-images-section">
+            <h2>Explore Our Vocational Programs</h2>
+            <div class="course-image-gallery">
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='electricals.jpg') }}" alt="Electricals Course">
+                    <h3>Electricals</h3>
+                    <a href="{{ url_for('static', filename='electricals.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='catering.jpg') }}" alt="Catering Course">
+                    <h3>Catering</h3>
+                    <a href="{{ url_for('static', filename='catering.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='welding.jpg') }}" alt="Welding Course">
+                    <h3>Welding</h3>
+                    <a href="{{ url_for('static', filename='welding.html') }}">Learn More</a>
+                </div>
+                <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='plumbing.jpg') }}" alt="Plumbing Course">
+                    <h3>Plumbing</h3>
+                    <a href="{{ url_for('static', filename='plumbing.html') }}">Learn More</a>
+                </div>
+                 <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='building.jpg') }}" alt="Plumbing Course">
+                    <h3>Building & Construction Technology</h3>
+                    <a href="{{ url_for('static', filename='building.html') }}">Learn More</a>
+                </div>
+                 <div class="course-image-item">
+                    <img src="{{ url_for('static', filename='fashion.jpg') }}" alt="Plumbing Course">
+                    <h3>Fashion Design Technology</h3>
+                    <a href="{{ url_for('static', filename='fashion.html') }}">Learn More</a>
+                </div>
+                </div>
+        </div>
+
+        <p class="back-link"><a href="{{ url_for('index') }}">Back to Home</a></p>
+    </div>
 <hr>
 <!-- <div class='container'>
     <p class='text-center'>Meet our Administrators</p>

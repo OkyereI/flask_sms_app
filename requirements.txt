@@ -27,6 +27,7 @@ et-xmlfile==1.1.0
 exceptiongroup==1.2.2
 executing==2.1.0
 Flask==3.0.2
+Flask-Admin==1.6.1
 Flask-Excel==0.0.7
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.1.1
@@ -59,6 +60,7 @@ parso==0.8.4
 pexpect==4.9.0
 pillow==10.4.0
 prompt_toolkit==3.0.48
+psycopg2-binary==2.9.10
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pycparser==2.22
@@ -76,6 +78,7 @@ python-config==0.1.2
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-docx==1.1.2
+python-dotenv==1.1.0
 pytz==2024.1
 requests==2.32.3
 six==1.16.0

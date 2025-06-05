@@ -83,7 +83,7 @@ ELECTIVE_SUBJECT_NAMES_BY_DEPARTMENT = {
     'Other': ['General Knowledge in Art'] ,# Example for departments not explicitly listed,
     'electricals': ['Electrical installation', 'Principles of electrical','practicals'],
     'welding': ['Welding Fabrication', 'welding principles','practicals'],
-    'fashion': ['Garment design', 'Garment construction', 'practicals'],
+    'fashion': ['Garment design', 'Garment Construction', 'practicals'],
     'plumbing': ['Plumbing Principles', 'Plumbing Technology','practicals'],
     'Catering': ['Catering Principles', 'Catering Production','practicals'],
     'building': ['Construction Practice', 'Construction Materials','practicals'],

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results - {{ semester_key }} {% if selected_department and selected_department != 'all' %}- {{ selected_department }}{% endif %}</title>
+    <style>
+        @media print { .no-print { display: none; } }
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        .student-card { page-break-inside: avoid; border: 1px solid #000; margin: 10px 0; padding: 15px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .print-btn { position: fixed; top: 10px; right: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
+    
+    <div class="header">
+        <h2>Student Results - {{ semester_key }}</h2>
+        {% if selected_department and selected_department != 'all' %}
+        <h3>Department: {{ selected_department }}</h3>
+        {% endif %}
+        <p>Printed on: {{ print_date }} | Total Students: {{ all_students_results|length }}</p>
+    </div>
+    
+    {% for student in all_students_results %}
+    <div class="student-card">
+        <h4>{{ student.student_info['Student Name'] }} ({{ student.student_info['Student ID'] }})</h4>
+        <p><strong>Department:</strong> {{ student.student_info['Student Department'] }} | 
+           <strong>Phone:</strong> {{ student.student_info['Parent Phone'] }}</p>
+        
+        {% if student.semester_data.get('Core Subjects') %}
+        <h5>Core Subjects</h5>
+        <table>
+            <tr><th>Subject</th><th>Exams</th><th>Class</th><th>Total</th><th>Grade</th><th>Remarks</th></tr>
+            {% for subj in student.semester_data['Core Subjects'] %}
+            <tr>
+                <td>{{ subj.Subject }}</td>
+                <td>{{ subj.get('Exams Score', 'N/A') }}</td>
+                <td>{{ subj.get('Class Score', 'N/A') }}</td>
+                <td>{{ subj.get('Total Score', 'N/A') }}</td>
+                <td>{{ subj.get('Grade', 'N/A') }}</td>
+                <td>{{ subj.get('Remarks', 'N/A') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        
+        {% if student.semester_data.get('Elective Subjects') %}
+        <h5>Elective Subjects</h5>
+        <table>
+            <tr><th>Subject</th><th>Exams</th><th>Class</th><th>Total</th><th>Grade</th><th>Remarks</th></tr>
+            {% for subj in student.semester_data['Elective Subjects'] %}
+            <tr>
+                <td>{{ subj.Subject }}</td>
+                <td>{{ subj.get('Exams Score', 'N/A') }}</td>
+                <td>{{ subj.get('Class Score', 'N/A') }}</td>
+                <td>{{ subj.get('Total Score', 'N/A') }}</td>
+                <td>{{ subj.get('Grade', 'N/A') }}</td>
+                <td>{{ subj.get('Remarks', 'N/A') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reports - Gyedu Technical Institute</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #27ae60;
+            background-color: #2c3e50;
+        }
+        
+        .nav a.back-link {
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .page-subtitle {
+            color: #7f8c8d;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #219a52;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #bdc3c7;
+            color: #555;
+        }
+        
+        .btn-outline:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Filters Section */
+        .filters-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .filters-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .date-range span {
+            color: #7f8c8d;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .stat-card .sub-value {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        
+        .stat-card .change {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        
+        .stat-card .change.positive {
+            color: #27ae60;
+        }
+        
+        .stat-card .change.negative {
+            color: #e74c3c;
+        }
+        
+        .stat-card .trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        .stat-card .trend.up {
+            color: #27ae60;
+        }
+        
+        .stat-card .trend.down {
+            color: #e74c3c;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Report Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .report-tab {
+            padding: 12px 25px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .report-tab:hover {
+            background: #e0e0e0;
+        }
+        
+        .report-tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+        }
+        
+        .chart-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .amount {
+            font-weight: 600;
+        }
+        
+        .amount.positive {
+            color: #27ae60;
+        }
+        
+        .amount.negative {
+            color: #e74c3c;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Export Section */
+        .export-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .export-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            min-width: 180px;
+            z-index: 100;
+            margin-top: 5px;
+        }
+        
+        .export-menu.show {
+            display: block;
+        }
+        
+        .export-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .export-menu a:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .export-menu a:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .export-menu a:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        /* Top Lists */
+        .top-list {
+            list-style: none;
+        }
+        
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .top-item:last-child {
+            border-bottom: none;
+        }
+        
+        .top-rank {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .top-rank.gold {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: white;
+        }
+        
+        .top-rank.silver {
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+            color: white;
+        }
+        
+        .top-rank.bronze {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+        }
+        
+        .top-info {
+            flex: 1;
+        }
+        
+        .top-info h4 {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+        
+        .top-info p {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .top-amount {
+            font-weight: 700;
+            font-size: 16px;
+            color: #27ae60;
+        }
+        
+        /* Summary Boxes */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .summary-box h4 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .quick-stat {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .quick-stat .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .quick-stat .label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .nav-container, .filters-card, .header-actions, .btn {
+                display: none !important;
+            }
+            
+            .container {
+                padding: 0;
+            }
+            
+            .card, .chart-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+        
+        /* Bar Chart Styles */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            height: 250px;
+            padding: 20px 0;
+        }
+        
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bar {
+            width: 100%;
+            max-width: 60px;
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .bar-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .bar-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        /* Donut Chart Styles */
+        .donut-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .donut-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .donut-center .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .donut-center .label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GYEDU TECHNICAL INSTITUTE</h1>
+        <div class="header-info">
+            <div>Admin Finance Module</div>
+            <div>{% if current_user %}{{ current_user }}{% endif %}</div>
+        </div>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="/admin">Dashboard</a>
+            <a href="/admin/store">Store Management</a>
+            <a href="/admin/finance" class="active">Finance & Accounts</a>
+            <a href="/admin/estate">Estate Management</a>
+            <a href="/admin/manage_hods">HOD Management</a>
+            <a href="/admin/results">Results</a>
+            <a href="/admin/students">Students</a>
+            <a href="/logout" class="back-link">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Financial Reports</h1>
+                <p class="page-subtitle">Analyze financial performance and generate comprehensive reports</p>
+            </div>
+            <div class="header-actions">
+                <div class="export-dropdown">
+                    <button class="btn btn-primary" onclick="toggleExportMenu()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export Report
+                    </button>
+                    <div class="export-menu" id="exportMenu">
+                        <a href="#" onclick="exportReport('pdf')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            Export as PDF
+                        </a>
+                        <a href="#" onclick="exportReport('excel')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            Export as Excel
+                        </a>
+                        <a href="#" onclick="exportReport('print')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters-card">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Report Type</label>
+                    <select id="reportType" onchange="changeReport()">
+                        <option value="daily">Daily Collection</option>
+                        <option value="weekly">Weekly Summary</option>
+                        <option value="monthly" selected>Monthly Report</option>
+                        <option value="term">Term Report</option>
+                        <option value="annual">Annual Report</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="monthFilter">
+                    <label>Month</label>
+                    <select id="monthSelect" onchange="updateReport()">
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11" selected>December</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="yearFilter">
+                    <label>Year</label>
+                    <select id="yearSelect" onchange="updateReport()">
+                        <option value="2024" selected>2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="customDateRange" style="display: none;">
+                    <label>Custom Range</label>
+                    <div class="date-range">
+                        <input type="date" id="dateFrom" placeholder="From">
+                        <span>to</span>
+                        <input type="date" id="dateTo" placeholder="To">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>Class</label>
+                    <select id="classFilter" onchange="updateReport()">
+                        <option value="">All Classes</option>
+                        <option value="form1">Form 1</option>
+                        <option value="form2">Form 2</option>
+                        <option value="form3">Form 3</option>
+                        <option value="form4">Form 4</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Collected</h3>
+                <div class="value">GH₵ 245,680</div>
+                <div class="change positive">↑ 12.5% from last month</div>
+                <div class="trend up">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    Upward trend
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Outstanding Balance</h3>
+                <div class="value">GH₵ 23,150</div>
+                <div class="sub-value">45 students with pending fees</div>
+                <div class="change negative">↓ 5% reduction from last month</div>
+            </div>
+            <div class="stat-card">
+                <h3>Collection Rate</h3>
+                <div class="value">91.4%</div>
+                <div class="sub-value">Target: 95%</div>
+                <div class="progress-bar" style="margin-top: 10px;">
+                    <div class="progress-fill" style="width: 91.4%; background: linear-gradient(90deg, #27ae60, #2ecc71);"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Daily Average</h3>
+                <div class="value">GH₵ 8,189</div>
+                <div class="sub-value">Based on 30 days</div>
+                <div class="change positive">↑ 8% from last month</div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <div class="value">1,245</div>
+                <div class="label">Total Transactions</div>
+            </div>
+            <div class="quick-stat">
+                <div class="value">456</div>
+                <div class="label">Students Paid</div>
+            </div>
+            <div class="quick-stat">
+                <div class="value">89</div>
+                <div class="label">Students Pending</div>
+            </div>
+            <div class="quick-stat">
+                <div class="value">5</div>
+                <div class="label">Days to Month End</div>
+            </div>
+        </div>
+        
+        <!-- Report Tabs -->
+        <div class="report-tabs">
+            <button class="report-tab active" onclick="switchReportTab('overview')">Overview</button>
+            <button class="report-tab" onclick="switchReportTab('collection')">Collection Summary</button>
+            <button class="report-tab" onclick="switchReportTab('category')">By Category</button>
+            <button class="report-tab" onclick="switchReportTab('class')">By Class</button>
+            <button class="report-tab" onclick="switchReportTab('outstanding')">Outstanding</button>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Monthly Collection Trend</h3>
+                <div class="bar-chart">
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 18,500</div>
+                        <div class="bar" style="height: 150px; background: linear-gradient(180deg, #3498db, #2980b9);"></div>
+                        <div class="bar-label">Jul</div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 22,300</div>
+                        <div class="bar" style="height: 180px; background: linear-gradient(180deg, #3498db, #2980b9);"></div>
+                        <div class="bar-label">Aug</div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 25,800</div>
+                        <div class="bar" style="height: 210px; background: linear-gradient(180deg, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Sep</div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 28,400</div>
+                        <div class="bar" style="height: 230px; background: linear-gradient(180deg, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Oct</div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 32,100</div>
+                        <div class="bar" style="height: 260px; background: linear-gradient(180deg, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Nov</div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-value">GH₵ 35,600</div>
+                        <div class="bar" style="height: 290px; background: linear-gradient(180deg, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Dec</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Collection by Fee Category</h3>
+                <div class="donut-container">
+                    <div class="donut-chart" style="background: conic-gradient(#27ae60 0% 45%, #3498db 45% 70%, #f39c12 70% 85%, #e74c3c 85% 95%, #9b59b6 95% 100%);">
+                        <div class="donut-center">
+                            <div class="value">GH₵ 245K</div>
+                            <div class="label">Total</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-legend" style="flex-direction: column; align-items: flex-start;">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #27ae60;"></div>
+                                <span>School Fees (45%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #3498db;"></div>
+                                <span>Exam Fees (25%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f39c12;"></div>
+                                <span>Practical Fees (15%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #e74c3c;"></div>
+                                <span>Library Fees (10%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9b59b6;"></div>
+                                <span>Others (5%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Tables -->
+        <div class="card">
+            <h3 class="card-title">Collection by Class</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Students</th>
+                            <th>Total Fees</th>
+                            <th>Collected</th>
+                            <th>Outstanding</th>
+                            <th>Collection Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Form 1</strong></td>
+                            <td>125</td>
+                            <td>GH₵ 62,500</td>
+                            <td class="amount positive">GH₵ 58,200</td>
+                            <td class="amount">GH₵ 4,300</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar" style="flex: 1; max-width: 150px;">
+                                        <div class="progress-fill" style="width: 93%; background: #27ae60;"></div>
+                                    </div>
+                                    <span>93%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Form 2</strong></td>
+                            <td>118</td>
+                            <td>GH₵ 59,000</td>
+                            <td class="amount positive">GH₵ 54,800</td>
+                            <td class="amount">GH₵ 4,200</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar" style="flex: 1; max-width: 150px;">
+                                        <div class="progress-fill" style="width: 93%; background: #27ae60;"></div>
+                                    </div>
+                                    <span>93%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Form 3</strong></td>
+                            <td>132</td>
+                            <td>GH₵ 66,000</td>
+                            <td class="amount positive">GH₵ 62,350</td>
+                            <td class="amount">GH₵ 3,650</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar" style="flex: 1; max-width: 150px;">
+                                        <div class="progress-fill" style="width: 94%; background: #27ae60;"></div>
+                                    </div>
+                                    <span>94%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Form 4</strong></td>
+                            <td>98</td>
+                            <td>GH₵ 49,000</td>
+                            <td class="amount positive">GH₵ 70,330</td>
+                            <td class="amount">GH₵ 11,000</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar" style="flex: 1; max-width: 150px;">
+                                        <div class="progress-fill" style="width: 78%; background: #f39c12;"></div>
+                                    </div>
+                                    <span>78%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background: #f8f9fa; font-weight: 600;">
+                            <td>Total</td>
+                            <td>473</td>
+                            <td>GH₵ 236,500</td>
+                            <td class="amount positive">GH₵ 245,680</td>
+                            <td class="amount">GH₵ 23,150</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar" style="flex: 1; max-width: 150px;">
+                                        <div class="progress-fill" style="width: 90%; background: #27ae60;"></div>
+                                    </div>
+                                    <span>90%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Summary Grid -->
+        <div class="summary-grid">
+            <div class="card">
+                <h3 class="card-title">Top Paying Classes</h3>
+                <ul class="top-list">
+                    <li class="top-item">
+                        <div class="top-rank gold">1</div>
+                        <div class="top-info">
+                            <h4>Form 3</h4>
+                            <p>132 students • 94% collection</p>
+                        </div>
+                        <div class="top-amount">GH₵ 62,350</div>
+                    </li>
+                    <li class="top-item">
+                        <div class="top-rank silver">2</div>
+                        <div class="top-info">
+                            <h4>Form 1</h4>
+                            <p>125 students • 93% collection</p>
+                        </div>
+                        <div class="top-amount">GH₵ 58,200</div>
+                    </li>
+                    <li class="top-item">
+                        <div class="top-rank bronze">3</div>
+                        <div class="top-info">
+                            <h4>Form 2</h4>
+                            <p>118 students • 93% collection</p>
+                        </div>
+                        <div class="top-amount">GH₵ 54,800</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Fee Categories Summary</h3>
+                <div class="summary-box">
+                    <h4>Revenue by Category</h4>
+                    <div class="summary-item">
+                        <span>School Fees</span>
+                        <span class="amount positive">GH₵ 110,556</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Exam Fees</span>
+                        <span class="amount positive">GH₵ 61,420</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Practical Fees</span>
+                        <span class="amount positive">GH₵ 36,852</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Library Fees</span>
+                        <span class="amount positive">GH₵ 24,568</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Others</span>
+                        <span class="amount positive">GH₵ 12,284</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Outstanding Report -->
+        <div class="card" id="outstandingReport" style="display: none;">
+            <h3 class="card-title">Outstanding Fees Report</h3>
+            <div class="alert alert-info">
+                <strong>Note:</strong> The following students have outstanding fee balances requiring attention.
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Class</th>
+                            <th>Outstanding Amount</th>
+                            <th>Days Overdue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>STI/2024/045</td>
+                            <td>John Mensah</td>
+                            <td>Form 4</td>
+                            <td class="amount negative">GH₵ 450.00</td>
+                            <td>15 days</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Send Reminder</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>STI/2024/089</td>
+                            <td>Mary Akoto</td>
+                            <td>Form 2</td>
+                            <td class="amount negative">GH₵ 350.00</td>
+                            <td>8 days</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Send Reminder</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>STI/2024/123</td>
+                            <td>Peter Kofi</td>
+                            <td>Form 3</td>
+                            <td class="amount negative">GH₵ 280.00</td>
+                            <td>5 days</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Send Reminder</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentReportTab = 'overview';
+        
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('monthSelect').value = today.getMonth();
+            document.getElementById('yearSelect').value = today.getFullYear();
+        });
+        
+        function changeReport() {
+            const reportType = document.getElementById('reportType').value;
+            const customRange = document.getElementById('customDateRange');
+            const monthFilter = document.getElementById('monthFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            
+            // Hide all optional filters first
+            customRange.style.display = 'none';
+            monthFilter.style.display = 'none';
+            yearFilter.style.display = 'none';
+            
+            // Show relevant filters based on report type
+            if (reportType === 'custom') {
+                customRange.style.display = 'flex';
+            } else if (reportType === 'monthly') {
+                monthFilter.style.display = 'flex';
+                yearFilter.style.display = 'flex';
+            } else if (reportType === 'annual') {
+                yearFilter.style.display = 'flex';
+            }
+        }
+        
+        function switchReportTab(tab) {
+            currentReportTab = tab;
+            
+            // Update tab styles
+            document.querySelectorAll('.report-tab').forEach(tabBtn => {
+                tabBtn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide relevant sections
+            const outstandingReport = document.getElementById('outstandingReport');
+            if (tab === 'outstanding') {
+                outstandingReport.style.display = 'block';
+            } else {
+                outstandingReport.style.display = 'none';
+            }
+        }
+        
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            
+            alert('Generating ' + reportType + ' report for ' + 
+                  (month ? 'Month ' + month + ' ' : '') + 
+                  year + '...\n\nThis would load and display the requested financial report data.');
+        }
+        
+        function updateReport() {
+            // This would update the report data when filters change
+            console.log('Updating report with new filter values');
+        }
+        
+        function toggleExportMenu() {
+            document.getElementById('exportMenu').classList.toggle('show');
+        }
+        
+        function exportReport(format) {
+            const reportType = document.getElementById('reportType').value;
+            const month = document.getElementById('monthSelect').options[document.getElementById('monthSelect').selectedIndex].text;
+            const year = document.getElementById('yearSelect').value;
+            
+            alert('Exporting ' + reportType + ' report as ' + format.toUpperCase() + 
+                  '\n\nReport Period: ' + month + ' ' + year + 
+                  '\n\nThis would generate and download the ' + format.toUpperCase() + ' file.');
+            
+            document.getElementById('exportMenu').classList.remove('show');
+        }
+        
+        // Close export menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.export-dropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                document.getElementById('exportMenu').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

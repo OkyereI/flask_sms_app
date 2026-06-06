@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtered Actions - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Print & SMS by Department/Semester</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Filter Students</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin_filtered_actions') }}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="department" class="form-label">Department</label>
+                        <select name="department" id="department" class="form-select">
+                            <option value="all">All Departments</option>
+                            {% for dept in available_departments %}
+                                {% if dept != 'all' %}
+                                <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <select name="year" id="year" class="form-select" required>
+                            <option value="">Select Year</option>
+                            {% for year in available_years %}
+                            <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="semester" class="form-label">Semester</label>
+                        <select name="semester" id="semester" class="form-select" required>
+                            <option value="">Select Semester</option>
+                            {% for sem in available_semesters %}
+                            <option value="{{ sem }}" {% if selected_semester == sem %}selected{% endif %}>{{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter Students</button>
+            </form>
+        </div>
+    </div>
+    
+    {% if filtered_students %}
+    <!-- Action Buttons -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Actions for {{ student_count }} Students</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <a href="{{ url_for('print_filtered_results', department=selected_department, year=selected_year, semester=selected_semester) }}" 
+                       class="btn btn-info btn-lg w-100" target="_blank">
+                        🖨️ Print All Results ({{ student_count }} students)
+                    </a>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <form method="POST" action="{{ url_for('send_filtered_sms') }}" 
+                          onsubmit="return confirm('Send SMS to {{ student_count }} parents?');">
+                        <input type="hidden" name="department" value="{{ selected_department }}">
+                        <input type="hidden" name="year" value="{{ selected_year }}">
+                        <input type="hidden" name="semester" value="{{ selected_semester }}">
+                        <button type="submit" class="btn btn-warning btn-lg w-100">
+                            📱 Send SMS to All ({{ student_count }} parents)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Students Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Filtered Students</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Parent Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in filtered_students %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ student['Student ID'] }}</td>
+                            <td>{{ student['Student Name'] }}</td>
+                            <td>{{ student['Student Department'] }}</td>
+                            <td>{{ student['Parent Phone'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% elif selected_year and selected_semester %}
+    <div class="alert alert-info">No students found with the selected filters.</div>
+    {% else %}
+    <div class="alert alert-secondary">Select Year and Semester to filter students.</div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

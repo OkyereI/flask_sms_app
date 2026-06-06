@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses Management - Gyedu Technical Institute</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #e74c3c;
+            background-color: #2c3e50;
+        }
+        
+        .nav a.back-link {
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .page-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .stat-card h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        .stat-card .description {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-group small {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: middle;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-utilities { background-color: #3498db; color: white; }
+        .badge-supplies { background-color: #27ae60; color: white; }
+        .badge-maintenance { background-color: #f39c12; color: white; }
+        .badge-salaries { background-color: #9b59b6; color: white; }
+        .badge-equipment { background-color: #1abc9c; color: white; }
+        .badge-other { background-color: #95a5a6; color: white; }
+        
+        .amount-cell {
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GYEDU TECHNICAL INSTITUTE</h1>
+        <div class="header-info">
+            <div>Admin Finance Module</div>
+            <div>Expenses Management</div>
+        </div>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="/admin">Dashboard</a>
+            <a href="/admin/store">Store Management</a>
+            <a href="/admin/finance">Finance & Accounts</a>
+            <a href="/admin/estate">Estate Management</a>
+            <a href="/admin/manage_hods">HOD Management</a>
+            <a href="/admin/results">Results</a>
+            <a href="/admin/students">Students</a>
+            <a href="/logout" class="back-link">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 class="page-title">Expenses Management</h2>
+        <p class="page-subtitle">Record and track school expenses</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="nav-links">
+            <a href="{{ url_for('admin_finance') }}">Dashboard</a>
+            <a href="{{ url_for('admin_finance_fee_setup') }}">Fee Setup</a>
+            <a href="{{ url_for('admin_finance_payment') }}">Record Payment</a>
+            <a href="{{ url_for('admin_finance_students') }}">Student Accounts</a>
+            <a href="{{ url_for('admin_finance_expenses') }}" style="background-color: #e74c3c;">Expenses</a>
+        </div>
+        
+        <!-- Stats Summary -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Expenses</h3>
+                <div class="value">GHS {{ "%.2f"|format(total_expenses) }}</div>
+                <div class="description">All recorded expenses</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #3498db;">
+                <h3 style="color: #3498db;">Records Count</h3>
+                <div class="value" style="color: #3498db;">{{ expenses|length }}</div>
+                <div class="description">Total expense entries</div>
+            </div>
+        </div>
+        
+        <!-- Add New Expense Form -->
+        <div class="card">
+            <h3 class="card-title">Record New Expense</h3>
+            <form method="POST" action="{{ url_for('admin_finance_expenses') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Expense Category *</label>
+                        <select name="category" id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Utilities">Utilities (Electricity, Water, Internet)</option>
+                            <option value="Supplies">Office & Teaching Supplies</option>
+                            <option value="Maintenance">Maintenance & Repairs</option>
+                            <option value="Salaries">Salaries & Allowances</option>
+                            <option value="Equipment">Equipment & Furniture</option>
+                            <option value="Transport">Transport & Fuel</option>
+                            <option value="Cleaning">Cleaning & Sanitation</option>
+                            <option value="Events">Events & Activities</option>
+                            <option value="Other">Other Expenses</option>
+                        </select>
+                        <small>Select the expense category</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (GHS) *</label>
+                        <input type="number" name="amount" id="amount" step="0.01" min="0" placeholder="0.00" required>
+                        <small>Enter the expense amount</small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <input type="text" name="description" id="description" placeholder="Brief description of the expense" required>
+                        <small>What was this expense for?</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendor">Vendor / Supplier</label>
+                        <input type="text" name="vendor" id="vendor" placeholder="e.g., ABC Electricals">
+                        <small>Who was paid?</small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="approved_by">Approved By</label>
+                        <input type="text" name="approved_by" id="approved_by" placeholder="e.g., Principal, Bursar">
+                        <small>Who approved this expense?</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Additional Notes</label>
+                        <textarea name="notes" id="notes" placeholder="Any additional notes..."></textarea>
+                        <small>Optional: Add any relevant notes</small>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Record Expense
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        Clear Form
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Expenses Table -->
+        <div class="card">
+            <h3 class="card-title">Expense Records</h3>
+            {% if expenses %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Vendor</th>
+                                <th>Amount</th>
+                                <th>Approved By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else 'N/A' }}</td>
+                                    <td>
+                                        {% if expense.category == 'Utilities' %}
+                                            <span class="badge badge-utilities">{{ expense.category }}</span>
+                                        {% elif expense.category == 'Supplies' %}
+                                            <span class="badge badge-supplies">{{ expense.category }}</span>
+                                        {% elif expense.category == 'Maintenance' %}
+                                            <span class="badge badge-maintenance">{{ expense.category }}</span>
+                                        {% elif expense.category == 'Salaries' %}
+                                            <span class="badge badge-salaries">{{ expense.category }}</span>
+                                        {% elif expense.category == 'Equipment' %}
+                                            <span class="badge badge-equipment">{{ expense.category }}</span>
+                                        {% else %}
+                                            <span class="badge badge-other">{{ expense.category }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ expense.vendor or '-' }}</td>
+                                    <td class="amount-cell">GHS {{ "%.2f"|format(expense.amount) }}</td>
+                                    <td>{{ expense.approved_by or '-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#bdc3c7" stroke-width="2" style="margin-bottom: 15px;">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <h3>No Expenses Recorded</h3>
+                    <p>Use the form above to record your first expense.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

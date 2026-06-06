@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Items - Gyedu Technical Institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #28a745; margin: 0; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; text-decoration: none; display: inline-block; transition: background-color 0.3s ease; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-warning { background-color: #ffc107; color: #212529; }
+        .card { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; margin-top: 0; text-align: center; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        select:focus, input:focus, textarea:focus { border-color: #28a745; outline: none; }
+        .stock-info { background-color: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 5px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <h1>Issue Items</h1>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="item_id">Select Item *</label>
+                    <select id="item_id" name="item_id" required>
+                        <option value="">Select an item</option>
+                        {% for item in items %}
+                            <option value="{{ item.id }}" data-quantity="{{ item.quantity }}" data-unit="{{ item.unit }}">
+                                {{ item.name }} ({{ item.category }}) - Available: {{ item.quantity }} {{ item.unit }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div id="stock-display" class="stock-info" style="display: none;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity to Issue *</label>
+                    <input type="number" id="quantity" name="quantity" step="0.01" min="0.01" required placeholder="Enter quantity">
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipient_type">Recipient Type *</label>
+                    <select id="recipient_type" name="recipient_type" required>
+                        <option value="">Select type</option>
+                        <option value="Student">Student</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Department">Department</option>
+                        <option value="Class">Class</option>
+                        <option value="Event">Event/Activity</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipient">Recipient Name/ID *</label>
+                    <input type="text" id="recipient" name="recipient" required placeholder="e.g., John Doe or SHS1 Class">
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Reason for issuing..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-warning" style="flex: 1;">Issue Item</button>
+                    <a href="{{ url_for('admin_store') }}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('item_id').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            const display = document.getElementById('stock-display');
+            if (selected.value) {
+                const quantity = selected.getAttribute('data-quantity');
+                const unit = selected.getAttribute('data-unit');
+                display.innerHTML = '<strong>Available Stock:</strong> ' + quantity + ' ' + unit;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

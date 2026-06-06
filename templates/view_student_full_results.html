@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Full Student Results - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        /* School Header Styles */
+        .school-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 2px;
+            margin-bottom: 5px;
+        }
+        .school-logo {
+            max-width: 100px;
+            max-height: 100px;
+            margin-right: 20px;
+        }
+        .school-info {
+            text-align: center;
+        }
+        .school-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .school-motto {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin: 5px 0 0 0;
+        }
+        .document-title {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            font-size: 1.3rem;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 25px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+        }
+        h4 {
+            color: #007bff;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .student-info {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .student-info p {
+            margin: 5px 0;
+            font-size: 1rem;
+        }
+        .student-info strong {
+            color: #007bff;
+            min-width: 120px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .semester-header {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #b3d7ff;
+        }
+        .semester-title {
+            color: #007bff;
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        /* Footer Styles */
+        .result-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+        .hod-remarks-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+        }
+        .hod-remarks-section h4 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .hod-remarks-box {
+            min-height: 60px;
+            border: 1px dashed #aaa;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fff;
+            font-style: italic;
+            color: #666;
+        }
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+        .signature-box {
+            width: 45%;
+            text-align: center;
+        }
+        .signature-line {
+            width: 100%;
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+        .signature-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .signature-name {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .signature-date {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+        .stamp-area {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #aaa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            color: #999;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-sm mb-3">Back to Dashboard</a>
+        
+        <!-- School Header with Logo -->
+        <div class="school-header">
+            <img src="{{ url_for('static', filename='real-logo.JPG') }}" class="school-logo" alt="School Logo" onerror="this.style.display='none'">
+            <div class="school-info">
+                <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
+                <p class="school-motto">"Making you Employable"</p>
+            </div>
+        </div>
+        
+        <!-- Document Title -->
+        <div class="document-title">
+            OFFICIAL ACADEMIC TRANSCRIPT
+        </div>
+        
+        {% if student_data and student_data.student_info %}
+            <!-- Student Information -->
+            <div class="student-info">
+                <p><strong>Student Name:</strong> {{ student_data.student_info.get('Student Name', 'N/A') }}</p>
+                <p><strong>Student ID:</strong> {{ student_data.student_info.get('Student ID', 'N/A') }}</p>
+                <p><strong>Department:</strong> {{ student_data.student_info.get('Student Department', 'N/A') }}</p>
+                <p><strong>Parent Phone:</strong> {{ student_data.student_info.get('Parent Phone', 'N/A') }}</p>
+            </div>
+
+            <h2>Academic Report History</h2>
+
+            {% if student_data.results_by_semester %}
+                {% for semester_key, semester_details in student_data.results_by_semester.items() %}
+                    <div class="semester-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                            <h3 class="semester-title" style="margin: 0; color: #007bff; border: none; padding: 0;">{{ semester_key }}</h3>
+                            {% set has_subjects = semester_details.get('Core Subjects') or semester_details.get('Elective Subjects') %}
+                            {% if has_subjects %}
+                            <div class="actions-bar">
+                                <select id="sms_year_{{ loop.index }}" style="padding: 5px; border-radius: 4px;">
+                                    {% set year = semester_key.split(' - ')[0] %}
+                                    <option value="{{ year }}" selected>{{ year }}</option>
+                                </select>
+                                <select id="sms_semester_{{ loop.index }}" style="padding: 5px; border-radius: 4px;">
+                                    {% set sem = semester_key.split(' - ')[1] %}
+                                    <option value="{{ sem }}" selected>{{ sem }}</option>
+                                </select>
+                                <button onclick="sendSemesterSMS('{{ student_data.student_info.get('Student ID') }}', {{ loop.index }})" 
+                                        class="btn btn-primary btn-sm">Send SMS for this Semester</button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if not has_subjects %}
+                            <p>No data available for {{ semester_key }}.</p>
+                        {% else %}
+                            {% if semester_details.get('Core Subjects') %}
+                                <h4>Core Subjects</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Exams Score</th>
+                                            <th>Class Score</th>
+                                            <th>Total Score</th>
+                                            <th>Grade</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for subject_data in semester_details.get('Core Subjects', []) %}
+                                            <tr>
+                                                <td>{{ subject_data.get('Subject', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Exams Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Class Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Total Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Grade', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Remarks', 'N/A') }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+
+                            {% if semester_details.get('Elective Subjects') %}
+                                <h4>Elective Subjects</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Exams Score</th>
+                                            <th>Class Score</th>
+                                            <th>Total Score</th>
+                                            <th>Grade</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for subject_data in semester_details.get('Elective Subjects', []) %}
+                                            <tr>
+                                                <td>{{ subject_data.get('Subject', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Exams Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Class Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Total Score', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Grade', 'N/A') }}</td>
+                                                <td>{{ subject_data.get('Remarks', 'N/A') }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning mt-4">No academic results found for this student across any semester.</div>
+            {% endif %}
+            
+            <!-- Footer with HOD Remarks and Signature -->
+            <div class="result-footer">
+                <!-- HOD Remarks Section -->
+                <div class="hod-remarks-section">
+                    <h4>Head of Department Remarks</h4>
+                    <div class="hod-remarks-box">
+                        {% set hod_remarks = student_data.student_info.get('HOD Remarks', '') %}
+                        {% if hod_remarks and hod_remarks.strip() %}
+                            {{ hod_remarks }}
+                        {% else %}
+                            <!-- Blank for handwritten remarks -->
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Signature Section -->
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <div class="signature-line"></div>
+                        <div class="signature-label">Head of Department</div>
+                        <div class="signature-name">{{ student_data.student_info.get('Student Department', 'Department') }} Department</div>
+                        <div class="signature-date">Date: ________________</div>
+                    </div>
+                    <div class="signature-box">
+                        <div class="stamp-area">
+                            Place<br>School<br>Seal<br>Here
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Print Date -->
+                <p class="text-center" style="margin-top: 30px; color: #666; font-size: 0.85rem;">
+                    <em>This document was generated on {{ now }}</em>
+                </p>
+            </div>
+
+        {% else %}
+            <div class="alert alert-danger">Student data not found or could not be loaded.</div>
+        {% endif %}
+    </div>
+    
+    <script>
+        function sendSemesterSMS(studentId, index) {
+            var year = document.getElementById('sms_year_' + index).value;
+            var semester = document.getElementById('sms_semester_' + index).value;
+            
+            if (confirm('Are you sure you want to send ' + semester + ' ' + year + ' results to this student\'s parent via SMS?')) {
+                window.location.href = '/admin/student/' + studentId + '/send_semester_sms?year=' + year + '&semester=' + semester;
+            }
+        }
+    </script>
+</body>
+</html>

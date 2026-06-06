@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Results - {{ department }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 90vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-messages li.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .flash-messages li.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .flash-messages li.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            color: #004085;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #004085;
+        }
+        .info-box li {
+            margin-bottom: 5px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .warning-box h3 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .warning-box p {
+            color: #856404;
+            margin: 0;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        form select,
+        form input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form input[type="file"] {
+            padding: 8px;
+        }
+        form input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        form input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .example-format {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .expires-info {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ department }}</h1>
+        <h2>Upload Results for {{ semester_key }}</h2>
+        <p class="subtitle">Secure Upload Portal for Department Heads</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <p class="expires-info"><strong>Link Expires:</strong> {{ expires_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        
+        <div class="warning-box">
+            <h3>Important Notice</h3>
+            <p>This link can only be used <strong>ONCE</strong>. Please ensure you have all the results ready before uploading. After submitting, this link will no longer be valid.</p>
+        </div>
+        
+        <div class="info-box">
+            <h3>Excel File Format Requirements</h3>
+            <ul>
+                <li>The Excel file must contain at least these columns:
+                    <ul>
+                        <li><strong>Student ID</strong> - Unique identifier for each student (REQUIRED)</li>
+                        <li><strong>Student Name</strong> - Full name of the student</li>
+                        <li><strong>Parent Phone</strong> - Parent's contact number</li>
+                    </ul>
+                </li>
+                <li>For subject scores, use column names like:
+                    <ul>
+                        <li><strong>Math Exams Score</strong>, <strong>Math Class Score</strong>, <strong>Math Total Score</strong>, <strong>Math Grade</strong>, <strong>Math Remarks</strong></li>
+                        <li><strong>English Exams Score</strong>, <strong>English Class Score</strong>, etc.</li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="example-format">
+                <strong>Example Excel Format:</strong><br>
+                Student ID | Student Name | Math Total Score | English Total Score | Physics Total Score<br>
+                2024001 | John Doe | 85 | 78 | 92
+            </div>
+        </div>
+        
+        <form action="{{ url_for('department_upload', token=token) }}" method="post" enctype="multipart/form-data" onsubmit="return confirm('Are you sure you want to upload these results? This action can only be done once.');">
+            <label for="file">Upload Results Excel File (.xlsx or .xls):</label>
+            <input type="file" id="file" name="file" accept=".xlsx,.xls" required>
+
+            <input type="submit" value="Upload Results">
+        </form>
+    </div>
+</body>
+</html>

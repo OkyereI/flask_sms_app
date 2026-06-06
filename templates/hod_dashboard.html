@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>HOD Dashboard - Gyedu Technical Institute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .school-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .school-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .hod-info {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-bar input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        .search-bar input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-state h3 {
+            color: #333;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .badge-info {
+            background-color: #e7f3ff;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="school-info">
+                <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
+                <span class="hod-info">| HOD Dashboard - {{ department }}</span>
+            </div>
+            <div>
+                <a href="{{ url_for('hod_logout') }}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Search and Students Card -->
+        <div class="card">
+            <h2>Student Records</h2>
+            
+            <!-- Search Form -->
+            <form method="GET" class="search-bar">
+                <input type="text" name="search_query" placeholder="Search by Student Name or ID..." value="{{ search_query if search_query else '' }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if search_query %}
+                    <a href="{{ url_for('hod_dashboard') }}" class="btn btn-secondary">Clear</a>
+                {% endif %}
+            </form>
+            
+            {% if students %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>{{ student['Student ID'] }}</td>
+                                <td>{{ student['Student Name'] }}</td>
+                                <td><span class="badge badge-info">{{ student['Student Department'] }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('hod_student_remarks', student_id=student['Student ID']) }}" class="btn btn-primary btn-sm">Add Remarks</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% elif search_query %}
+                <div class="empty-state">
+                    <h3>No Results Found</h3>
+                    <p>No students found matching "{{ search_query }}" in your department.</p>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No Students Found</h3>
+                    <p>There are no students registered in the {{ department }} department.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Instructions Card -->
+        <div class="card">
+            <h2>Instructions</h2>
+            <ul style="line-height: 1.8; color: #555;">
+                <li>Use the search bar above to find specific students by name or ID</li>
+                <li>Click the "Add Remarks" button next to a student to view their academic record and add remarks</li>
+                <li>Your remarks will be saved to the student's official transcript</li>
+                <li>Remarks should be professional and relevant to the student's academic performance</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

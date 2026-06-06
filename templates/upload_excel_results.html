@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Student Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 90vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #28a745;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-messages li.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .flash-messages li.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .flash-messages li.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            color: #004085;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #004085;
+        }
+        .info-box li {
+            margin-bottom: 8px;
+        }
+        .template-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .template-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .template-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .template-options label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .template-options select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .upload-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .upload-section h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        form select,
+        form input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form input[type="file"] {
+            padding: 8px;
+        }
+        form input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        form input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .example-format {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+        .note-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 15px;
+            color: #155724;
+        }
+        .warning-box {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 15px;
+            color: #721c24;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Student Results</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Template Download Section -->
+        <div class="template-section">
+            <h3>1. Download Excel Template</h3>
+            <p>Download a pre-formatted Excel template to fill in with student results.</p>
+            <form action="{{ url_for('download_template') }}" method="GET" class="template-options">
+                <div class="form-group">
+                    <label for="template_year">Academic Year:</label>
+                    <select id="template_year" name="year">
+                        {% for year in available_years %}
+                            <option value="{{ year }}" {% if year == '2025' %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="template_semester">Semester:</label>
+                    <select id="template_semester" name="semester">
+                        {% for semester in available_semesters %}
+                            <option value="{{ semester }}" {% if semester == 'Semester 1' %}selected{% endif %}>{{ semester }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="template_department">Department:</label>
+                    <select id="template_department" name="department">
+                        <option value="all">All Departments</option>
+                        {% for dept in available_departments %}
+                            <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Download Template</button>
+            </form>
+            <div class="note-box">
+                <strong>Tip:</strong> Select "All Departments" to include all subjects. Select a specific department to include only core subjects plus that department's electives.
+            </div>
+        </div>
+        
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h3>2. Upload Completed Results</h3>
+            
+            <div class="info-box">
+                <h3>Excel File Format Requirements</h3>
+                <ul>
+                    <li><strong>Required Columns:</strong> Student ID, Student Name, Student Department</li>
+                    <li><strong>Optional Column:</strong> Parent Phone (can be left blank)</li>
+                    <li><strong>Score Columns:</strong> Must follow the format: <code>Subject Score Type - Year Semester</code></li>
+                    <li><strong>Example:</strong> <code>Math Total Score - 2025 Semester 1</code></li>
+                    <li><strong>Supported Semesters:</strong> Semester 1, Semester 2, Sem 1, Sem 2 (with any year)</li>
+                </ul>
+                
+                <div class="example-format">
+                    <strong>Expected Column Format:</strong><br>
+                    Student ID | Student Name | Student Department | Parent Phone | Math Total Score - 2025 Semester 1 | English Grade - 2025 Semester 1 | ...<br><br>
+                    <strong>Also supports Semester 2:</strong><br>
+                    Math Total Score - 2025 Semester 2 | Science Grade - 2025 Semester 2 | ...
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Important:</strong> The semester is automatically detected from column headers. Ensure headers follow the format: "Subject Score Type - Year Semester" (e.g., "Math Total Score - 2025 Semester 2").
+                </div>
+            </div>
+        
+            <form action="{{ url_for('upload_excel_results') }}" method="post" enctype="multipart/form-data">
+                <label for="file">Upload Completed Excel File (.xlsx or .xls):</label>
+                <input type="file" id="file" name="file" accept=".xlsx,.xls" required>
+
+                <input type="submit" value="Upload and Update Results">
+            </form>
+        </div>
+
+        <p class="back-link"><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p>
+    </div>
+</body>
+</html>

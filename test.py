@@ -1203,23 +1203,41 @@ def save_to_excel(df, data_type):
 def get_google_sheet_client():
     """Authenticates and returns a Google Sheets client."""
     try:
-        # Try environment variable first (for Render deployment)
-        creds_json = os.getenv('GOOGLE_CREDENTIALS')
-        if creds_json:
-            credentials_dict = json.loads(creds_json)
-            credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                credentials_dict, SCOPES
-            )
-            gc = gspread.authorize(credentials)
-            print("✓ Authenticated with Google Sheets using environment variable")
-            return gc
+        import base64
+        import json
         
-        # Fallback to local file (for development)
+        creds_b64 = os.getenv('GOOGLE_CREDENTIALS')
+        if creds_b64:
+            try:
+                # Try base64 first (for Render)
+                creds_json = base64.b64decode(creds_b64).decode()
+                credentials_dict = json.loads(creds_json)
+                credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+                    credentials_dict, SCOPES
+                )
+                gc = gspread.authorize(credentials)
+                print("✓ Authenticated with Google Sheets (base64)")
+                return gc
+            except Exception as e:
+                print(f"Base64 failed: {e}")
+                # Try plain JSON as fallback
+                try:
+                    credentials_dict = json.loads(creds_b64)
+                    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+                        credentials_dict, SCOPES
+                    )
+                    gc = gspread.authorize(credentials)
+                    print("✓ Authenticated with Google Sheets (plain JSON)")
+                    return gc
+                except Exception as e2:
+                    print(f"Plain JSON also failed: {e2}")
+        
+        # Fallback to local file
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
             SERVICE_ACCOUNT_FILE, SCOPES
         )
         gc = gspread.authorize(credentials)
-        print("✓ Authenticated with Google Sheets using local file")
+        print("✓ Authenticated with Google Sheets (local file)")
         return gc
         
     except Exception as e:

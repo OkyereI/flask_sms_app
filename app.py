@@ -12,7 +12,7 @@ import gspread.utils # Import for gspread utilities
 from oauth2client.service_account import ServiceAccountCredentials # Import for authentication
 import uuid # Import for generating unique share tokens
 import hashlib # Import for secure token generation
-
+import json
 # --- HELPER FUNCTION FOR FINANCE ACCESS ---
 def check_finance_access():
     """
@@ -1203,11 +1203,25 @@ def save_to_excel(df, data_type):
 def get_google_sheet_client():
     """Authenticates and returns a Google Sheets client."""
     try:
+        # Try environment variable first (for Render deployment)
+        creds_json = os.getenv('GOOGLE_CREDENTIALS')
+        if creds_json:
+            credentials_dict = json.loads(creds_json)
+            credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+                credentials_dict, SCOPES
+            )
+            gc = gspread.authorize(credentials)
+            print("✓ Authenticated with Google Sheets using environment variable")
+            return gc
+        
+        # Fallback to local file (for development)
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
             SERVICE_ACCOUNT_FILE, SCOPES
         )
         gc = gspread.authorize(credentials)
+        print("✓ Authenticated with Google Sheets using local file")
         return gc
+        
     except Exception as e:
         print(f"Error authenticating with Google Sheets API: {e}")
         return None

@@ -7,12 +7,15 @@ from werkzeug.security import generate_password_hash, check_password_hash # Impo
 from datetime import datetime, timedelta # Import datetime for PDF timestamp
 import os # Import os for file path operations
 from werkzeug.utils import secure_filename # Import secure_filename for safe file uploads
+from google.oauth2 import service_account
 import gspread # Import gspread for Google Sheets write operations
 import gspread.utils # Import for gspread utilities
-from oauth2client.service_account import ServiceAccountCredentials # Import for authentication
 import uuid # Import for generating unique share tokens
 import hashlib # Import for secure token generation
 import json
+import base64
+from functools import wraps
+from dotenv import load_dotenv
 # --- HELPER FUNCTION FOR FINANCE ACCESS ---
 def check_finance_access():
     """
@@ -1206,14 +1209,15 @@ def get_google_sheet_client():
         import base64
         import json
         
+        # Use the newer google-auth library instead of oauth2client
         creds_b64 = os.getenv('GOOGLE_CREDENTIALS')
         if creds_b64:
             try:
                 # Try base64 first (for Render)
                 creds_json = base64.b64decode(creds_b64).decode()
                 credentials_dict = json.loads(creds_json)
-                credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                    credentials_dict, SCOPES
+                credentials = service_account.Credentials.from_service_account_info(
+                    credentials_dict, scopes=SCOPES
                 )
                 gc = gspread.authorize(credentials)
                 print("✓ Authenticated with Google Sheets (base64)")
@@ -1223,8 +1227,8 @@ def get_google_sheet_client():
                 # Try plain JSON as fallback
                 try:
                     credentials_dict = json.loads(creds_b64)
-                    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                        credentials_dict, SCOPES
+                    credentials = service_account.Credentials.from_service_account_info(
+                        credentials_dict, scopes=SCOPES
                     )
                     gc = gspread.authorize(credentials)
                     print("✓ Authenticated with Google Sheets (plain JSON)")
@@ -1233,8 +1237,12 @@ def get_google_sheet_client():
                     print(f"Plain JSON also failed: {e2}")
         
         # Fallback to local file
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            SERVICE_ACCOUNT_FILE, SCOPES
+        if not os.path.exists(SERVICE_ACCOUNT_FILE):
+            print(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
+            return None
+        
+        credentials = service_account.Credentials.from_service_account_json(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES
         )
         gc = gspread.authorize(credentials)
         print("✓ Authenticated with Google Sheets (local file)")
@@ -1242,6 +1250,8 @@ def get_google_sheet_client():
         
     except Exception as e:
         print(f"Error authenticating with Google Sheets API: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def sync_payment_to_google_sheet(payment_data):
@@ -9059,7 +9069,7 @@ def save_student_results_to_sheet(df):
             print(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
             return False
         
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, SCOPES)
+        credentials = service_account.Credentials.from_service_account_json(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
         gc = gspread.authorize(credentials)
         
         # Use the UNIFIED Google Sheet

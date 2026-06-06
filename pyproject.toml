@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "asante-tano-sms"
+version = "1.0.0"
+description = "Asante Tano Methodist School Management System"
+requires-python = ">=3.12"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.0.0"
+pandas = "^2.2.0"
+openpyxl = "^3.1.5"
+gunicorn = "^21.2.0"
+gspread = "^6.0.0"
+oauth2client = "^4.1.3"
+google-auth = "^2.23.0"
+requests = "^2.31.0"
+weasyprint = "^60.0"
+python-dateutil = "^2.8.0"

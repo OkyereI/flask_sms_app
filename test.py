@@ -587,8 +587,15 @@ class SchoolStoreItem:
     
     @classmethod
     def all(cls):
-        """Get all store items - first try local Excel, then Google Sheets"""
-        # Try local Excel first
+        """Get all store items - first try Google Sheets, then local Excel as fallback"""
+        # Try Google Sheets FIRST (online mode - for deployment)
+        synced_df = cls._sync_from_google_sheet()
+        if synced_df is not None and not synced_df.empty:
+            print(f"Loaded {len(synced_df)} store items from Google Sheets (online mode)")
+            return synced_df.to_dict('records')
+        
+        # Fall back to local Excel only if Google Sheets fails or is empty
+        print("Falling back to local Excel for store items...")
         try:
             excel_path = get_excel_path(cls.data_type)
             if os.path.exists(excel_path):
@@ -599,14 +606,10 @@ class SchoolStoreItem:
                     if len(df) > 0:
                         # Clean up any timestamp values in unit/threshold columns
                         df = cls._clean_data(df)
+                        print(f"Loaded {len(df)} store items from local Excel (offline mode)")
                         return df.to_dict('records')
         except Exception as e:
             print(f"Error reading store items from Excel: {e}")
-        
-        # Try Google Sheets if local is empty
-        synced_df = cls._sync_from_google_sheet()
-        if synced_df is not None and not synced_df.empty:
-            return synced_df.to_dict('records')
         
         return []
     
@@ -3979,8 +3982,9 @@ def instructor_dashboard():
             student_record = {}
             # Normalize Student ID
             student_record['Student ID'] = row.get('Student ID', row.get('StudentID', row.get('student_id', '')))
-            # Normalize Student Name
-            student_record['Student Name'] = row.get('Student Name', row.get('StudentName', row.get('student_name', '')))
+            # Normalize Student Name - ensure it's always a string to prevent template errors
+            student_name = row.get('Student Name', row.get('StudentName', row.get('student_name', '')))
+            student_record['Student Name'] = str(student_name) if student_name else ''
             # Normalize Department - try multiple possible column names
             student_department = row.get('Student Department', row.get('Department', row.get('department', row.get('Class', ''))))
             student_record['Department'] = student_department

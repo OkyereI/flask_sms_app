@@ -575,9 +575,22 @@
         function filterStudentsByForm() {
             var formFilter = document.getElementById('formFilter').value;
             var filter = document.getElementById('studentSearchInput').value.toLowerCase();
+            
+            // Filter My Students section (studentGrid)
             var cards = document.querySelectorAll('#studentGrid .student-card');
             for (var i = 0; i < cards.length; i++) {
                 var card = cards[i];
+                var form = card.getAttribute('data-form');
+                var text = card.textContent.toLowerCase();
+                var showByForm = (formFilter === '' || form === formFilter);
+                var showBySearch = (filter === '' || text.indexOf(filter) > -1);
+                card.style.display = (showByForm && showBySearch) ? '' : 'none';
+            }
+            
+            // Filter Enter Student Results section (studentGridAlt) - show same filtered results
+            var altCards = document.querySelectorAll('#studentGridAlt .student-card');
+            for (var i = 0; i < altCards.length; i++) {
+                var card = altCards[i];
                 var form = card.getAttribute('data-form');
                 var text = card.textContent.toLowerCase();
                 var showByForm = (formFilter === '' || form === formFilter);

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard - Asante Tano Methodist Technical Institute</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a5f2a 0%, #28a745 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: #1a5f2a;
+            padding: 0 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 18px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav a i {
+            font-size: 1rem;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav a.active {
+            color: white;
+            border-bottom-color: #ffd700;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a5f2a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.revenue { border-left-color: #28a745; }
+        .stat-card.students { border-left-color: #3498db; }
+        .stat-card.payments { border-left-color: #9b59b6; }
+        .stat-card.pending { border-left-color: #f39c12; }
+
+        .stat-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.15;
+        }
+
+        .stat-card.revenue .stat-card-icon { background: #28a745; }
+        .stat-card.students .stat-card-icon { background: #3498db; }
+        .stat-card.payments .stat-card-icon { background: #9b59b6; }
+        .stat-card.pending .stat-card-icon { background: #f39c12; }
+
+        .stat-card-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-card h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .stat-card.revenue h3 { color: #28a745; }
+        .stat-card.students h3 { color: #3498db; }
+        .stat-card.payments h3 { color: #9b59b6; }
+        .stat-card.pending h3 { color: #f39c12; }
+
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .stat-card small {
+            color: #adb5bd;
+            font-size: 0.8rem;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a5f2a;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #28a745;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title i {
+            color: #28a745;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-action {
+            padding: 18px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-action i {
+            font-size: 1.2rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1a5f2a 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: linear-gradient(135deg, #1a5f2a 0%, #28a745 100%);
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        tr {
+            transition: all 0.2s ease;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        td {
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        td strong {
+            color: #1a5f2a;
+        }
+
+        /* Badge */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+
+        .empty-state-icon i {
+            font-size: 2.5rem;
+            color: #adb5bd;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* Sync Notice */
+        .sync-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .sync-notice h3 {
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .sync-notice p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .btn-sync {
+            background: white;
+            color: #667eea;
+            margin-top: 15px;
+        }
+
+        .btn-sync:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-container {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+
+            .nav a {
+                padding: 15px 16px;
+                font-size: 0.85rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1><i class="fas fa-graduation-cap" style="margin-right: 10px;"></i>Asante Tano Methodist Technical Institute</h1>
+            <div class="header-info"><i class="fas fa-wallet" style="margin-right: 5px;"></i>Finance Management Dashboard</div>
+        </div>
+        <a href="{{ url_for('finance_login') }}" class="btn btn-secondary">
+            <i class="fas fa-sign-out-alt"></i>Logout
+        </a>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('finance_dashboard') }}" class="active">
+                <i class="fas fa-chart-line"></i>Dashboard
+            </a>
+            <a href="{{ url_for('admin_finance_record_payment') }}">
+                <i class="fas fa-hand-holding-usd"></i>Record Payment
+            </a>
+            <a href="{{ url_for('admin_finance_view_payments') }}">
+                <i class="fas fa-receipt"></i>Payment History
+            </a>
+            <a href="{{ url_for('admin_finance_student_accounts') }}">
+                <i class="fas fa-users"></i>Student Accounts
+            </a>
+            <a href="{{ url_for('admin_finance_expenses') }}">
+                <i class="fas fa-file-invoice-dollar"></i>Expenses
+            </a>
+            <a href="{{ url_for('admin_finance_reports') }}">
+                <i class="fas fa-file-alt"></i>Reports
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% elif category == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if has_google_sheet %}
+        <div class="sync-notice">
+            <h3><i class="fas fa-sync"></i> Google Sheets Sync Active</h3>
+            <p>Your finance data is automatically synced with Google Sheets.</p>
+            <a href="{{ url_for('finance_sync_data') }}" class="btn btn-sync">
+                <i class="fas fa-sync-alt"></i>Sync All Data
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Page Title -->
+        <h1 class="page-title"><i class="fas fa-chart-line" style="margin-right: 10px;"></i>Finance Dashboard</h1>
+        <p class="page-subtitle">Welcome back! Here's an overview of your financial status.</p>
+        
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card revenue">
+                <div class="stat-card-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>GHS {{ "%.2f"|format(total_revenue) }}</h3>
+                <p>Total Revenue Collected</p>
+                <small><i class="fas fa-calendar"></i> Current Year</small>
+            </div>
+            <div class="stat-card students">
+                <div class="stat-card-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3>{{ total_students }}</h3>
+                <p>Total Students</p>
+                <small><i class="fas fa-chart-bar"></i> In System</small>
+            </div>
+            <div class="stat-card payments">
+                <div class="stat-card-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <h3>{{ total_payments }}</h3>
+                <p>Payments Recorded</p>
+                <small><i class="fas fa-check-circle"></i> Completed</small>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>{{ pending_count }}</h3>
+                <p>Pending Payments</p>
+                <small><i class="fas fa-exclamation-circle"></i> Awaiting</small>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-bolt"></i>Quick Actions
+            </h2>
+            <div class="quick-actions">
+                <a href="{{ url_for('finance_record_payment') }}" class="btn-action btn-success">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    Record Payment
+                </a>
+                <a href="{{ url_for('finance_student_accounts') }}" class="btn-action btn-primary">
+                    <i class="fas fa-search-dollar"></i>
+                    Search Debtors
+                </a>
+                <a href="{{ url_for('finance_expenses') }}" class="btn-action btn-warning">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Record Expense
+                </a>
+                <a href="{{ url_for('finance_reports') }}" class="btn-action btn-purple">
+                    <i class="fas fa-chart-pie"></i>
+                    Generate Report
+                </a>
+            </div>
+        </div>
+        
+        <!-- Recent Payments -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-history"></i>Recent Payments
+            </h2>
+            {% if recent_payments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-receipt"></i> Receipt No</th>
+                                <th><i class="fas fa-calendar"></i> Date</th>
+                                <th><i class="fas fa-user"></i> Student</th>
+                                <th><i class="fas fa-tag"></i> Fee Type</th>
+                                <th><i class="fas fa-money-bill"></i> Amount</th>
+                                <th><i class="fas fa-credit-card"></i> Method</th>
+                                <th><i class="fas fa-info-circle"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments[:10] %}
+                            <tr>
+                                <td><strong>{{ payment.get('receipt_number', '-') }}</strong></td>
+                                <td>{{ payment.get('payment_date', '-') }}</td>
+                                <td>{{ payment.get('student_name', '-') }}</td>
+                                <td>{{ payment.get('fee_type', '-') }}</td>
+                                <td><strong>GHS {{ "%.2f"|format(payment.get('amount', 0)) }}</strong></td>
+                                <td>{{ payment.get('payment_method', '-') }}</td>
+                                <td>
+                                    <span class="badge badge-{{ 'success' if payment.get('status') == 'completed' else 'warning' }}">
+                                        <i class="fas {% if payment.get('status') == 'completed' %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+                                        {{ payment.get('status', 'pending')|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if total_payments > 10 %}
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ url_for('finance_view_payments') }}" class="btn-action btn-secondary" style="display: inline-flex;">
+                        <i class="fas fa-eye"></i>
+                        View All {{ total_payments }} Payments
+                    </a>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <h3>No Payments Recorded Yet</h3>
+                    <p>Start by recording your first student payment to track your revenue.</p>
+                    <a href="{{ url_for('finance_record_payment') }}" class="btn-action btn-success" style="display: inline-flex;">
+                        <i class="fas fa-plus"></i>
+                        Record First Payment
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

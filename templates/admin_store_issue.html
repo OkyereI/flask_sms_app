@@ -33,7 +33,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
+            <h1 class="school-name">Gyedu Technical Institute</h1>
         </div>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -53,8 +53,10 @@
                     <select id="item_id" name="item_id" required>
                         <option value="">Select an item</option>
                         {% for item in items %}
-                            <option value="{{ item.id }}" data-quantity="{{ item.quantity }}" data-unit="{{ item.unit }}">
-                                {{ item.name }} ({{ item.category }}) - Available: {{ item.quantity }} {{ item.unit }}
+                            {% set item_id_val = item['id'] if item['id'] is defined else 0 %}
+                            {% if item_id_val is number %}
+                                <option value="{{ item_id_val | int }}">{% else %}<option value="{{ item_id_val }}">{% endif %}
+                                {{ item['name'] if item['name'] is defined else 'Unknown' }} ({{ item['category'] if item['category'] is defined else '' }}) - Available: {{ item['quantity'] if item['quantity'] is defined else 0 }} {{ item['unit'] if item['unit'] is defined else '' }}
                             </option>
                         {% endfor %}
                     </select>

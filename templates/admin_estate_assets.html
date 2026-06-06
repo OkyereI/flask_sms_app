@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management - Gyedu Technical Institute
+        
+    </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #27ae60;
+            background-color: #2c3e50;
+        }
+        
+        .nav a.back-link {
+            margin-left: auto;
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .page-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #229954;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box input,
+        .search-box select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-Inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-Maintenance {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .actions .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Asset Management</h1>
+            <div class="header-info">Gyedu Technical Institute
+                
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_store') }}">Store</a>
+            <a href="{{ url_for('admin_finance') }}">Finance</a>
+            <a href="{{ url_for('admin_estate') }}">Estate</a>
+            <a href="{{ url_for('admin_store_transactions') }}">Transactions</a>
+            <a href="{{ url_for('admin_logout') }}" class="back-link">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 class="page-title">Asset Management</h2>
+        <p class="page-subtitle">Manage school assets inventory</p>
+        
+        <div class="two-column">
+            <div class="card">
+                <h3 class="card-title">Register New Asset</h3>
+                <form method="POST" action="{{ url_for('admin_estate_assets') }}">
+                    <div class="form-group">
+                        <label>Asset Name *</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Asset Code/Tag *</label>
+                        <input type="text" name="asset_code" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Vehicle">Vehicle</option>
+                            <option value="Building">Building</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select name="location_id">
+                            <option value="">Select Location</option>
+                            {% for location in locations %}
+                            <option value="{{ location.get('id') }}">{{ location.get('name') }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Purchase Value</label>
+                        <input type="number" name="purchase_value" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Condition</label>
+                        <select name="condition">
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Register Asset</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Asset Inventory</h3>
+                
+                <form method="GET" action="{{ url_for('admin_estate_assets') }}" class="search-box">
+                    <input type="text" name="search" placeholder="Search assets..." value="{{ search }}">
+                    <select name="category">
+                        <option value="">All Categories</option>
+                        <option value="Electronics" {% if category_filter == 'Electronics' %}selected{% endif %}>Electronics</option>
+                        <option value="Furniture" {% if category_filter == 'Furniture' %}selected{% endif %}>Furniture</option>
+                        <option value="Equipment" {% if category_filter == 'Equipment' %}selected{% endif %}>Equipment</option>
+                        <option value="Vehicle" {% if category_filter == 'Vehicle' %}selected{% endif %}>Vehicle</option>
+                        <option value="Building" {% if category_filter == 'Building' %}selected{% endif %}>Building</option>
+                        <option value="Other" {% if category_filter == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{{ url_for('admin_estate_assets') }}" class="btn btn-secondary">Clear</a>
+                </form>
+                
+                {% if assets %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in assets %}
+                        <tr>
+                            <td><strong>{{ asset.get('asset_code', '-') }}</strong></td>
+                            <td>{{ asset.get('name', '-') }}</td>
+                            <td>{{ asset.get('category', '-') }}</td>
+                            <td>GHS {{ "%.2f"|format(asset.get('purchase_value', 0)) }}</td>
+                            <td>
+                                <span class="badge badge-{{ asset.get('status', 'Inactive') }}">
+                                    {{ asset.get('status', 'Inactive') }}
+                                </span>
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('admin_estate_move_asset', asset_id=asset.get('id')) }}" class="btn btn-primary">Move</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <h3>No Assets Found</h3>
+                    <p>{% if search or category_filter %}No assets match your search criteria.{% else %}Register your first asset using the form on the left.{% endif %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

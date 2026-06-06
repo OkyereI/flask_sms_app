@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Upload Students - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .school-name { font-size: 1.5rem; font-weight: bold; color: #28a745; margin: 0; }
+        .nav-links { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-links a { padding: 10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; flex: 1; text-align: center; }
+        .nav-links a:hover { background-color: #218838; }
+        .card { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1 { color: #333; margin-top: 0; text-align: center; margin-bottom: 25px; }
+        h2 { color: #333; margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        input:focus, select:focus { border-color: #28a745; outline: none; }
+        .btn-group { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; text-decoration: none; display: inline-block; text-align: center; flex: 1; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .info-box { background-color: #e7f3ff; border: 1px solid #b3d7ff; border-radius: 4px; padding: 15px; margin-bottom: 20px; }
+        .info-box h3 { color: #004085; margin-bottom: 10px; font-size: 1rem; }
+        .info-box ul { margin-left: 20px; color: #004085; }
+        .info-box li { margin-bottom: 5px; }
+        .file-upload-wrapper { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; background-color: #fafafa; transition: all 0.3s ease; }
+        .file-upload-wrapper:hover { border-color: #28a745; background-color: #f0fff0; }
+        .file-upload-wrapper input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .sample-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        .sample-table th, .sample-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .sample-table th { background-color: #28a745; color: white; }
+        .sample-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .note-box { background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 15px; margin-top: 15px; }
+        .note-box p { color: #856404; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="school-name">Gyedu Technical Institute</h1>
+            <p style="color: #666; margin-top: 5px;">Bulk Student Registration - Auto ID Generation</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('admin_manage_students') }}">Manage Students</a>
+            <a href="{{ url_for('admin_add_student') }}">Single Add</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <h1>Bulk Upload Students</h1>
+            
+            <div class="info-box">
+                <h3>Upload Instructions</h3>
+                <ul>
+                    <li>Upload an Excel file (.xlsx) containing student data</li>
+                    <li>Required columns: <strong>Student Name</strong>, <strong>Student Department</strong></li>
+                    <li>Optional column: <strong>Parent Phone</strong></li>
+                    <li>The system will automatically generate unique Student IDs for each student</li>
+                    <li>ID Format: [DEPT_CODE]STUATI[YEAR][SEQ] (e.g., EETSTUATI25001)</li>
+                </ul>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="entry_year">Entry Year *</label>
+                    <input type="number" id="entry_year" name="entry_year" required value="{{ current_year }}" min="2000" max="2100">
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">The year students enrolled/will enroll</p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Excel File *</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" name="file" accept=".xlsx,.xls" required>
+                        <p style="color: #666; margin-top: 10px; font-size: 0.9rem;">Supported formats: .xlsx, .xls</p>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">Upload & Generate IDs</button>
+                    <a href="{{ url_for('admin_manage_students') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            
+            <div class="note-box">
+                <p><strong>Note:</strong> If a student with the same auto-generated ID already exists, that row will be skipped.</p>
+                <p><strong>Tip:</strong> Make sure your Excel file has proper column headers matching the requirements above.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Sample Excel Format</h2>
+            <p style="color: #666; margin-bottom: 15px;">Your Excel file should look like this:</p>
+            
+            <table class="sample-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Student Department</th>
+                        <th>Parent Phone (Optional)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Kwame</td>
+                        <td>electrical</td>
+                        <td>0243123456</td>
+                    </tr>
+                    <tr>
+                        <td>Akosua Mensah</td>
+                        <td>welding</td>
+                        <td>0201234567</td>
+                    </tr>
+                    <tr>
+                        <td>Kofi Adom</td>
+                        <td>fashion</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="info-box" style="margin-top: 15px;">
+                <h3>Department Codes Reference</h3>
+                <ul>
+                    <li><strong>Electrical:</strong> EET | <strong>Welding:</strong> WEL | <strong>Plumbing:</strong> PLB</li>
+                    <li><strong>Fashion/Garment:</strong> FAS | <strong>Catering:</strong> CAT | <strong>Building:</strong> BLD</li>
+                    <li><strong>Wood:</strong> WOO | <strong>ICT:</strong> ICT | <strong>Science:</strong> SCI</li>
+                    <li><strong>Business:</strong> BUS | <strong>General Arts:</strong> GAR | <strong>Hospitality:</strong> HOS</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

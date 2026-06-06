@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Remarks - Gyedu Technical Institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #007bff; margin: 0; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2, h3 { color: #333; margin-top: 0; }
+        .info-box { background-color: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        textarea { min-height: 100px; font-family: Arial, sans-serif; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-group .btn { flex: 1; text-align: center; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; }
+        .alert-warning { color: #856404; background-color: #fff3cd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .subject-row { background-color: #fff !important; }
+        .subject-header { background-color: #f0f0f0; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .current-remarks { font-style: italic; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
+                <p style="margin: 5px 0 0 0; color: #666;">Add Student Remarks - HOD Dashboard</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('hod_students') }}" class="btn btn-secondary">Back to Students</a>
+                <a href="{{ url_for('hod_view_student', student_id=student.get('Student ID', '')) }}" class="btn btn-primary">View All Results</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="info-box">
+            <strong>Student:</strong> {{ student.get('Student Name', 'N/A') }} |
+            <strong>ID:</strong> {{ student.get('Student ID', 'N/A') }} |
+            <strong>Department:</strong> {{ department }}
+        </div>
+        
+        <form method="POST">
+            <div class="card">
+                <h2>Add Remarks to Student Results</h2>
+                
+                <div class="form-group">
+                    <label for="semester">Select Semester *</label>
+                    <select name="semester" id="semester" required onchange="showSubjects()">
+                        <option value="">-- Select Semester --</option>
+                        {% for sem in semesters %}
+                        <option value="{{ sem }}">{{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Select Subject *</label>
+                    <select name="subject" id="subject" required>
+                        <option value="">-- Select Subject --</option>
+                        {% for sem, data in results_by_semester.items() %}
+                            {% if data['Core Subjects'] %}
+                                {% for subj in data['Core Subjects'] %}
+                                <option value="{{ subj.Subject }}" data-semester="{{ sem }}" class="subject-option" style="display: none;">{{ subj.Subject }} (Core) - {{ sem }}</option>
+                                {% endfor %}
+                            {% endif %}
+                            {% if data['Elective Subjects'] %}
+                                {% for subj in data['Elective Subjects'] %}
+                                <option value="{{ subj.Subject }}" data-semester="{{ sem }}" class="subject-option" style="display: none;">{{ subj.Subject }} (Elective) - {{ sem }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="remarks">Remarks *</label>
+                    <textarea name="remarks" id="remarks" required placeholder="Enter professional remarks about the student's academic performance in this subject..."></textarea>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Please provide constructive and professional feedback about the student's performance.</p>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">Save Remarks</button>
+                    <a href="{{ url_for('hod_view_student', student_id=student.get('Student ID', '')) }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
+        
+        <div class="card">
+            <h3>Current Results Summary</h3>
+            {% for sem, data in results_by_semester.items() %}
+            <div class="subject-header">{{ sem }}</div>
+            {% if data['Core Subjects'] or data['Elective Subjects'] %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>Total Score</th>
+                        <th>Grade</th>
+                        <th>Current Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if data['Core Subjects'] %}
+                        {% for subj in data['Core Subjects'] %}
+                        <tr class="subject-row">
+                            <td><strong>{{ subj.Subject }}</strong></td>
+                            <td><span style="background: #d4edda; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">Core</span></td>
+                            <td>{{ subj['Total Score'] or '-' }}</td>
+                            <td><strong>{{ subj['Grade'] or '-' }}</strong></td>
+                            <td class="current-remarks">{{ subj['Remarks'] or 'No remarks yet' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                    {% if data['Elective Subjects'] %}
+                        {% for subj in data['Elective Subjects'] %}
+                        <tr class="subject-row">
+                            <td><strong>{{ subj.Subject }}</strong></td>
+                            <td><span style="background: #e7f3ff; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">Elective</span></td>
+                            <td>{{ subj['Total Score'] or '-' }}</td>
+                            <td><strong>{{ subj['Grade'] or '-' }}</strong></td>
+                            <td class="current-remarks">{{ subj['Remarks'] or 'No remarks yet' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #666; text-align: center;">No results for this semester.</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script>
+        function showSubjects() {
+            const selectedSemester = document.getElementById('semester').value;
+            const subjectOptions = document.querySelectorAll('.subject-option');
+            
+            subjectOptions.forEach(option => {
+                if (option.dataset.semester === selectedSemester) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            // Reset subject selection
+            document.getElementById('subject').value = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Requests - Gyedu Technical Institute</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #27ae60;
+            background-color: #2c3e50;
+        }
+        
+        .nav a.back-link {
+            margin-left: auto;
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .page-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #229954;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .filter-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-box a {
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-box a.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .filter-box a:not(.active) {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .filter-box a:not(.active):hover {
+            background-color: #bdc3c7;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-Reported {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-In Progress {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .badge-Completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-High {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-Medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-Low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .actions .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Maintenance Requests</h1>
+            <div class="header-info">Gyedu Technical Institute</div>
+        </div>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_store') }}">Store</a>
+            <a href="{{ url_for('admin_finance') }}">Finance</a>
+            <a href="{{ url_for('admin_estate') }}">Estate</a>
+            <a href="{{ url_for('admin_store_transactions') }}">Transactions</a>
+            <a href="{{ url_for('admin_logout') }}" class="back-link">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 class="page-title">Maintenance Requests</h2>
+        <p class="page-subtitle">Report and track maintenance issues</p>
+        
+        <div class="two-column">
+            <div class="card">
+                <h3 class="card-title">Report New Issue</h3>
+                <form method="POST" action="{{ url_for('admin_estate_maintenance') }}">
+                    <div class="form-group">
+                        <label>Asset (Optional)</label>
+                        <select name="asset_id">
+                            <option value="">Select Asset</option>
+                            {% for asset in assets %}
+                            <option value="{{ asset.get('id') }}">{{ asset.get('name') }} ({{ asset.get('asset_code') }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location (Optional)</label>
+                        <select name="location_id">
+                            <option value="">Select Location</option>
+                            {% for location in locations %}
+                            <option value="{{ location.get('id') }}">{{ location.get('name') }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Description *</label>
+                        <textarea name="issue_description" rows="4" required placeholder="Describe the maintenance issue..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select name="priority">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Cost</label>
+                        <input type="number" name="estimated_cost" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="2" placeholder="Additional notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit Request</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Maintenance Requests</h3>
+                
+                <div class="filter-box">
+                    <a href="{{ url_for('admin_estate_maintenance', status='all') }}" class="{% if status_filter == 'all' %}active{% endif %}">All</a>
+                    <a href="{{ url_for('admin_estate_maintenance', status='Reported') }}" class="{% if status_filter == 'Reported' %}active{% endif %}">Reported</a>
+                    <a href="{{ url_for('admin_estate_maintenance', status='In Progress') }}" class="{% if status_filter == 'In Progress' %}active{% endif %}">In Progress</a>
+                    <a href="{{ url_for('admin_estate_maintenance', status='Completed') }}" class="{% if status_filter == 'Completed' %}active{% endif %}">Completed</a>
+                </div>
+                
+                {% if requests %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Issue</th>
+                            <th>Priority</th>
+                            <th>Est. Cost</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td><strong>#{{ request.get('id') }}</strong></td>
+                            <td>{{ request.get('issue_description', '-') }}</td>
+                            <td>
+                                <span class="badge badge-{{ request.get('priority') }}">
+                                    {{ request.get('priority') }}
+                                </span>
+                            </td>
+                            <td>GHS {{ "%.2f"|format(request.get('estimated_cost', 0)) }}</td>
+                            <td>
+                                <span class="badge badge-{{ request.get('status') }}">
+                                    {{ request.get('status') }}
+                                </span>
+                            </td>
+                            <td>{{ request.get('created_at', '-') }}</td>
+                            <td class="actions">
+                                {% if request.get('status') != 'Completed' %}
+                                <form method="POST" action="{{ url_for('admin_estate_complete_maintenance', request_id=request.get('id')) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Mark this request as completed?')">Complete</button>
+                                </form>
+                                {% else %}
+                                <span style="color: #27ae60;">Done</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <h3>No Maintenance Requests</h3>
+                    <p>{% if status_filter != 'all' %}No requests match the selected filter.{% else %}Report your first maintenance issue using the form on the left.{% endif %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Student Results - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #28a745; margin: 0; }
+        .card { background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2, h3 { color: #333; margin-top: 0; }
+        h2 { border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        input:focus, select:focus { border-color: #28a745; outline: none; }
+        .btn { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-group { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        .student-info { background-color: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .student-info p { margin: 5px 0; }
+        .subject-section { border: 2px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 25px; background-color: #fafafa; }
+        .subject-header { background-color: #28a745; color: white; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; }
+        .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .score-input { width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15ox; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #28a745; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .search-student { margin-bottom: 20px; }
+        .autocomplete-items { position: absolute; border: 1px solid #ddd; border-bottom: none; border-top: none; z-index: 99; width: 100%; max-height: 200px; overflow-y: auto; }
+        .autocomplete-item { padding: 10px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #ddd; }
+        .autocomplete-item:hover { background-color: #e9e9e9; }
+        .core-badge { background-color: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+        .elective-badge { background-color: #ffc107; color: #212529; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
+                <p style="margin: 5px 0 0 0; color: #666;">Enter Student Results</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+                <a href="{{ url_for('admin_manage_students') }}" class="btn btn-secondary">Manage Students</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Step 1: Select Student and Semester -->
+        <div class="card">
+            <h2>Select Student and Semester</h2>
+            
+            <form method="GET" action="{{ url_for('admin_enter_results') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="text" id="student_search" name="student_id" placeholder="Search by Student ID or Name..." 
+                               value="{{ student_id or '' }}" autocomplete="off" required>
+                        <div id="autocomplete_list" class="autocomplete-items"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="academic_year">Academic Year</label>
+                        <select id="academic_year" name="academic_year" required>
+                            <option value="">-- Select Year --</option>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if academic_year == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester" required>
+                            <option value="">-- Select Semester --</option>
+                            <option value="Semester 1" {% if semester == 'Semester 1' %}selected{% endif %}>Semester 1</option>
+                            <option value="Semester 2" {% if semester == 'Semester 2' %}selected{% endif %}>Semester 2</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Load Student
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Step 2: Enter Results (Only show if student and semester selected) -->
+        {% if student and academic_year and semester %}
+        <form method="POST">
+            <input type="hidden" name="student_id" value="{{ student.get('Student ID', '') }}">
+            <input type="hidden" name="academic_year" value="{{ academic_year }}">
+            <input type="hidden" name="semester" value="{{ semester }}">
+            
+            <!-- Student Info Banner -->
+            <div class="student-info">
+                <p><strong>Student Name:</strong> {{ student.get('Student Name', 'N/A') }}</p>
+                <p><strong>Student ID:</strong> {{ student.get('Student ID', 'N/A') }}</p>
+                <p><strong>Department:</strong> {{ student.get('Student Department', 'N/A') }}</p>
+                <p><strong>Entering Results for:</strong> {{ academic_year }} - {{ semester }}</p>
+            </div>
+            
+            <div class="card">
+                <h2>Core Subjects <span class="core-badge">Core</span></h2>
+                <div class="score-grid">
+                    {% for subject in core_subjects %}
+                    <div class="form-group">
+                        <label>{{ subject }} - Exams Score</label>
+                        <input type="number" name="score_{{ subject }}_Exams Score" min="0" max="100" step="0.01"
+                               value="{{ student.get(subject + ' Exams Score - ' + academic_year + ' ' + semester, '') }}"
+                               placeholder="0-100">
+                    </div>
+                    <div class="form-group">
+                        <label>{{ subject }} - Class Score</label>
+                        <input type="number" name="score_{{ subject }}_Class Score" min="0" max="100" step="0.01"
+                               value="{{ student.get(subject + ' Class Score - ' + academic_year + ' ' + semester, '') }}"
+                               placeholder="0-100">
+                    </div>
+                    <div class="form-group">
+                        <label>{{ subject }} - Total Score</label>
+                        <input type="number" name="score_{{ subject }}_Total Score" min="0" max="100" step="0.01"
+                               value="{{ student.get(subject + ' Total Score - ' + academic_year + ' ' + semester, '') }}"
+                               placeholder="Auto-calculated" readonly class="auto-calc" id="total_{{ subject }}">
+                        <small style="color: #666; font-size: 0.8rem;">Exams + Class</small>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ subject }} - Grade</label>
+                        <select name="score_{{ subject }}_Grade" id="grade_{{ subject }}" readonly class="auto-calc">
+                            <option value="">Select</option>
+                            <option value="A" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'A' %}selected{% endif %}>A</option>
+                            <option value="B+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B+' %}selected{% endif %}>B+</option>
+                            <option value="B" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B' %}selected{% endif %}>B</option>
+                            <option value="B-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B-' %}selected{% endif %}>B-</option>
+                            <option value="C+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C+' %}selected{% endif %}>C+</option>
+                            <option value="C" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C' %}selected{% endif %}>C</option>
+                            <option value="C-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C-' %}selected{% endif %}>C-</option>
+                            <option value="D+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D+' %}selected{% endif %}>D+</option>
+                            <option value="D" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D' %}selected{% endif %}>D</option>
+                            <option value="D-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D-' %}selected{% endif %}>D-</option>
+                            <option value="E" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'E' %}selected{% endif %}>E</option>
+                            <option value="F" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'F' %}selected{% endif %}>F</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ subject }} - Remarks</label>
+                        <input type="text" name="score_{{ subject }}_Remarks" id="remarks_{{ subject }}"
+                               value="{{ student.get(subject + ' Remarks - ' + academic_year + ' ' + semester, '') }}"
+                               placeholder="Auto-calculated" readonly class="auto-calc">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Elective Subjects -->
+            {% if department_subjects %}
+            <div class="card">
+                <h2>Department Subjects <span class="elective-badge">Elective</span></h2>
+                {% for subject in department_subjects %}
+                <div class="subject-section">
+                    <div class="subject-header">{{ subject }}</div>
+                    <div class="score-grid">
+                        <div class="form-group">
+                            <label>{{ subject }} - Exams Score</label>
+                            <input type="number" name="score_{{ subject }}_Exams Score" min="0" max="100" step="0.01"
+                                   value="{{ student.get(subject + ' Exams Score - ' + academic_year + ' ' + semester, '') }}"
+                                   placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label>{{ subject }} - Class Score</label>
+                            <input type="number" name="score_{{ subject }}_Class Score" min="0" max="100" step="0.01"
+                                   value="{{ student.get(subject + ' Class Score - ' + academic_year + ' ' + semester, '') }}"
+                                   placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label>{{ subject }} - Total Score</label>
+                            <input type="number" name="score_{{ subject }}_Total Score" min="0" max="100" step="0.01"
+                                   value="{{ student.get(subject + ' Total Score - ' + academic_year + ' ' + semester, '') }}"
+                                   placeholder="Auto-calculated" readonly class="auto-calc" id="total_{{ subject }}">
+                            <small style="color: #666; font-size: 0.8rem;">Exams + Class</small>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ subject }} - Grade</label>
+                            <select name="score_{{ subject }}_Grade" id="grade_{{ subject }}" readonly class="auto-calc">
+                                <option value="">Select</option>
+                                <option value="A" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'A' %}selected{% endif %}>A</option>
+                                <option value="B+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B+' %}selected{% endif %}>B+</option>
+                                <option value="B" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B' %}selected{% endif %}>B</option>
+                                <option value="B-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'B-' %}selected{% endif %}>B-</option>
+                                <option value="C+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C+' %}selected{% endif %}>C+</option>
+                                <option value="C" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C' %}selected{% endif %}>C</option>
+                                <option value="C-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'C-' %}selected{% endif %}>C-</option>
+                                <option value="D+" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D+' %}selected{% endif %}>D+</option>
+                                <option value="D" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D' %}selected{% endif %}>D</option>
+                                <option value="D-" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'D-' %}selected{% endif %}>D-</option>
+                                <option value="E" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'E' %}selected{% endif %}>E</option>
+                                <option value="F" {% if student.get(subject + ' Grade - ' + academic_year + ' ' + semester) == 'F' %}selected{% endif %}>F</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ subject }} - Remarks</label>
+                            <input type="text" name="score_{{ subject }}_Remarks" id="remarks_{{ subject }}"
+                                   value="{{ student.get(subject + ' Remarks - ' + academic_year + ' ' + semester, '') }}"
+                                   placeholder="Auto-calculated" readonly class="auto-calc">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Submit Button -->
+            <div class="btn-group">
+                <button type="submit" class="btn btn-success" style="flex: 1;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Save Results to Google Sheet
+                </button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+        {% elif student %}
+        <div class="card">
+            <div class="empty-state">
+                <h3>Please select Academic Year and Semester</h3>
+                <p>Select the year and semester above, then click "Load Student" to enter results.</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="empty-state">
+                <h3>No Student Selected</h3>
+                <p>Search for a student by ID or name, select the academic year and semester, then click "Load Student" to enter results.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Student search autocomplete
+        document.getElementById('student_search').addEventListener('input', function() {
+            const query = this.value;
+            if (query.length < 2) return;
+
+            fetch('/api/students/search?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('autocomplete_list');
+                    list.innerHTML = '';
+
+                    if (data.students && data.students.length > 0) {
+                        data.students.slice(0, 5).forEach(student => {
+                            const div = document.createElement('div');
+                            div.className = 'autocomplete-item';
+                            div.textContent = student['Student ID'] + ' - ' + student['Student Name'] + ' (' + student['Student Department'] + ')';
+                            div.onclick = function() {
+                                document.getElementById('student_search').value = student['Student ID'];
+                                list.innerHTML = '';
+                                // Auto-submit after selection
+                                document.getElementById('academic_year').focus();
+                            };
+                            list.appendChild(div);
+                        });
+                    }
+                });
+        });
+
+        // Technical School Grading Scale
+        // A: 75-100 = DISTINCTION
+        // B+: 70-74 = UPPER CREDIT
+        // B: 70-74 = UPPER CREDIT (intermediate)
+        // B-: 65-69 = UPPER CREDIT
+        // C+: 60-64 = CREDIT
+        // C: 60-64 = CREDIT (intermediate)
+        // C-: 50-59 = LOWER CREDIT
+        // D+: 45-49 = PASS
+        // D: 40-49 = PASS (intermediate)
+        // D-: 40-44 = PASS
+        // E: 40-49 = PASS (intermediate)
+        // F: 0-39 = FAIL
+
+        function getGradeAndRemarks(total) {
+            if (total === '' || isNaN(total)) {
+                return { grade: '', remarks: '' };
+            }
+
+            const score = parseFloat(total);
+
+            if (score >= 75) {
+                return { grade: 'A', remarks: 'DISTINCTION' };
+            } else if (score >= 70) {
+                return { grade: 'B+', remarks: 'UPPER CREDIT' };
+            } else if (score >= 65) {
+                return { grade: 'B-', remarks: 'UPPER CREDIT' };
+            } else if (score >= 60) {
+                return { grade: 'C+', remarks: 'CREDIT' };
+            } else if (score >= 50) {
+                return { grade: 'C-', remarks: 'LOWER CREDIT' };
+            } else if (score >= 45) {
+                return { grade: 'D+', remarks: 'PASS' };
+            } else if (score >= 40) {
+                return { grade: 'E', remarks: 'PASS' };
+            } else {
+                return { grade: 'F', remarks: 'FAIL' };
+            }
+        }
+
+        // Calculate results when exams or class score changes
+        function calculateSubjectResults(subject) {
+            const examsInput = document.querySelector(`input[name="score_${subject}_Exams Score"]`);
+            const classInput = document.querySelector(`input[name="score_${subject}_Class Score"]`);
+            const totalInput = document.getElementById(`total_${subject}`);
+            const gradeSelect = document.getElementById(`grade_${subject}`);
+            const remarksInput = document.getElementById(`remarks_${subject}`);
+
+            if (!examsInput || !classInput) return;
+
+            const exams = parseFloat(examsInput.value) || 0;
+            const classScore = parseFloat(classInput.value) || 0;
+            const total = exams + classScore;
+
+            // Update total score
+            if (totalInput) {
+                totalInput.value = total.toFixed(2);
+            }
+
+            // Calculate grade and remarks
+            const { grade, remarks } = getGradeAndRemarks(total);
+
+            // Update grade dropdown
+            if (gradeSelect) {
+                gradeSelect.value = grade;
+            }
+
+            // Update remarks
+            if (remarksInput) {
+                remarksInput.value = remarks;
+            }
+        }
+
+        // Initialize all subjects on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const subjects = ['Math', 'Science', 'Social', 'English', 'ICT', 'Entrepreneur',
+                              'Principles of electrical', 'Electrical installation',
+                              'Welding Principles', 'Welding Fabrication',
+                              'Plumbing Principles', 'Plumbing Technology',
+                              'Construction Practice', 'Construction Materials',
+                              'Garment design', 'Garment Construction',
+                              'Catering Principles', 'Catering Technology',
+                              'Wood Principles', 'Wood Technology'];
+
+            subjects.forEach(subject => {
+                const examsInput = document.querySelector(`input[name="score_${subject}_Exams Score"]`);
+                const classInput = document.querySelector(`input[name="score_${subject}_Class Score"]`);
+
+                if (examsInput) {
+                    examsInput.addEventListener('input', () => calculateSubjectResults(subject));
+                }
+                if (classInput) {
+                    classInput.addEventListener('input', () => calculateSubjectResults(subject));
+                }
+
+                // Initialize with current values
+                calculateSubjectResults(subject);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collect Payment - Gyedu Technical Institute</title>
+    <title>Payment History - Gyedu Technical Institute</title>
     <style>
         * {
             margin: 0;
@@ -11,26 +11,64 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary-green: #1B5E20;
+            --lighter-green: #2E7D32;
+            --accent-green: #4CAF50;
+            --bright-green: #66BB6A;
+            --light-bg: #E8F5E9;
+            --white: #ffffff;
+            --dark-text: #1B5E20;
+            --gray-text: #546E7A;
+            --border-color: #C8E6C9;
+            --danger: #E53935;
+            --warning: #FF9800;
+            --success: #43A047;
+            --info: #039BE5;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
+            font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 50%, #C5E1A5 100%);
+            min-height: 100vh;
             color: #333;
             line-height: 1.6;
         }
         
+        /* Header */
         .header {
-            background-color: #2c3e50;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--lighter-green) 100%);
             color: white;
-            padding: 20px 40px;
+            padding: 25px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(27, 94, 32, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -15%;
+            width: 350px;
+            height: 350px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         
         .header h1 {
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
         
         .header-info {
@@ -38,801 +76,837 @@
             opacity: 0.9;
         }
         
-        .nav-container {
-            background-color: #34495e;
-            padding: 0 40px;
-        }
-        
-        .nav {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .nav a {
-            color: #ecf0f1;
-            text-decoration: none;
-            padding: 15px 20px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .nav a:hover {
-            background-color: #2c3e50;
-            border-bottom-color: #3498db;
-        }
-        
-        .nav a.active {
-            border-bottom-color: #27ae60;
-            background-color: #2c3e50;
-        }
-        
-        .nav a.back-link {
-            border-bottom-color: #e74c3c;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px;
-        }
-        
-        .page-title {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .page-subtitle {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-        
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 20px;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .form-group small {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
+        .header-actions {
+            position: relative;
+            z-index: 1;
         }
         
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 25px;
+            padding: 12px 24px;
             font-size: 14px;
             font-weight: 600;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary { 
+            background: white; 
+            color: var(--primary-green); 
+            border: 2px solid var(--accent-green);
+        }
+        .btn-secondary:hover { 
+            background: var(--light-bg);
+            transform: translateY(-2px);
         }
         
         .btn-primary {
-            background-color: #27ae60;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--success) 100%);
             color: white;
         }
-        
         .btn-primary:hover {
-            background-color: #219a52;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
         }
         
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
+        /* Navigation */
+        .nav-container {
+            background: white;
+            padding: 0 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .btn-secondary:hover {
-            background-color: #7f8c8d;
-        }
-        
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        
-        .form-actions {
+        .nav {
             display: flex;
-            gap: 15px;
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #ecf0f1;
+            gap: 5px;
+            flex-wrap: wrap;
         }
         
-        .student-info-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: none;
+        .nav a {
+            color: var(--gray-text);
+            text-decoration: none;
+            padding: 18px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .student-info-card.show {
-            display: block;
+        .nav a svg {
+            width: 18px;
+            height: 18px;
         }
         
-        .student-info-card h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            opacity: 0.9;
+        .nav a:hover {
+            color: var(--primary-green);
+            background: var(--light-bg);
         }
         
-        .student-info-card .student-name {
-            font-size: 24px;
+        .nav a.active {
+            color: var(--primary-green);
+            border-bottom-color: var(--accent-green);
+            background: var(--light-bg);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 10px;
+            color: var(--primary-green);
+            margin-bottom: 8px;
         }
         
-        .student-info-card .student-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .student-info-card .detail-item {
-            background: rgba(255,255,255,0.15);
-            padding: 12px;
-            border-radius: 6px;
-        }
-        
-        .student-info-card .detail-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .student-info-card .detail-value {
+        .page-subtitle {
+            color: var(--gray-text);
             font-size: 16px;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-green), var(--bright-green));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        
+        .stat-icon svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+        
+        .stat-icon.green { background: linear-gradient(135deg, var(--accent-green), var(--success)); }
+        .stat-icon.blue { background: linear-gradient(135deg, #42A5F5, var(--info)); }
+        .stat-icon.orange { background: linear-gradient(135deg, #FFA726, var(--warning)); }
+        .stat-icon.purple { background: linear-gradient(135deg, #AB47BC, #7B1FA2); }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
         
-        .pending-balances {
-            background: #fff9e6;
-            border: 2px solid #f1c40f;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark-text);
         }
         
-        .pending-balances h4 {
-            color: #9a7b0a;
-            margin-bottom: 15px;
-            font-size: 16px;
+        .stat-subtext {
+            font-size: 13px;
+            color: var(--gray-text);
+            margin-top: 8px;
         }
         
-        .balance-item {
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--lighter-green) 100%);
+            color: white;
+            padding: 25px 30px;
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f1c40f;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
-        .balance-item:last-child {
-            border-bottom: none;
-        }
-        
-        .balance-item .category {
-            font-weight: 500;
-        }
-        
-        .balance-item .amount {
+        .card-title {
+            font-size: 20px;
             font-weight: 700;
-            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
-        .alert {
-            padding: 15px 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        .card-title svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--lighter-green) 100%);
+        }
+        
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 18px 20px;
+            border-bottom: 2px solid var(--border-color);
             font-size: 14px;
         }
         
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        tbody tr {
+            transition: all 0.2s ease;
         }
         
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        tbody tr:hover {
+            background-color: var(--light-bg);
         }
         
-        .receipt-preview {
-            background: white;
-            border: 2px dashed #3498db;
-            border-radius: 8px;
-            padding: 30px;
-            margin-top: 25px;
-            display: none;
-        }
-        
-        .receipt-preview.show {
-            display: block;
-        }
-        
-        .receipt-header {
-            text-align: center;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .receipt-header h2 {
-            color: #2c3e50;
-            font-size: 22px;
-        }
-        
-        .receipt-header p {
-            color: #7f8c8d;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-        
-        .receipt-details {
-            margin-bottom: 20px;
-        }
-        
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        .receipt-row.total {
-            font-weight: 700;
-            font-size: 18px;
-            border-top: 2px solid #2c3e50;
+        tbody tr:last-child td {
             border-bottom: none;
-            margin-top: 15px;
-            padding-top: 15px;
         }
         
-        .receipt-footer {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
-            color: #7f8c8d;
-            font-size: 13px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 12px;
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .status-badge.success {
-            background-color: #d4edda;
-            color: #155724;
+        .badge-success { 
+            background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%); 
+            color: var(--primary-green); 
         }
         
-        .status-badge.pending {
-            background-color: #fff3cd;
-            color: #856404;
+        .badge-warning { 
+            background: linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%); 
+            color: #E65100; 
         }
         
-        .status-badge.overdue {
-            background-color: #f8d7da;
-            color: #721c24;
+        .badge-danger { 
+            background: linear-gradient(135deg, #FFCDD2 0%, #EF9A9A 100%); 
+            color: var(--danger); 
         }
         
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+        .badge-info { 
+            background: linear-gradient(135deg, #B3E5FC 0%, #81D4FA 100%); 
+            color: #0277BD; 
         }
         
-        .modal-overlay.show {
-            display: flex;
+        .badge svg {
+            width: 14px;
+            height: 14px;
         }
         
-        .modal {
-            background: white;
+        /* Amount Styling */
+        .amount {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--success);
+        }
+        
+        /* Receipt Number Badge */
+        .receipt-badge {
+            background: #E8F5E9;
+            color: var(--primary-green);
+            padding: 5px 12px;
             border-radius: 8px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
         }
         
-        .modal h3 {
-            margin-bottom: 15px;
-            color: #27ae60;
-        }
-        
-        .modal p {
+        /* Alerts */
+        .alert {
+            padding: 18px 25px;
+            border-radius: 12px;
             margin-bottom: 25px;
-            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
         }
         
-        .modal-actions {
+        .alert svg {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+            color: var(--primary-green);
+            border: 2px solid var(--accent-green);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--gray-text);
+        }
+        
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: 50%;
             display: flex;
-            gap: 15px;
+            align-items: center;
             justify-content: center;
+        }
+        
+        .empty-icon svg {
+            width: 60px;
+            height: 60px;
+            color: var(--accent-green);
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        /* Student Info Cell */
+        .student-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-green), var(--bright-green));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .student-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .student-name {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        
+        .student-id {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray-text);
+            font-size: 13px;
+        }
+        
+        .footer-date {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Action Buttons */
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .nav-container {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+            
+            .nav {
+                min-width: max-content;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-actions {
+                width: 100%;
+            }
+            
+            .card-actions .btn {
+                flex: 1;
+            }
+            
+            .student-cell {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card, .stat-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* Print Styles */
+        @media print {
+            .header, .nav-container, .btn, .card-actions, .action-buttons {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 2px solid var(--border-color);
+            }
+            
+            .table-container {
+                border: 2px solid var(--border-color);
+            }
+            
+            table {
+                border: 2px solid var(--border-color);
+            }
+            
+            th, td {
+                border: 1px solid var(--border-color);
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <h1>GYEDU TECHNICAL INSTITUTE</h1>
-        <div class="header-info">
-            <div>Admin Finance Module</div>
-            <div>{% if current_user %}{{ current_user }}{% endif %}</div>
+        <div class="header-content">
+            <h1>Gyedu Technical Institute</h1>
+            <div class="header-info">Finance - Payment History</div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin_finance') }}" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Finance
+            </a>
         </div>
     </div>
     
+    <!-- Navigation -->
     <div class="nav-container">
         <div class="nav">
-            <a href="/admin">Dashboard</a>
-            <a href="/admin/store">Store Management</a>
-            <a href="/admin/finance" class="active">Finance & Accounts</a>
-            <a href="/admin/estate">Estate Management</a>
-            <a href="/admin/manage_hods">HOD Management</a>
-            <a href="/admin/results">Results</a>
-            <a href="/admin/students">Students</a>
-            <a href="/logout" class="back-link">Logout</a>
+            <a href="{{ url_for('admin_finance') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ url_for('admin_finance_fee_setup') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Fee Setup
+            </a>
+            <a href="{{ url_for('admin_finance_collect_payment') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Collect Payment
+            </a>
+            <a href="{{ url_for('admin_finance_view_payments') }}" class="active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Payment History
+            </a>
+            <a href="{{ url_for('admin_finance_students') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Students
+            </a>
+            <a href="{{ url_for('admin_finance_expenses') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                </svg>
+                Expenses
+            </a>
         </div>
     </div>
     
+    <!-- Main Content -->
     <div class="container">
-        <h2 class="page-title">Collect Payment</h2>
-        <p class="page-subtitle">Record student payments and generate receipts</p>
-        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {% if category == 'success' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            {% else %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            {% endif %}
+                        </svg>
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
         
-        <!-- Student Search Section -->
-        <div class="card">
-            <h3 class="card-title">Search Student</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="student_id">Student ID / Index Number</label>
-                    <input type="text" id="student_id" placeholder="e.g., STI/2024/001">
-                </div>
-                <div class="form-group">
-                    <label for="student_name">Student Name</label>
-                    <input type="text" id="student_name" placeholder="Search by student name">
-                </div>
-                <div class="form-group" style="justify-content: flex-end;">
-                    <button type="button" class="btn btn-primary" onclick="searchStudent()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                        Search Student
-                    </button>
-                </div>
-            </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Payment History</h1>
+            <p class="page-subtitle">Complete record of all student payments and transactions</p>
         </div>
         
-        <!-- Student Information Display -->
-        <div class="student-info-card" id="studentInfoCard">
-            <h3>Student Information</h3>
-            <div class="student-name" id="studentName">Student Name</div>
-            <div class="student-details">
-                <div class="detail-item">
-                    <div class="detail-label">Student ID</div>
-                    <div class="detail-value" id="displayStudentId">-</div>
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                 </div>
-                <div class="detail-item">
-                    <div class="detail-label">Class</div>
-                    <div class="detail-value" id="displayClass">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Programme</div>
-                    <div class="detail-value" id="displayProgramme">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Status</div>
-                    <div class="detail-value" id="displayStatus">-</div>
-                </div>
+                <div class="stat-label">Total Payments</div>
+                <div class="stat-value">{{ payments|length }}</div>
+                <div class="stat-subtext">All recorded transactions</div>
             </div>
-        </div>
-        
-        <!-- Pending Balances Display -->
-        <div class="pending-balances" id="pendingBalances" style="display: none;">
-            <h4>Pending Fee Balances</h4>
-            <div id="balanceList"></div>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #f1c40f; display: flex; justify-content: space-between;">
-                <strong>Total Outstanding</strong>
-                <strong style="color: #e74c3c; font-size: 18px;" id="totalOutstanding">GH₵ 0.00</strong>
-            </div>
-        </div>
-        
-        <!-- Payment Form -->
-        <form method="POST" action="/admin/finance/collect_payment" id="paymentForm">
-            <input type="hidden" name="student_id" id="hiddenStudentId">
             
-            <div class="card" id="paymentCard" style="display: none;">
-                <h3 class="card-title">Payment Details</h3>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fee_category">Fee Category *</label>
-                        <select name="fee_category" id="fee_category" required>
-                            <option value="">Select Fee Category</option>
-                            {% for category in fee_categories %}
-                                <option value="{{ category.id }}">{{ category.name }} (GH₵ {{ category.amount }})</option>
-                            {% endfor %}
-                        </select>
-                        <small>Select the fee category for this payment</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="payment_amount">Amount (GH₵) *</label>
-                        <input type="number" name="payment_amount" id="payment_amount" 
-                               step="0.01" min="0" placeholder="0.00" required>
-                        <small>Enter the payment amount</small>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="payment_method">Payment Method *</label>
-                        <select name="payment_method" id="payment_method" required>
-                            <option value="">Select Payment Method</option>
-                            <option value="cash">Cash</option>
-                            <option value="mobile_money">Mobile Money</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="cheque">Cheque</option>
-                            <option value="card">Card Payment</option>
-                        </select>
-                        <small>How was the payment received</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="payment_date">Payment Date *</label>
-                        <input type="date" name="payment_date" id="payment_date" required>
-                        <small>Date of payment collection</small>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="transaction_ref">Transaction Reference</label>
-                        <input type="text" name="transaction_ref" id="transaction_ref" 
-                               placeholder="e.g., MM123456789">
-                        <small>Mobile money or bank reference number</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="receipt_number">Receipt Number</label>
-                        <input type="text" name="receipt_number" id="receipt_number" 
-                               value="{{ next_receipt_number }}" readonly>
-                        <small>Auto-generated receipt number</small>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="payment_notes">Notes</label>
-                    <textarea name="payment_notes" id="payment_notes" 
-                              placeholder="Any additional notes about this payment..."></textarea>
-                    <small>Optional: Add any relevant notes</small>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                            <polyline points="7 3 7 8 15 8"></polyline>
-                        </svg>
-                        Record Payment & Generate Receipt
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                            <path d="M3 3v5h5"></path>
-                        </svg>
-                        Reset Form
-                    </button>
-                </div>
+                <div class="stat-label">Total Amount Collected</div>
+                <div class="stat-value">GH₵ {{ "%.2f"|format(total_collected) }}</div>
+                <div class="stat-subtext">Sum of all payments</div>
             </div>
-        </form>
+            
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="stat-label">Average Payment</div>
+                <div class="stat-value">GH₵ {{ "%.2f"|format(total_collected / payments|length if payments else 0) }}</div>
+                <div class="stat-subtext">Per transaction average</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="stat-label">Completed Transactions</div>
+                <div class="stat-value">{{ payments|length }}</div>
+                <div class="stat-subtext">Successfully processed</div>
+            </div>
+        </div>
         
-        <!-- Receipt Preview -->
-        <div class="receipt-preview" id="receiptPreview">
-            <div class="receipt-header">
-                <h2>GYEDU TECHNICAL INSTITUTE</h2>
-                <p>Official Payment Receipt</p>
-            </div>
-            <div class="receipt-details">
-                <div class="receipt-row">
-                    <span>Receipt Number:</span>
-                    <span id="receiptNum"></span>
+        <!-- Transactions Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    All Transactions
                 </div>
-                <div class="receipt-row">
-                    <span>Date:</span>
-                    <span id="receiptDate"></span>
-                </div>
-                <div class="receipt-row">
-                    <span>Student Name:</span>
-                    <span id="receiptStudent"></span>
-                </div>
-                <div class="receipt-row">
-                    <span>Student ID:</span>
-                    <span id="receiptStudentId"></span>
-                </div>
-                <div class="receipt-row">
-                    <span>Payment Method:</span>
-                    <span id="receiptMethod"></span>
-                </div>
-                <div class="receipt-row">
-                    <span>Fee Category:</span>
-                    <span id="receiptCategory"></span>
-                </div>
-                <div class="receipt-row">
-                    <span>Amount Paid:</span>
-                    <span id="receiptAmount"></span>
-                </div>
-                <div class="receipt-row total">
-                    <span>Total Paid:</span>
-                    <span id="receiptTotal"></span>
+                <div class="card-actions">
+                    <button onclick="window.print()" class="btn btn-primary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print Report
+                    </button>
+                    <button onclick="exportToCSV()" class="btn btn-secondary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export CSV
+                    </button>
                 </div>
             </div>
-            <div class="receipt-footer">
-                <p>This receipt is an official document of Gyedu Technical Institute</p>
-                <p>Generated on {% now 'datetime' %}</p>
+            
+            <div class="card-body">
+                {% if payments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Receipt No</th>
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Fee Type</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            {% set student_name = payment.get('student_name', '-') %}
+                            {% set student_id = payment.get('student_id', '-') %}
+                            <tr>
+                                <td><span class="receipt-badge">{{ payment.get('receipt_number', '-') }}</span></td>
+                                <td>{{ payment.get('payment_date', '-') }}</td>
+                                <td>
+                                    <div class="student-cell">
+                                        <div class="student-avatar">{{ student_name[:2].upper() if student_name != '-' else 'NA' }}</div>
+                                        <div class="student-details">
+                                            <div class="student-name">{{ student_name }}</div>
+                                            <div class="student-id">{{ student_id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>{{ payment.get('fee_type', '-') }}</strong></td>
+                                <td><span class="amount">GH₵ {{ "%.2f"|format(payment.get('amount', 0)) }}</span></td>
+                                <td>{{ payment.get('payment_method', '-') }}</td>
+                                <td>
+                                    <span class="badge badge-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        {{ payment.get('status', 'completed') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-secondary btn-icon" title="View Receipt" onclick="viewReceipt('{{ payment.get('receipt_number', '-') }}')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h3>No Payment Records</h3>
+                    <p>No payments have been recorded yet. Go to "Collect Payment" to record the first payment.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-date">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:18px;height:18px;vertical-align:middle;margin-right:8px;color:var(--accent-green);">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Generated on {{ current_date }}
             </div>
         </div>
     </div>
     
-    <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
-        <div class="modal">
-            <h3>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-            </h3>
-            <h3>Payment Recorded Successfully!</h3>
-            <p>The payment has been recorded and a receipt has been generated.</p>
-            <div class="modal-actions">
-                <button class="btn btn-primary" onclick="printReceipt()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                        <rect x="6" y="14" width="12" height="8"></rect>
-                    </svg>
-                    Print Receipt
-                </button>
-                <button class="btn btn-secondary" onclick="closeModal()">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Set default date to today
-        document.getElementById('payment_date').valueAsDate = new Date();
-        
-        // Demo student data for testing
-        const demoStudents = [
-            { id: 'STI/2024/001', name: 'Kwame Asante', class: 'Form 3', programme: 'Electrical Engineering', status: 'Active', balances: [
-                { category: 'School Fees', amount: 450.00 },
-                { category: 'Library Fee', amount: 50.00 }
-            ]},
-            { id: 'STI/2024/002', name: 'Ama Osei', class: 'Form 2', programme: 'Computer Science', status: 'Active', balances: [
-                { category: 'School Fees', amount: 200.00 },
-                { category: 'Exam Fee', amount: 150.00 }
-            ]},
-            { id: 'STI/2024/003', name: 'Kofi Mensah', class: 'Form 4', programme: 'Mechanical Engineering', status: 'Active', balances: [
-                { category: 'School Fees', amount: 800.00 },
-                { category: 'Practical Fee', amount: 300.00 }
-            ]}
-        ];
-        
-        let currentStudent = null;
-        
-        function searchStudent() {
-            const studentId = document.getElementById('student_id').value.trim();
-            const studentName = document.getElementById('student_name').value.trim().toLowerCase();
-            
-            // Find student from demo data
-            let student = null;
-            if (studentId) {
-                student = demoStudents.find(s => s.id === studentId);
-            } else if (studentName) {
-                student = demoStudents.find(s => s.name.toLowerCase().includes(studentName));
-            }
-            
-            if (student) {
-                currentStudent = student;
-                displayStudentInfo(student);
-                displayPendingBalances(student);
-                document.getElementById('paymentCard').style.display = 'block';
-                document.getElementById('hiddenStudentId').value = student.id;
-            } else {
-                alert('Student not found. Please check the ID or name and try again.');
-                resetForm();
-            }
+        function viewReceipt(receiptNumber) {
+            // Navigate to the student account page with the receipt number
+            window.location.href = '{{ url_for("admin_finance_student_account") }}?search=' + receiptNumber;
         }
         
-        function displayStudentInfo(student) {
-            document.getElementById('studentInfoCard').classList.add('show');
-            document.getElementById('studentName').textContent = student.name;
-            document.getElementById('displayStudentId').textContent = student.id;
-            document.getElementById('displayClass').textContent = student.class;
-            document.getElementById('displayProgramme').textContent = student.programme;
-            document.getElementById('displayStatus').innerHTML = '<span class="status-badge success">' + student.status + '</span>';
-        }
-        
-        function displayPendingBalances(student) {
-            const balanceList = document.getElementById('balanceList');
-            const pendingBalances = document.getElementById('pendingBalances');
+        function exportToCSV() {
+            // Create CSV content from payments data
+            let csvContent = 'Receipt No,Date,Student ID,Student Name,Fee Type,Amount,Method,Status\n';
             
-            if (student.balances && student.balances.length > 0) {
-                pendingBalances.style.display = 'block';
-                balanceList.innerHTML = '';
-                
-                let total = 0;
-                student.balances.forEach(balance => {
-                    total += balance.amount;
-                    balanceList.innerHTML += `
-                        <div class="balance-item">
-                            <span class="category">${balance.category}</span>
-                            <span class="amount">GH₵ ${balance.amount.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-                
-                document.getElementById('totalOutstanding').textContent = 'GH₵ ' + total.toFixed(2);
-            } else {
-                pendingBalances.style.display = 'none';
-            }
-        }
-        
-        function resetForm() {
-            document.getElementById('student_id').value = '';
-            document.getElementById('student_name').value = '';
-            document.getElementById('studentInfoCard').classList.remove('show');
-            document.getElementById('pendingBalances').style.display = 'none';
-            document.getElementById('paymentCard').style.display = 'none';
-            document.getElementById('paymentForm').reset();
-            document.getElementById('hiddenStudentId').value = '';
-            document.getElementById('payment_date').valueAsDate = new Date();
-            currentStudent = null;
-        }
-        
-        function printReceipt() {
-            window.print();
-        }
-        
-        function closeModal() {
-            document.getElementById('successModal').classList.remove('show');
-            resetForm();
-        }
-        
-        // Handle form submission
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            {% if payments %}
+            {% for payment in payments %}
+            csvContent += '{{ payment.get("receipt_number", "-") }},{{ payment.get("payment_date", "-") }},{{ payment.get("student_id", "-") }},{{ payment.get("student_name", "-") }},{{ payment.get("fee_type", "-") }},{{ payment.get("amount", 0) }},{{ payment.get("payment_method", "-") }},{{ payment.get("status", "completed") }}\n';
+            {% endfor %}
+            {% endif %}
             
-            // Show success modal
-            document.getElementById('successModal').classList.add('show');
-            
-            // Generate receipt preview
-            generateReceiptPreview();
-        });
-        
-        function generateReceiptPreview() {
-            if (!currentStudent) return;
-            
-            document.getElementById('receiptPreview').classList.add('show');
-            document.getElementById('receiptNum').textContent = document.getElementById('receipt_number').value;
-            document.getElementById('receiptDate').textContent = document.getElementById('payment_date').value;
-            document.getElementById('receiptStudent').textContent = currentStudent.name;
-            document.getElementById('receiptStudentId').textContent = currentStudent.id;
-            document.getElementById('receiptMethod').textContent = document.getElementById('payment_method').value.replace('_', ' ');
-            
-            const categorySelect = document.getElementById('fee_category');
-            document.getElementById('receiptCategory').textContent = categorySelect.options[categorySelect.selectedIndex].text.split(' (')[0];
-            document.getElementById('receiptAmount').textContent = 'GH₵ ' + parseFloat(document.getElementById('payment_amount').value).toFixed(2);
-            document.getElementById('receiptTotal').textContent = 'GH₵ ' + parseFloat(document.getElementById('payment_amount').value).toFixed(2);
+            // Create and download the CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'payment_history_{{ current_date.replace(" ", "_") }}.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
         
-        // Allow Enter key to search
-        document.getElementById('student_id').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchStudent();
-            }
-        });
-        
-        document.getElementById('student_name').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchStudent();
-            }
+        // Add hover effect to table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#E8F5E9';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
         });
     </script>
 </body>

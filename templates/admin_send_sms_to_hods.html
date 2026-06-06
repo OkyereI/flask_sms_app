@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send SMS to HODs - Gyedu Technical</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .card-header {
+            background-color: #6f42c1;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+        .btn-primary {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+        .btn-primary:hover {
+            background-color: #5a3a9e;
+            border-color: #5a3a9e;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .info-box {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box i {
+            color: #6f42c1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fa fa-user-tie"></i> Send SMS to All HODs</h3>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="info-box">
+                <i class="fa fa-info-circle"></i>
+                <strong>Note:</strong> This will send an SMS message to all registered Heads of Department in the system. Use this to communicate important department updates and requirements.
+            </div>
+            
+            <form method="POST" action="{{ url_for('admin_send_sms_to_hods') }}">
+                <div class="form-group">
+                    <label for="message"><i class="fa fa-comment"></i> Message Content</label>
+                    <textarea 
+                        class="form-control" 
+                        id="message" 
+                        name="message" 
+                        rows="6" 
+                        placeholder="Enter your message here..."
+                        required
+                        maxlength="160"></textarea>
+                    <small class="form-text text-muted">
+                        Maximum 160 characters (standard SMS length). 
+                        Longer messages will be split into multiple SMS.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Preview:</label>
+                    <div class="border rounded p-3 bg-light" id="messagePreview">
+                        Your message will appear here...
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Character Count:</label>
+                    <span id="charCount" class="badge badge-primary">0</span> / 160
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fa fa-paper-plane"></i> Send SMS to All HODs
+                    </button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-lg">
+                        <i class="fa fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const messageInput = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+        const preview = document.getElementById('messagePreview');
+        
+        messageInput.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            if (count > 160) {
+                charCount.classList.remove('badge-primary');
+                charCount.classList.add('badge-danger');
+            } else {
+                charCount.classList.remove('badge-danger');
+                charCount.classList.add('badge-primary');
+            }
+            
+            preview.textContent = this.value || 'Your message will appear here...';
+        });
+    </script>
+</body>
+</html>

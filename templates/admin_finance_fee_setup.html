@@ -5,54 +5,310 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fee Setup - Gyedu Technical Institute</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .school-name { font-size: 1.3rem; font-weight: bold; color: #007bff; margin: 0; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; transition: background-color 0.3s ease; }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-primary:hover { background-color: #0056b3; }
-        .btn-secondary { background-color: #6c757d; color: white; }
-        .btn-secondary:hover { background-color: #5a6268; }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-success:hover { background-color: #218838; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
-        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        h1, h2 { color: #333; margin-top: 0; }
-        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
-        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
-        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-        .badge-success { background-color: #d4edda; color: #155724; }
-        .badge-secondary { background-color: #e9ecef; color: #495057; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        input:focus, select:focus { border-color: #007bff; outline: none; }
-        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .nav-links a { padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; }
-        .nav-links a:hover { background-color: #0056b3; }
-        .fee-card { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #007bff; }
-        .fee-card h3 { margin: 0 0 10px 0; color: #007bff; }
-        .fee-card p { margin: 5px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #27ae60;
+            background-color: #2c3e50;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #229954;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-secondary {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .fee-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .fee-card h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        
+        .fee-card p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .fee-card-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .sync-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
-                <p style="margin: 5px 0 0 0; color: #666;">Fee Setup</p>
-            </div>
-            <div>
-                <a href="{{ url_for('admin_finance') }}" class="btn btn-secondary">Back to Finance</a>
-            </div>
+    <div class="header">
+        <div>
+            <h1>Gyedu Technical Institute</h1>
+            <div class="header-info">Fee Setup</div>
         </div>
-        
+        <a href="{{ url_for('admin_finance') }}" class="btn btn-secondary">Back to Finance</a>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('admin_finance') }}">Dashboard</a>
+            <a href="{{ url_for('admin_finance_fee_setup') }}" class="active">Fee Setup</a>
+            <a href="{{ url_for('admin_finance_collect_payment') }}">Record Payment</a>
+            <a href="{{ url_for('admin_finance_students') }}">Student Accounts</a>
+            <a href="{{ url_for('admin_finance_expenses') }}">Expenses</a>
+            <a href="{{ url_for('admin_finance_view_payments') }}">Payment History</a>
+        </div>
+    </div>
+    
+    <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -61,67 +317,74 @@
             {% endif %}
         {% endwith %}
         
-        <div class="nav-links">
-            <a href="{{ url_for('admin_finance') }}">Dashboard</a>
-            <a href="{{ url_for('admin_finance_fee_setup') }}">Fee Setup</a>
-            <a href="{{ url_for('admin_finance_payment') }}">Record Payment</a>
-            <a href="{{ url_for('admin_finance_students') }}">Student Accounts</a>
-            <a href="{{ url_for('admin_finance_expenses') }}">Expenses</a>
+        {% if show_sync_notice %}
+        <div class="sync-notice">
+            <h3>Google Sheets Sync Enabled</h3>
+            <p>Fee types are synced with your Google Sheet: {{ sheet_url }}</p>
         </div>
+        {% endif %}
         
-        <!-- Add New Fee Form -->
-        <div class="card">
-            <h2>Add New Fee Type</h2>
-            <form method="POST">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label for="name">Fee Name *</label>
-                        <input type="text" id="name" name="name" required placeholder="e.g., Tuition Fee, Feeding Fee">
+        <div class="grid-2">
+            <!-- Add New Fee Type Form -->
+            <div class="card">
+                <h2 class="card-title">Add New Fee Type</h2>
+                <form method="POST" action="{{ url_for('admin_finance_fee_setup') }}">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Fee Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="e.g., Tuition Fee, Feeding Fee">
+                        </div>
+                        <div class="form-group">
+                            <label for="academic_year">Academic Year *</label>
+                            <input type="text" id="academic_year" name="academic_year" required placeholder="e.g., 2025-2026">
+                        </div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="academic_year">Academic Year *</label>
-                        <input type="text" id="academic_year" name="academic_year" required placeholder="e.g., 2025-2026">
+                        <label for="amount">Amount (GHS) *</label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0" required placeholder="0.00">
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="amount">Amount (GHS) *</label>
-                    <input type="number" id="amount" name="amount" step="0.01" min="0" required placeholder="0.00">
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="2" placeholder="Optional description..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-success">Create Fee Type</button>
-            </form>
-        </div>
-        
-        <!-- Existing Fee Types -->
-        <div class="card">
-            <h2>Existing Fee Types</h2>
-            {% if fees %}
-                {% for fee in fees %}
-                    <div class="fee-card">
-                        <h3>{{ fee.name }} ({{ fee.academic_year }})</h3>
-                        <p><strong>Amount:</strong> GHS {{ "%.2f"|format(fee.amount) }}</p>
-                        {% if fee.description %}
-                            <p><strong>Description:</strong> {{ fee.description }}</p>
-                        {% endif %}
-                        <p>
-                            <strong>Status:</strong> 
-                            {% if fee.is_active %}
-                                <span class="badge badge-success">Active</span>
-                            {% else %}
-                                <span class="badge badge-secondary">Inactive</span>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="3" placeholder="Optional description..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success" style="margin-top: 10px;">
+                        Create Fee Type
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Existing Fee Types -->
+            <div class="card">
+                <h2 class="card-title">Existing Fee Types</h2>
+                {% if fees %}
+                    {% for fee in fees %}
+                        <div class="fee-card">
+                            <h3>{{ fee.name }} <small>({{ fee.academic_year }})</small></h3>
+                            <p><strong>Amount:</strong> GHS {{ "%.2f"|format(fee.amount) }}</p>
+                            {% if fee.description %}
+                                <p><strong>Description:</strong> {{ fee.description }}</p>
                             {% endif %}
-                        </p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge {% if fee.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                                    {{ 'Active' if fee.is_active else 'Inactive' }}
+                                </span>
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 80px; height: 80px; opacity: 0.5; margin: 0 auto 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <h3>No Fee Types Created</h3>
+                        <p>Create your first fee type using the form on the left.</p>
                     </div>
-                {% endfor %}
-            {% else %}
-                <p style="text-align: center; color: #666; padding: 20px;">No fee types created yet.</p>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>

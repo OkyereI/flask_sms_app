@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 700px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .school-name { font-size: 1.5rem; font-weight: bold; color: #28a745; margin: 0; }
+        .nav-links { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-links a { padding: 10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; flex: 1; text-align: center; }
+        .nav-links a:hover { background-color: #218838; }
+        .card { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-top: 0; text-align: center; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        input:focus, select:focus { border-color: #28a745; outline: none; }
+        .btn-group { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; text-decoration: none; display: inline-block; text-align: center; flex: 1; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .help-text { font-size: 0.85rem; color: #666; margin-top: 5px; }
+        .info-box { background-color: #e7f3ff; border: 1px solid #b3d7ff; border-radius: 4px; padding: 15px; margin-bottom: 20px; }
+        .info-box h3 { color: #004085; margin-bottom: 10px; font-size: 1rem; }
+        .info-box ul { margin-left: 20px; color: #004085; }
+        .info-box li { margin-bottom: 5px; }
+        .id-preview { background-color: #f8f9fa; border: 2px dashed #28a745; border-radius: 4px; padding: 15px; text-align: center; margin-bottom: 20px; }
+        .id-preview .label { color: #666; font-size: 0.9rem; }
+        .id-preview .id-format { color: #28a745; font-weight: bold; font-size: 1.2rem; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="school-name">Gyedu Technical Institute</h1>
+            <p style="color: #666; margin-top: 5px;">Student Registration - Auto ID Generation</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('admin_manage_students') }}">Manage Students</a>
+            <a href="{{ url_for('admin_bulk_upload_students') }}">Bulk Upload</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <h1>Add New Student</h1>
+            
+            <div class="id-preview">
+                <div class="label">Student ID Format</div>
+                <div class="id-format">[DEPT_CODE]STUATI[YEAR][SEQ]</div>
+                <div class="help-text" style="margin-top: 5px;">Example: EETSTUATI25001, WELSTUATI25002</div>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="student_name">Student Name *</label>
+                    <input type="text" id="student_name" name="student_name" required placeholder="Full name of student">
+                </div>
+                
+                <div class="form-group">
+                    <label for="department">Department *</label>
+                    <select id="department" name="department" required onchange="updateIdPreview()">
+                        <option value="">Select Department</option>
+                        {% for dept in AVAILABLE_DEPARTMENTS %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="entry_year">Entry Year *</label>
+                    <input type="number" id="entry_year" name="entry_year" required value="{{ current_year }}" min="2000" max="2100">
+                    <p class="help-text">The year the student enrolled/will enroll</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parent_phone">Parent/Guardian Phone</label>
+                    <input type="text" id="parent_phone" name="parent_phone" placeholder="e.g., 0243123456">
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">Register Student (Auto-ID)</button>
+                    <a href="{{ url_for('admin_manage_students') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            
+            <div class="info-box" style="margin-top: 25px;">
+                <h3>Department Code Reference</h3>
+                <ul>
+                    <li><strong>Electrical:</strong> EET | <strong>Welding:</strong> WEL | <strong>Plumbing:</strong> PLB</li>
+                    <li><strong>Fashion/Garment:</strong> FAS | <strong>Catering:</strong> CAT | <strong>Building:</strong> BLD</li>
+                    <li><strong>Wood:</strong> WOO | <strong>ICT:</strong> ICT | <strong>Science:</strong> SCI</li>
+                    <li><strong>Business:</strong> BUS | <strong>General Arts:</strong> GAR</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateIdPreview() {
+            const dept = document.getElementById('department').value;
+            const year = document.getElementById('entry_year').value;
+            // This is just a visual preview - actual ID is generated on server
+        }
+    </script>
+</body>
+</html>

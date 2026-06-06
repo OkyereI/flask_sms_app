@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gyedutechnical</title>
+    <title>Gyedu Technical</title>
     <link rel="stylesheet" type="" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
@@ -227,17 +227,80 @@ function carousel() {
         .back-link a:hover {
             text-decoration: underline;
         }
+        /* Staff Portals Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown .dropdown-toggle {
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .dropdown-menu a {
+            color: #333 !important;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            margin: 0 !important;
+            border-bottom: 1px solid #eee;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-menu a:hover {
+            background-color: #007bff;
+            color: white !important;
+        }
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown:hover .dropdown-toggle {
+            color: #ccc;
+        }
+        /* Staff Portals Section Styles */
+        .staff-portals-section {
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        .staff-portals-section h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <h1 style="color: navy;">G.T.I</h1>
+        <h1 style="color: rgb(118, 192, 226);"><G class="T I"></G></h1>
               <div class="navbar-links">
             <a href="{{ url_for('index') }}" class="active">Home</a>
             <a href="{{ url_for('student_login') }}">Student Login</a>
             <a href="{{ url_for('admin_login') }}">Admin Login</a>
             <a href="{{ url_for('ai_assistant') }}">AI Assistant</a>
             <a href="{{ url_for('library') }}">Library</a>
+            {# Staff Portals Dropdown #}
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: white; text-decoration: none; margin-left: 20px; font-size: 1.1rem;">
+                    Staff Portals
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{ url_for('finance_login') }}">Finance Officer</a>
+                    <a class="dropdown-item" href="{{ url_for('estate_login') }}">Estate Officer</a>
+                    <a class="dropdown-item" href="{{ url_for('store_login') }}">Store Keeper</a>
+                    <a class="dropdown-item" href="{{ url_for('hod_login') }}">Head of Department</a>
+                </div>
+            </div>
              {# Add Logout link for admin if logged in #}
              {% if session.get('admin_logged_in') %}
                   <a href="{{ url_for('admin_logout') }}">Logout</a>
@@ -249,7 +312,7 @@ function carousel() {
         <div class="center " style="max-width:100%; max-height: 60%;" >
             <img class="w3-content w3-section" src="/static/real-logo.JPG" style="width:10%">
             <div class='text-center'>
-                <h1>GYEDU TECHNICAL INSTITUTE</h1>
+                <h1>Gyedu Technical Institute</h1>
                 <p style='font-family:arial;color:#000065'>Making you Employable</p>
             </div>
             <hr>
@@ -269,6 +332,11 @@ function carousel() {
                 <p>Manage student data and send notifications.</p>
                 <a href="{{ url_for('admin_login') }}">Go to Admin Login</a>
             </div>
+            <div class="login-option">
+                <h3>Instructor Portal</h3>
+                <p>Enter and manage subject results.</p>
+                <a href="{{ url_for('instructor_login') }}">Go to Instructor Login</a>
+            </div>
              <div class="login-option">
                 <h3>AI Assistant</h3>
                 <p>Get help with your research and studies.</p>
@@ -279,431 +347,38 @@ function carousel() {
                 <p>Access educational resources.</p>
                 <a href="{{ url_for('library') }}">Go to Library</a>
             </div>
+        </div>
 
-
+        <div class="staff-portals-section">
+            <h2>Staff Portals</h2>
+            <p style="margin-bottom: 30px;">Access department-specific portals for authorized staff members.</p>
+            <div class="login-options">
+                <div class="login-option">
+                    <h3>Finance Officer</h3>
+                    <p>Manage school finances and payments.</p>
+                    <a href="{{ url_for('finance_login') }}">Go to Finance Portal</a>
+                </div>
+                <div class="login-option">
+                    <h3>Estate Officer</h3>
+                    <p>Handle estate and property management.</p>
+                    <a href="{{ url_for('estate_login') }}">Go to Estate Portal</a>
+                </div>
+                <div class="login-option">
+                    <h3>Store Keeper</h3>
+                    <p>Manage inventory and store items.</p>
+                    <a href="{{ url_for('store_login') }}">Go to Store Portal</a>
+                </div>
+                <div class="login-option">
+                    <h3>Head of Department</h3>
+                    <p>Access departmental dashboards and reports.</p>
+                    <a href="{{ url_for('hod_login') }}">Go to HOD Portal</a>
+                </div>
+            </div>
         </div>
         
        
-        <div class="row">
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/img7.jpg" style="width:100%">
-</div>
-<div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/fash-img1 (1).jpg" style="width:100%">
-</div>
-
-<div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/welding (1).jpg" style="width:100%">
-</div>
-<div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/img5.jpg" style="width:100%">
-</div>
-<div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/image2.jpg" style="width:100%">
-</div>
-<div  class="col-sm-4" style="max-width:100%; max-height: 60%;" >
-    <img class="w3-content w3-section" src="/static/tire.jpg" style="width:100%;height:55%">
-</div>
-</div>
-
-<!-- <script>
-var myIndex = 0;
-carousel();
-
-function carousel() {
-var i;
-var x = document.getElementsByClassName("Slide");
-for (i = 0; i < x.length; i++) {
-x[i].style.display = "none";  
-}
-myIndex++;
-if (myIndex > x.length) {myIndex = 1}    
-x[myIndex-1].style.display = "block";  
-setTimeout(carousel, 4000);    
-}
-</script> -->
-   <!-- <div id='img-one'class="img-thumbnail" width="100%" height="100% float-left">
-    </div>
-</div>-->
-
-
-<hr>
-<div class='row' style='margin-top:40px'>
- 
-<div id="t" class=col-sm-4>
-<span style='color:#000065'>OUR HISTORY</span>
-
-<br>
-<p  class="container p-3 my-3 bg-primary text-white">
-Gyedu Technical Institute was Initiated by the Chief of Gyedu, which primary goal was to impact skills oriented program for the community  and youth. His decision was to give his people technical know how for self employment and development.
-
-
-</p>
-</div>
-<hr>
-
-<div id="t" class=col-sm-4>
-<span style='color:#000065'>OUR VISION</span>
-
-<br>
-<p  class="container p-3 my-3 bg-dark  text-white">
-The vission of Gyedu Technical Institute is to train and develop skills oriented programs to the youth to be self reliance and indepent. We want to train and educate the handy men and women for tomorrow.
-</p>
-</div>
-<hr>
-<div id="t" class=col-sm-4>
-<span style='color:#000065'>OUR MISSION</span>
-
-<br>
-<p  class="container p-3 my-3 bg-secondary text-white">
-Making every student employable. Our focus is to train with technical knowledge  and achieve an artisonal workmanship that would depend on themselves with technical skills delivery  
-
-
-</p>
-</div>
-
-</div>
-<hr>
-<div class='row' style='margin-top:20px'>
- 
-    <div  class= col-sm-9>
-        <span style='color:#000065;height:2px'>news</span>
-
-        <br>
-        <p  class="container p-3 my-3 bg-dark text-white">
-        <a href="news.html"><h2>HEADLINES</h2></a>
-        <hr>
-        <p>The regional director of CTEVT visits Gyedu Technical Institute</p>
-        <p>
-        The regional director of Commission of Technical and Vocational Education Training(CTVET) Mr. Asare Bediako Seth popularly known as ABS  on his regional tour visited Gyedu Technical Institute (G.T.I) on the 22nd August 2023. The purpose of his regional tour was to visit the technical schools in the Ahafo Region to introduce himself together with his district team members. </p>
-            </p>
-     </div>
-    <div>
-        <img  src="/static/group.jpg" alt=""class="w3-content w3-section " style="max-width:100%;"> 
-    </div>
-</div>
-
-
-
-<hr>
-<div class='container w-520'> </div>
-    <h1 class='text-center'><span style='color:blue'>The School tour by the Regional Director</span></h1>
-
-    <div>
-    <p>The school welcomed regional director</p>
-        <img src="/static/meeting.jpg" class="w3-content w3-section " style="max-width:100%;" alt="">
-    </div>
-    <hr>
-    <!-- <div>
-    <p> The principal together with the regional director</p>
-        <img src="/static/reg-d-principal.jpg" class="w3-content w3-section " style="max-width:100%;" alt="our hostel">
-    </div>
-    <hr>
-    <div>
-    <p>The Assistant Head master of Administration together with district monitoring and evaluation director</p>
-        <img src="/static/vice.jpg" class="w3-content w3-section " style="max-width:100%;" alt="our hostel">
-    </div>
-    <hr>
-    <div>
-    <p>the tour</p>
-        <img src="/static/group.jpg" class="w3-content w3-section " style="max-width:100%;" alt="our hostel">
-    </div>
-    <hr>
-    <div>
-    <p>the district and the school accountant</p>
-        <img src="/static/account.jpg" class="w3-content w3-section " style="max-width:100%;" alt="our hostel">
-    </div>
-</div> -->
-
-<hr>
-
-
-<!-- <div style='margin-top:140px;'>
-    
-<h1 class='text-center'>Our Courses</h1>
-<div class='row' style='margin-left:1em'>
-
-
-<div class= 'col'>
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-        <img class="w3-content w3-section" src="/static/img5.jpg" style="width:100%">
-    </div>   <p> 
-We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Electricals Engineering Technology</a></p> 
-</div>
-   <div class="col">
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-        <img class="w3-content w3-section" src="/static/BC.jpg" style="width:100%">
-    </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Building and construction Technology</a></p> 
-   </div> 
-    <div class="col">
-        <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-            <img class="w3-content w3-section" src="/static/welding (2).jpg" style="width:100%">
-        </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Welding and fabrication Technology</a></p> 
-   </div>
-   <div class="col">
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-        <img class="w3-content w3-section" src="/static/welding (3).jpg" style="width:100%">
-    </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Plumbing and Gas fitting Technology</a></p> 
-   </div>
-   <div class="col">
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-        <img class="w3-content w3-section" src="/static/fash-img1 (5).jpg" style="width:100%">
-    </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Fashing  Design  Technology</a></p> 
-   </div>
-   <div class="col">
-    <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-        <img class="w3-content w3-section" src="/static/welding (1).jpg" style="width:100%">
-    </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Wood Construction Technology</a></p> 
-   </div>
-   <div class="col">
-    
-    <div class="col">
-        <div  class="col-sm-4 " style="max-width:100%; max-height: 60%;" >
-            <img class="w3-content w3-section" src="/static/food.jpg" style="width:100%">
-        </div> 
-        We offer 
-</p>
-<p><a href="{{ url_for('courses') }}">Hospitality and Catering Technology</a></p> 
-</div>
-   </div>
-</div>
-</div> -->
-<div class="container">
-        <h1>Our Academic and Vocational Courses</h1>
-
-        <div class="course-list">
-            {% if courses %}
-                {% for course in courses %}
-                    <div class="course-card">
-                        <h2>{{ course.name }}</h2>
-                        <p>{{ course.description }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p style="grid-column: 1 / -1; text-align: center;">No courses available at the moment. Please check back later!</p>
-            {% endif %}
-        </div>
-
-        <div class="course-images-section">
-            <h2>Explore Our Vocational Programs</h2>
-            <div class="course-image-gallery">
-                <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='electricals.jpg') }}" alt="Electricals Course">
-                    <h3>Electricals</h3>
-                    <a href="{{ url_for('static', filename='electricals.html') }}">Learn More</a>
-                </div>
-                <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='catering.jpg') }}" alt="Catering Course">
-                    <h3>Catering</h3>
-                    <a href="{{ url_for('static', filename='catering.html') }}">Learn More</a>
-                </div>
-                <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='welding.jpg') }}" alt="Welding Course">
-                    <h3>Welding</h3>
-                    <a href="{{ url_for('static', filename='welding.html') }}">Learn More</a>
-                </div>
-                <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='plumbing.jpg') }}" alt="Plumbing Course">
-                    <h3>Plumbing</h3>
-                    <a href="{{ url_for('static', filename='plumbing.html') }}">Learn More</a>
-                </div>
-                 <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='building.jpg') }}" alt="Plumbing Course">
-                    <h3>Building & Construction Technology</h3>
-                    <a href="{{ url_for('static', filename='building.html') }}">Learn More</a>
-                </div>
-                 <div class="course-image-item">
-                    <img src="{{ url_for('static', filename='fashion.jpg') }}" alt="Plumbing Course">
-                    <h3>Fashion Design Technology</h3>
-                    <a href="{{ url_for('static', filename='fashion.html') }}">Learn More</a>
-                </div>
-                </div>
-        </div>
-
-        <p class="back-link"><a href="{{ url_for('index') }}">Back to Home</a></p>
-    </div>
-<hr>
-<!-- <div class='container'>
-    <p class='text-center'>Meet our Administrators</p>
-    <div>
-        <p>principal</p>
-    </div>
-    <div>
-        <p>Assistant Head of academics</p>
-    </div>
-    <div>
-        <p>Assistant Head of Administration</p>
-    </div>
-    <div>
-        <p>The Accountant</p>
-    </div>
-    <div>
-        <p>The store Keeper</p>
-    </div>
-</div>
-<hr>
-<div class='col'>
-<h3  class='text-center'>Submit Application form</h3>
-    <form class=' row col-sm-4 d-flex  center text-white' style='width:50%; height:15em; background:#000065; border-radius:8px;'>
-    <div class='form-group'>
-        
-   
-        <label for="name" style='margin-top:20px;'>Enter Name:<input type="name" name="" value="" class='form-control' placeholder='name'  style='border-bottom-style: solid ;margin-left:0.1em;border-radius:8px;'></label> <br>
-        <label for="email">Enter Email:<input class='form-control' style='margin-top:20px;margin-left:0.1em; border-bottom:20px;border-radius:8px;' type="text" name="" value="" placeholder='email'></label><br>
-        <a href='mailto:gyedutechnical@gmail.com? subject:register with us enquiries' class='btn btn-primary'type="submit" value='submit'>submit</a>
-    </div>
-    </form>
-</div>
-<hr> -->
-
-<div class='row' style='margin-left:2em'>
-     
-    <!-- <div class="w3-content w3-section ml-20" style="max-width:500px">
-<p>What students enjoy doing</p>
-
-<img class="mySlides w3-animate-fading" src="/static/img1.jpg" style="width:100%">
-<img class="mySlides w3-animate-fading" src="/static/welding (3).jpg" style="width:100%">
-<img class="mySlides w3-animate-fading" src="/static/BC.jpg" style="width:100%; height:60%">
-<img class="mySlides w3-animate-fading" src="/static/FASH.jpg" style="width:100%">
-</div>
-
-<script>
-var myIndex = 0;
-carousel();
-
-function carousel() {
-var i;
-var x = document.getElementsByClassName("mySlides");
-for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";  
-}
-myIndex++;
-if (myIndex > x.length) {myIndex = 1}    
-x[myIndex-1].style.display = "block";  
-setTimeout(carousel, 9000);    
-}
-</script>
-    <div class='container p-1 my-3 bg-primary text-white col-sm-4'>
-    <img class="center" src="/static/kumi.jpg" alt="" style='width=100%;height=100%; border-radius:50%; '> 
-    <h5>About students and projects</h5>
-    <hr style='background:orange'>
-    <div class="w3-panel w3-leftbar w3-light-grey">
-<p class="w3-xlarge w3-serif">
-<i>"Our students enjoy hands on projects and love to involve themselves prospective live projects."</i></p>
-<p> instructor kumi </p>
-</div>
-    <p>
-    this is a what the students enjoy doing
-    </p>
-</div>
-</div>
-<hr>
-<br> -->
-<div class='row'style='margin-left:2em'>
-    
-
-<div class="w3-content w3-section" style="max-width:500px; border-radius:6px">
-<p>Students and Sports</p>
-
-<img class="Slides w3-animate-fading" src="/static/sports (1).jpg" style="width:100%">
-<!-- <img class="Slides w3-animate-fading" src="/static/men.jpg" style="width:100%"> -->
-<img class="Slides w3-animate-fading" src="/static/sports (2).jpg" style="width:100%; height:60%">
-<img class="Slides w3-animate-fading" src="/static/sports (3).jpg" style="width:100%">
-</div>
-
-<script>
-var myIndex = 0;
-carousel();
-
-function carousel() {
-var i;
-var x = document.getElementsByClassName("Slides");
-for (i = 0; i < x.length; i++) {
-x[i].style.display = "none";  
-}
-myIndex++;
-if (myIndex > x.length) {myIndex = 1}    
-x[myIndex-1].style.display = "block";  
-setTimeout(carousel, 9000);    
-}
-</script>
-<div class="col-sm-4 ml-20px mt-40px" style='max-width:500px; margin-left:60px; ' >
-<p>
-The men  and women sporting team participated in a VOTESSA games held at bechem secondary school and we won the men athlete for the competion with a gold medal .
-
-</p>
-<p>
-The women football team placed second the the entire tournament and received silver medal for been placed second in the tournament
-</p>
-<p>The men volley ball team also placed second in the entire tounament and received a silver medal</p>
-<p>The women volley ball team also received a silver medal and was placed second in the entire tournament</p>
-</div>
-</div>
-<hr>
-<fieldset>
-    
-
-    <!-- <h1 class='text-center' style='color:red'>Our Affiliate</h1>
-    <div class='row' style='margin-left:2em'>
-                <div>
-                <a href="https://ctvet.gov.gh/"><img  src="ctvet.jpg" alt=" read from this site"  style='width:80%;height:80%'></a>
-                </div>
-             -->
-    
-             
-             
-</div>
-<footer class="row" style='width:100%;  border-radius:15px; background:#eee; margin-top:16
-px;margin-left:2em;'>
-    <div class='col-sm-4'>
-        <p style='margin-left:40px; margin-top:20px'>Quick link</p>
-        <ul style='list-style:none' class='text-left'>
-            <li><i class='fa fa-home' style='margin-left:15px;list-style:none'></i><a href="home.html"  style='margin-left:15px; text-decoration:none'>Home</a></li>
-            <li><i class='fa fa-mobile' style='margin-left:15px'></i><a href="contact.html"  style='margin-left:15px; text-decoration:none'>Contact</a></li>
-            <li><i class='fa fa-phone' style='margin-left:15px'></i><a href="about.html"  style='margin-left:15px; text-decoration:none'>About Us</a></li>
-            <li><i class='fa fa-envelope' style='margin-left:15px'></i><a href="mail.html"  style='margin-left:15px; text-decoration:none'>mail</a></li>
-            
-        </ul>
-    </div>
-    <div class="col-sm-4" style='margin-top:20px;width: 100%;'>
-    
-    <p class='text-center'>Address</p>
-            <p class='text-center'>Gyedu Technical Institute</p>
-            <p class='text-center'>P.O.Box 28</p>
-    
-        <p class='text-center'>Location:Gyedu, Asutifi South</p>
-        <p class='text-center'>Ahafo-Region-Ghana</p>
-        <p class='text-center'>contact:0243618800</p>
-    </div>
-    <div class="col-sm-4"style='color:navy;list-style:none;margin-top:20px'>
-    <ul class='nav'>
-        <a href="" ><li class='nav-item'><i class='fa fa-facebook' style='list-style:none; margin-left:10px;margin-right:10px'></i></a></li>
-        <a href=""><li class='nav-item'><i class='fa fa-twitter' style='list-style:none;margin-right:10px'></i></li></a>
-        <a href=""><li class='nav-item'><i class='fa fa-instagram' style='list-style:none;margin-right:10px'></i></li></a>
-        <a href=""><li class='nav-item'><i class='fa fa-envelope' style='list-style:none;margin-right:10px'></i></li></a>
-    </ul>
-    </div>
-    
-    </footer >
     <div class="text-center"> 
-        copy-right-2023 Design by Zion@soft
+        copy-right-2023 Design by globalbusiness@2026
     </div>  
 </body>
 </html>

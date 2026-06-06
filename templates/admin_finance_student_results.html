@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; color: #333; }
+        .header { background-color: #2c3e50; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .nav-container { background-color: #34495e; padding: 0 40px; }
+        .nav { display: flex; gap: 5px; }
+        .nav a { color: #ecf0f1; text-decoration: none; padding: 15px 20px; font-size: 14px; transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav a:hover { background-color: #2c3e50; border-bottom-color: #3498db; }
+        .nav a.active { border-bottom-color: #27ae60; background-color: #2c3e50; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 30px; }
+        .page-title { font-size: 28px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .page-subtitle { color: #7f8c8d; margin-bottom: 30px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 25px; }
+        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-success:hover { background-color: #219a52; }
+        .btn-secondary { background-color: #95a5a6; color: white; }
+        .btn-warning { background-color: #f39c12; color: white; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ecf0f1; font-size: 13px; }
+        th { background-color: #34495e; color: white; font-weight: 600; white-space: nowrap; }
+        tr:hover { background-color: #f8f9fa; }
+        .grade-a { background-color: #d4edda; color: #155724; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .grade-b { background-color: #cfe2ff; color: #084298; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .grade-c { background-color: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .grade-d { background-color: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .score { font-weight: 600; }
+        .alert { padding: 15px 20px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #7f8c8d; }
+        .quick-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Gyedu Technical Institute</h1>
+            <div style="font-size: 14px; opacity: 0.9;">Finance - Student Results Management</div>
+        </div>
+        <a href="{{ url_for('admin_finance') }}" class="btn btn-secondary">Back to Finance</a>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('admin_finance') }}">Dashboard</a>
+            <a href="{{ url_for('admin_finance_fee_setup') }}">Fee Setup</a>
+            <a href="{{ url_for('admin_finance_collect_payment') }}">Record Payment</a>
+            <a href="{{ url_for('admin_finance_students') }}">Students</a>
+            <a href="{{ url_for('admin_finance_student_results') }}" class="active">Results</a>
+            <a href="{{ url_for('admin_finance_expenses') }}">Expenses</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 class="page-title">Student Exam Results</h2>
+        <p class="page-subtitle">View and edit student examination scores for 2021 Semester 1</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="quick-actions">
+            <a href="{{ url_for('admin_sync_students') }}" class="btn btn-primary">Import from Google Sheet</a>
+            <a href="{{ url_for('admin_sync_students_push') }}" class="btn btn-warning">Export to Google Sheet</a>
+        </div>
+        
+        <div class="card">
+            <div class="search-box">
+                <form method="GET" action="{{ url_for('admin_finance_student_results') }}" style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" name="search" placeholder="Search by student ID, name, or department..." value="{{ search_query }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if search_query %}
+                    <a href="{{ url_for('admin_finance_student_results') }}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+            
+            {% if students %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Parent Phone</th>
+                            <th colspan="5" style="background-color: #27ae60; text-align: center;">Math</th>
+                            <th colspan="5" style="background-color: #3498db; text-align: center;">Science</th>
+                            <th colspan="5" style="background-color: #9b59b6; text-align: center;">Social</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>Exam</th><th>Class</th><th>Total</th><th>Grade</th><th>Remarks</th>
+                            <th>Exam</th><th>Class</th><th>Total</th><th>Grade</th><th>Remarks</th>
+                            <th>Exam</th><th>Class</th><th>Total</th><th>Grade</th><th>Remarks</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td><strong>{{ student.get('student_id', '-') }}</strong></td>
+                            <td>{{ student.get('student_name', '-') }}</td>
+                            <td>{{ student.get('department', '-') }}</td>
+                            <td>{{ student.get('parent_phone', '-') }}</td>
+                            
+                            <!-- Math -->
+                            <td class="score">{{ student.get('math_exams_score_2021_1') or '-' }}</td>
+                            <td class="score">{{ student.get('math_class_score_2021_1') or '-' }}</td>
+                            <td class="score"><strong>{{ student.get('math_total_score_2021_1') or '-' }}</strong></td>
+                            <td><span class="grade-{{ student.get('math_grade_2021_1', 'c')|lower }}">{{ student.get('math_grade_2021_1') or '-' }}</span></td>
+                            <td>{{ student.get('math_remarks_2021_1') or '-' }}</td>
+                            
+                            <!-- Science -->
+                            <td class="score">{{ student.get('science_exams_score_2021_1') or '-' }}</td>
+                            <td class="score">{{ student.get('science_class_score_2021_1') or '-' }}</td>
+                            <td class="score"><strong>{{ student.get('science_total_score_2021_1') or '-' }}</strong></td>
+                            <td><span class="grade-{{ student.get('science_grade_2021_1', 'c')|lower }}">{{ student.get('science_grade_2021_1') or '-' }}</span></td>
+                            <td>{{ student.get('science_remarks_2021_1') or '-' }}</td>
+                            
+                            <!-- Social -->
+                            <td class="score">{{ student.get('social_exams_score_2021_1') or '-' }}</td>
+                            <td class="score">{{ student.get('social_class_score_2021_1') or '-' }}</td>
+                            <td class="score"><strong>{{ student.get('social_total_score_2021_1') or '-' }}</strong></td>
+                            <td><span class="grade-{{ student.get('social_grade_2021_1', 'c')|lower }}">{{ student.get('social_grade_2021_1') or '-' }}</span></td>
+                            <td>{{ student.get('social_remarks_2021_1') or '-' }}</td>
+                            
+                            <td>
+                                {% set edit_id = student.get('id') if student.get('id') else student.get('student_id') %}
+                                {% if edit_id %}
+                                <a href="{{ url_for('admin_finance_student_results_edit', student_id=edit_id) }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Edit</a>
+                                {% else %}
+                                <span style="color: #999;">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No Students Found</h3>
+                <p>{% if search_query %}No students match your search criteria.{% else %}No student records found.{% endif %}</p>
+                <p style="margin-top: 10px;"><a href="{{ url_for('admin_sync_students') }}" class="btn btn-primary">Import Students from Google Sheet</a></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

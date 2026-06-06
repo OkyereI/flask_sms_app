@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Students - Gyedu Technical Institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #007bff; margin: 0; }
+        .hod-info { color: #666; font-size: 0.95rem; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { color: #333; margin-top: 0; }
+        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-bar input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; min-width: 200px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #e9ecef; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .badge-info { background-color: #e7f3ff; color: #007bff; }
+        .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
+                <p class="hod-info">HOD Dashboard - {{ department }}</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('hod_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <h2>Students in {{ department }} ({{ students|length }})</h2>
+            
+            <div class="search-bar">
+                <form method="GET" style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" name="search" placeholder="Search by Name or ID..." value="{{ search_query if search_query else '' }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if search_query %}
+                    <a href="{{ url_for('hod_students') }}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+            
+            {% if students %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.get('Student ID', 'N/A') }}</td>
+                        <td>{{ student.get('Student Name', 'N/A') }}</td>
+                        <td><span class="badge badge-info">{{ student.get('Student Department', 'N/A') }}</span></td>
+                        <td class="actions">
+                            <a href="{{ url_for('hod_view_student', student_id=student.get('Student ID')) }}" class="btn btn-primary btn-sm">View Results</a>
+                            <a href="{{ url_for('hod_edit_student_results', student_id=student.get('Student ID')) }}" class="btn btn-primary btn-sm">Add Remarks</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% elif search_query %}
+            <div class="empty-state">
+                <h3>No Results Found</h3>
+                <p>No students found matching "{{ search_query }}" in your department.</p>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No Students Found</h3>
+                <p>There are no students registered in the {{ department }} department.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

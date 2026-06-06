@@ -1,0 +1,426 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Results - Gyedu Technical Institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #28a745; margin: 0; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2, h3 { color: #333; margin-top: 0; }
+        .info-box { background-color: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #28a745; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; }
+        .semester-section { margin-bottom: 30px; border: 2px solid #ddd; border-radius: 8px; padding: 20px; }
+        .score-input { width: 80px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
+        .subject-header { background-color: #f0f0f0; font-weight: bold; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        .auto-calculated { background-color: #e9ecef; cursor: not-allowed; }
+        .calculation-hint { font-size: 0.85rem; color: #666; font-style: italic; margin-top: 5px; }
+        .readonly-field { background-color: #e9ecef; cursor: not-allowed; }
+        input[readonly] { background-color: #e9ecef; }
+        .editable-badge { background-color: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
+        .calculated-badge { background-color: #6c757d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
+        
+        /* FIX: Ensure editable inputs are always interactive */
+        .score-input, input.score-input, .editable-input {
+            background-color: #fff !important;
+            cursor: text !important;
+            pointer-events: auto !important;
+            border: 2px solid #28a745 !important;
+        }
+        
+        /* URGENT FIX: Force overwrite any conflicting styles for editable inputs */
+        tr[data-subject] input[type="number"],
+        tr[data-subject] input[type="number"].score-input,
+        tr[data-subject] input[type="number"].editable-input {
+            background-color: #fff !important;
+            color: #000 !important;
+            cursor: text !important;
+            pointer-events: auto !important;
+            border: 2px solid #28a745 !important;
+            opacity: 1 !important;
+            -webkit-appearance: textfield !important;
+            -moz-appearance: textfield !important;
+            appearance: textfield !important;
+        }
+        
+        /* HIGH PRIORITY: Force show editable inputs correctly */
+        .editable-input:not([readonly]),
+        input.editable-input:not([readonly]) {
+            background-color: #ffffff !important;
+            border: 2px solid #28a745 !important;
+            cursor: text !important;
+            pointer-events: auto !important;
+        }
+        .score-input:focus, input.score-input:focus, .editable-input:focus {
+            border-color: #218838 !important;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3) !important;
+        }
+        .readonly-field, input[readonly], .readonly-field input {
+            background-color: #e9ecef !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+        
+        /* EMERGENCY FIX: Override ALL pointer-events and cursor for editable inputs */
+        * {
+            box-sizing: border-box;
+        }
+        
+        /* CRITICAL: Remove ALL readonly styles from any field NOT explicitly marked readonly */
+        tbody input[type="number"] {
+            background-color: #fff !important;
+            color: #000 !important;
+            cursor: text !important;
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            border: 2px solid #28a745 !important;
+            border-radius: 4px;
+            padding: 8px;
+            font-weight: bold;
+        }
+        
+        /* CRITICAL: Ensure select dropdowns for editable fields work */
+        tbody select:not([readonly]) {
+            background-color: #fff !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            border: 2px solid #28a745 !important;
+        }
+        
+        /* Force any input that should be editable to show correctly */
+        .editable-badge + input,
+        input.editable-input,
+        input.score-input:not([readonly]) {
+            background-color: #ffffff !important;
+            color: #000 !important;
+            cursor: text !important;
+            pointer-events: auto !important;
+            -webkit-appearance: textfield !important;
+            appearance: textfield !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
+                <p style="margin: 5px 0 0 0; color: #666;">Edit Student Results</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('admin_manage_students') }}" class="btn btn-secondary">Back to Students</a>
+                <a href="{{ url_for('view_student_full_results', student_id=student.get('Student ID')) }}" class="btn btn-primary">View Full Results</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="info-box">
+            <strong>Student:</strong> {{ student.get('Student Name', 'N/A') }} | 
+            <strong>ID:</strong> {{ student.get('Student ID', 'N/A') }} | 
+            <strong>Department:</strong> {{ student.get('Student Department', 'N/A') }}
+        </div>
+        
+        <div class="card">
+            <p class="calculation-hint"><strong>Note:</strong> Total Score, Grade, and Remarks are automatically calculated. Only <span class="editable-badge">Exams Score</span> and <span class="editable-badge">Class Score</span> are editable.</p>
+        </div>
+        
+        <form method="POST" id="editResultsForm">
+            <div class="card">
+                <h2>Select Semester to Edit</h2>
+                <div class="form-group">
+                    <select name="semester" id="semesterSelect" onchange="showSemester()" required>
+                        <option value="">-- Select Semester --</option>
+                        {% for sem in semesters %}
+                        <option value="{{ sem }}">{{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            {% for sem in semesters %}
+            <div id="semester_{{ loop.index }}" class="semester-section" style="display: none;" data-semester="{{ sem }}">
+                <h3>{{ sem }}</h3>
+                
+                {% set semester_cols = [] %}
+                {% for col in all_columns %}
+                    {% if ' - ' + sem in col %}
+                        {% set _ = semester_cols.append(col) %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% set subjects = {} %}
+                {% for col in semester_cols %}
+                    {# COMPLETE REWRITE: Parse column name to extract subject and score_type #}
+                    {# Column formats that can appear:
+                       1. "Math Exams Score - 2026 Semester 2" (proper format with " - ")
+                       2. "Math_Exams Score - 2026 Semester 2" (underscore before subject)
+                       3. "Math_Exams Score2026 Semester 2" (no " - ", underscore before subject, no space before year)
+                    #}
+                    
+                    {% set col_clean = col.replace('_', ' ') %}  {# Replace underscores with spaces first #}
+                    
+                    {% set score_type = '' %}
+                    {% set subj = '' %}
+                    
+                    {# Try to find score type at the end of the column name #}
+                    {% if ' Exams Score' in col_clean %}
+                        {% set score_type = 'Exams Score' %}
+                    {% elif ' Class Score' in col_clean %}
+                        {% set score_type = 'Class Score' %}
+                    {% elif ' Total Score' in col_clean %}
+                        {% set score_type = 'Total Score' %}
+                    {% elif ' Grade' in col_clean %}
+                        {% set score_type = 'Grade' %}
+                    {% elif ' Remarks' in col_clean %}
+                        {% set score_type = 'Remarks' %}
+                    {% endif %}
+                    
+                    {% if score_type %}
+                        {# Extract subject name by removing score_type and semester #}
+                        {% set temp = col_clean.replace(score_type, '')|trim %}
+                        {% set subj = temp.replace(sem, '')|trim %}
+                        {# Clean up any remaining dashes and extra spaces #}
+                        {% set subj = subj.replace('-', '')|trim %}
+                        {% set subj = subj.replace('  ', ' ')|trim %}
+                    {% endif %}
+                    
+                    {% if subj and score_type %}
+                        {% set _ = subjects.update({subj: subjects.get(subj, []) + [col]}) %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% for subject, cols in subjects.items() %}
+                <div class="subject-group" data-subject="{{ subject }}" data-semester="{{ sem }}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Exams Score</th>
+                                <th>Class Score</th>
+                                <th>Total Score</th>
+                                <th>Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-subject="{{ subject }}">
+                                <td style="font-weight: bold; background-color: #f0f0f0; min-width: 150px;">{{ subject }}</td>
+                                <td>
+                                    {# Find Exams Score column #}
+                                    {% for col in cols %}
+                                        {% if 'exams score' in col|lower %}
+                                            <input type="number" name="score_exams_{{ subject }}" 
+                                                   value="{{ student.get(col, '') }}" 
+                                                   placeholder="0-100" min="0" max="100" step="0.01"
+                                                   class="editable-input"
+                                                   data-subject="{{ subject }}" 
+                                                   data-score-type="Exams"
+                                                   data-column="{{ col }}"
+                                                   oninput="calculateResults('{{ subject }}', '{{ sem }}')"
+                                                   style="width: 100%; padding: 8px; border: 2px solid #28a745; border-radius: 4px; text-align: center;">
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {# Find Class Score column #}
+                                    {% for col in cols %}
+                                        {% if 'class score' in col|lower %}
+                                            <input type="number" name="score_class_{{ subject }}" 
+                                                   value="{{ student.get(col, '') }}" 
+                                                   placeholder="0-100" min="0" max="100" step="0.01"
+                                                   class="editable-input"
+                                                   data-subject="{{ subject }}" 
+                                                   data-score-type="Class"
+                                                   data-column="{{ col }}"
+                                                   oninput="calculateResults('{{ subject }}', '{{ sem }}')"
+                                                   style="width: 100%; padding: 8px; border: 2px solid #28a745; border-radius: 4px; text-align: center;">
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {# Find Total Score column - auto calculated #}
+                                    {% for col in cols %}
+                                        {% if 'total score' in col|lower %}
+                                            <input type="number" name="score_total_{{ subject }}" 
+                                                   value="{{ student.get(col, '') }}" 
+                                                   readonly
+                                                   data-subject="{{ subject }}" 
+                                                   data-column="{{ col }}"
+                                                   style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; text-align: center; cursor: not-allowed;">
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {# Find Grade column - auto calculated #}
+                                    {% for col in cols %}
+                                        {% if ' grade' in col|lower %}
+                                            <select name="score_grade_{{ subject }}" 
+                                                   readonly
+                                                   data-subject="{{ subject }}" 
+                                                   data-column="{{ col }}"
+                                                   style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">
+                                                <option value="">-</option>
+                                                <option value="A" {% if student.get(col, '') == 'A' %}selected{% endif %}>A</option>
+                                                <option value="B" {% if student.get(col, '') == 'B' %}selected{% endif %}>B</option>
+                                                <option value="C" {% if student.get(col, '') == 'C' %}selected{% endif %}>C</option>
+                                                <option value="D" {% if student.get(col, '') == 'D' %}selected{% endif %}>D</option>
+                                                <option value="E" {% if student.get(col, '') == 'E' %}selected{% endif %}>E</option>
+                                                <option value="F" {% if student.get(col, '') == 'F' %}selected{% endif %}>F</option>
+                                            </select>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {# Find Remarks column - auto calculated #}
+                                    {% for col in cols %}
+                                        {% if ' remarks' in col|lower %}
+                                            <input type="text" name="score_remarks_{{ subject }}" 
+                                                   value="{{ student.get(col, '') }}" 
+                                                   readonly
+                                                   data-subject="{{ subject }}" 
+                                                   data-column="{{ col }}"
+                                                   style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            <div class="btn-group" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-success" style="flex: 1;">Save Results</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Changes</button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Grading scale based on students_result.xlsx
+        function getGradeAndRemarks(total) {
+            if (total === '' || isNaN(total)) {
+                return { grade: '', remarks: '' };
+            }
+            
+            const score = parseFloat(total);
+            
+            if (score >= 75) {
+                return { grade: 'A', remarks: 'Excellent' };
+            } else if (score >= 65) {
+                return { grade: 'B', remarks: 'Very Good' };
+            } else if (score >= 55) {
+                return { grade: 'C', remarks: 'Good' };
+            } else if (score >= 45) {
+                return { grade: 'D', remarks: 'Pass' };
+            } else if (score >= 35) {
+                return { grade: 'E', remarks: 'Satisfactory' };
+            } else {
+                return { grade: 'F', remarks: 'Fail' };
+            }
+        }
+
+        // Calculate results when exams or class score changes
+        function calculateResults(subject, semester) {
+            // Find all inputs for this subject
+            const subjectGroup = document.querySelector(`.subject-group[data-subject="${subject}"][data-semester="${semester}"]`);
+            if (!subjectGroup) return;
+            
+            // Get exams and class scores
+            const examsInput = subjectGroup.querySelector(`input[data-subject="${subject}"][data-score-type="Exams Score"]`);
+            const classInput = subjectGroup.querySelector(`input[data-subject="${subject}"][data-score-type="Class Score"]`);
+            
+            const exams = parseFloat(examsInput?.value) || 0;
+            const classScore = parseFloat(classInput?.value) || 0;
+            const total = exams + classScore;
+            
+            // Get the readonly inputs
+            const totalInput = subjectGroup.querySelector(`.total-input[data-subject="${subject}"][data-semester="${semester}"]`);
+            const gradeInput = subjectGroup.querySelector(`.grade-input[data-subject="${subject}"][data-semester="${semester}"]`);
+            const remarksInput = subjectGroup.querySelector(`.remarks-input[data-subject="${subject}"][data-semester="${semester}"]`);
+            
+            // Update total score
+            if (totalInput) {
+                totalInput.value = total.toFixed(2);
+            }
+            
+            // Calculate grade and remarks
+            const { grade, remarks } = getGradeAndRemarks(total);
+            
+            // Update grade dropdown
+            if (gradeInput) {
+                gradeInput.value = grade;
+            }
+            
+            // Update remarks
+            if (remarksInput) {
+                remarksInput.value = remarks;
+            }
+        }
+
+        // Initialize calculations for all visible subjects
+        function initializeCalculations() {
+            const subjectGroups = document.querySelectorAll('.subject-group');
+            subjectGroups.forEach(group => {
+                const subject = group.dataset.subject;
+                const semester = group.dataset.semester;
+                calculateResults(subject, semester);
+            });
+        }
+
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with any existing values
+            setTimeout(initializeCalculations, 100);
+        });
+
+        function showSemester() {
+            const selectedIndex = document.getElementById('semesterSelect').selectedIndex;
+            const sections = document.querySelectorAll('.semester-section');
+            
+            sections.forEach((section, index) => {
+                if (index + 1 === selectedIndex) {
+                    section.style.display = 'block';
+                    // Initialize calculations for this semester
+                    setTimeout(initializeCalculations, 100);
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        function resetForm() {
+            if (confirm('Are you sure you want to reset all changes? This will restore original values.')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

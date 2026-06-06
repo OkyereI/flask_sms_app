@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student Results - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; color: #333; }
+        .header { background-color: #2c3e50; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+        .page-title { font-size: 28px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 25px; }
+        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #3498db; }
+        .subject-section { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .subject-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid; }
+        .math-title { border-color: #27ae60; color: #27ae60; }
+        .science-title { border-color: #3498db; color: #3498db; }
+        .social-title { border-color: #9b59b6; color: #9b59b6; }
+        .score-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-success:hover { background-color: #219a52; }
+        .btn-secondary { background-color: #95a5a6; color: white; }
+        .button-group { display: flex; gap: 10px; margin-top: 20px; }
+        .alert { padding: 15px 20px; border-radius: 5px; margin-bottom: 20px; }
+        .student-info { background-color: #e8f4f8; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .student-info h3 { color: #2c3e50; margin-bottom: 10px; }
+        .student-info p { color: #555; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Gyedu Technical Institute</h1>
+            <div style="font-size: 14px; opacity: 0.9;">Edit Student Results - 2021 Semester 1</div>
+        </div>
+        <a href="{{ url_for('admin_finance_student_results') }}" class="btn btn-secondary">Back to Results</a>
+    </div>
+    
+    <div class="container">
+        <h2 class="page-title">Edit Student Results</h2>
+        
+        <div class="student-info">
+            <h3>Student Information</h3>
+            <p><strong>Student ID:</strong> {{ student.get('student_id', 'N/A') }}</p>
+            <p><strong>Name:</strong> {{ student.get('student_name', 'N/A') }}</p>
+            <p><strong>Department:</strong> {{ student.get('department') or 'N/A' }}</p>
+            <p><strong>Parent Phone:</strong> {{ student.get('parent_phone') or 'N/A' }}</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('admin_finance_student_results_edit', student_id=student.get('id') or student.get('student_id')) }}">
+            <div class="card">
+                <h3 class="card-title">Basic Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student Name</label>
+                        <input type="text" name="student_name" value="{{ student.get('student_name') or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" name="department" value="{{ student.get('department') or '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Parent Phone</label>
+                        <input type="text" name="parent_phone" value="{{ student.get('parent_phone') or '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Math Section -->
+            <div class="subject-section">
+                <h3 class="subject-title math-title">Mathematics - 2021 Semester 1</h3>
+                <div class="score-grid">
+                    <div class="form-group">
+                        <label>Exams Score</label>
+                        <input type="number" name="math_exams_score" min="0" max="100" value="{{ student.get('math_exams_score_2021_1') or 0 }}" onchange="calculateTotal('math')">
+                    </div>
+                    <div class="form-group">
+                        <label>Class Score</label>
+                        <input type="number" name="math_class_score" min="0" max="100" value="{{ student.get('math_class_score_2021_1') or 0 }}" onchange="calculateTotal('math')">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Score</label>
+                        <input type="number" name="math_total_score" id="math_total" min="0" max="100" value="{{ student.get('math_total_score_2021_1') or 0 }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Grade</label>
+                        <select name="math_grade">
+                            <option value="">Select Grade</option>
+                            <option value="A" {% if student.get('math_grade_2021_1') == 'A' %}selected{% endif %}>A (90-100)</option>
+                            <option value="B" {% if student.get('math_grade_2021_1') == 'B' %}selected{% endif %}>B (80-89)</option>
+                            <option value="C" {% if student.get('math_grade_2021_1') == 'C' %}selected{% endif %}>C (70-79)</option>
+                            <option value="D" {% if student.get('math_grade_2021_1') == 'D' %}selected{% endif %}>D (60-69)</option>
+                            <option value="F" {% if student.get('math_grade_2021_1') == 'F' %}selected{% endif %}>F (Below 60)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <input type="text" name="math_remarks" value="{{ student.get('math_remarks_2021_1') or '' }}" placeholder="e.g., Excellent work">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Science Section -->
+            <div class="subject-section">
+                <h3 class="subject-title science-title">Science - 2021 Semester 1</h3>
+                <div class="score-grid">
+                    <div class="form-group">
+                        <label>Exams Score</label>
+                        <input type="number" name="science_exams_score" min="0" max="100" value="{{ student.get('science_exams_score_2021_1') or 0 }}" onchange="calculateTotal('science')">
+                    </div>
+                    <div class="form-group">
+                        <label>Class Score</label>
+                        <input type="number" name="science_class_score" min="0" max="100" value="{{ student.get('science_class_score_2021_1') or 0 }}" onchange="calculateTotal('science')">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Score</label>
+                        <input type="number" name="science_total_score" id="science_total" min="0" max="100" value="{{ student.get('science_total_score_2021_1') or 0 }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Grade</label>
+                        <select name="science_grade">
+                            <option value="">Select Grade</option>
+                            <option value="A" {% if student.get('science_grade_2021_1') == 'A' %}selected{% endif %}>A (90-100)</option>
+                            <option value="B" {% if student.get('science_grade_2021_1') == 'B' %}selected{% endif %}>B (80-89)</option>
+                            <option value="C" {% if student.get('science_grade_2021_1') == 'C' %}selected{% endif %}>C (70-79)</option>
+                            <option value="D" {% if student.get('science_grade_2021_1') == 'D' %}selected{% endif %}>D (60-69)</option>
+                            <option value="F" {% if student.get('science_grade_2021_1') == 'F' %}selected{% endif %}>F (Below 60)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <input type="text" name="science_remarks" value="{{ student.get('science_remarks_2021_1') or '' }}" placeholder="e.g., Good progress">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Social Section -->
+            <div class="subject-section">
+                <h3 class="subject-title social-title">Social Studies - 2021 Semester 1</h3>
+                <div class="score-grid">
+                    <div class="form-group">
+                        <label>Exams Score</label>
+                        <input type="number" name="social_exams_score" min="0" max="100" value="{{ student.get('social_exams_score_2021_1') or 0 }}" onchange="calculateTotal('social')">
+                    </div>
+                    <div class="form-group">
+                        <label>Class Score</label>
+                        <input type="number" name="social_class_score" min="0" max="100" value="{{ student.get('social_class_score_2021_1') or 0 }}" onchange="calculateTotal('social')">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Score</label>
+                        <input type="number" name="social_total_score" id="social_total" min="0" max="100" value="{{ student.get('social_total_score_2021_1') or 0 }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Grade</label>
+                        <select name="social_grade">
+                            <option value="">Select Grade</option>
+                            <option value="A" {% if student.get('social_grade_2021_1') == 'A' %}selected{% endif %}>A (90-100)</option>
+                            <option value="B" {% if student.get('social_grade_2021_1') == 'B' %}selected{% endif %}>B (80-89)</option>
+                            <option value="C" {% if student.get('social_grade_2021_1') == 'C' %}selected{% endif %}>C (70-79)</option>
+                            <option value="D" {% if student.get('social_grade_2021_1') == 'D' %}selected{% endif %}>D (60-69)</option>
+                            <option value="F" {% if student.get('social_grade_2021_1') == 'F' %}selected{% endif %}>F (Below 60)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <input type="text" name="social_remarks" value="{{ student.get('social_remarks_2021_1') or '' }}" placeholder="e.g., Keep it up">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <a href="{{ url_for('admin_finance_student_results') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        function calculateTotal(subject) {
+            var exams = parseFloat(document.querySelector('input[name="' + subject + '_exams_score"]').value) || 0;
+            var cls = parseFloat(document.querySelector('input[name="' + subject + '_class_score"]').value) || 0;
+            var total = exams + cls;
+            document.getElementById(subject + '_total').value = total;
+        }
+    </script>
+</body>
+</html>

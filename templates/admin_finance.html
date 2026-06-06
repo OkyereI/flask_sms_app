@@ -3,53 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Management - Gyedu Technical Institute</title>
+    <title>Finance Dashboard - Gyedu Technical Institute</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .school-name { font-size: 1.3rem; font-weight: bold; color: #007bff; margin: 0; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; transition: background-color 0.3s ease; }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-primary:hover { background-color: #0056b3; }
-        .btn-secondary { background-color: #6c757d; color: white; }
-        .btn-secondary:hover { background-color: #5a6268; }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-success:hover { background-color: #218838; }
-        .btn-warning { background-color: #ffc107; color: #212529; }
-        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        h1, h2 { color: #333; margin-top: 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .stat-card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); text-align: center; }
-        .stat-card h3 { font-size: 2rem; margin: 0 0 10px 0; }
-        .stat-card.revenue h3 { color: #28a745; }
-        .stat-card.expense h3 { color: #dc3545; }
-        .stat-card.balance h3 { color: #007bff; }
-        .stat-card.debt h3 { color: #ffc107; }
-        .stat-card p { margin: 0; color: #666; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .nav-links a { padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; }
-        .nav-links a:hover { background-color: #0056b3; }
-        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
-        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-container {
+            background-color: #34495e;
+            padding: 0 40px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            background-color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .nav a.active {
+            border-bottom-color: #27ae60;
+            background-color: #2c3e50;
+        }
+        
+        .nav a.back-link {
+            margin-left: auto;
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .page-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            text-align: center;
+            border-left: 4px solid;
+        }
+        
+        .stat-card.revenue {
+            border-left-color: #27ae60;
+        }
+        
+        .stat-card.expense {
+            border-left-color: #e74c3c;
+        }
+        
+        .stat-card.balance {
+            border-left-color: #3498db;
+        }
+        
+        .stat-card.debt {
+            border-left-color: #f39c12;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card.revenue h3 { color: #27ae60; }
+        .stat-card.expense h3 { color: #e74c3c; }
+        .stat-card.balance h3 { color: #3498db; }
+        .stat-card.debt h3 { color: #f39c12; }
+        
+        .stat-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #229954;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d68910;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-sync {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-sync:hover {
+            background: linear-gradient(135deg, #5a6fd1 0%, #6a4190 100%);
+        }
+        
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .sync-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .sync-notice h3 {
+            margin-bottom: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
-                <p style="margin: 5px 0 0 0; color: #666;">Finance Management</p>
-            </div>
-            <div>
-                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
-            </div>
+    <div class="header">
+        <div>
+            <h1>Gyedu Technical Institute</h1>
+            <div class="header-info">Finance Management Dashboard</div>
         </div>
-        
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="{{ url_for('admin_finance') }}" class="active">Dashboard</a>
+            <a href="{{ url_for('admin_finance_fee_setup') }}">Fee Setup</a>
+            <a href="{{ url_for('admin_finance_collect_payment') }}">Record Payment</a>
+            <a href="{{ url_for('admin_finance_students') }}">Student Accounts</a>
+            <a href="{{ url_for('admin_finance_expenses') }}">Expenses</a>
+            <a href="{{ url_for('admin_finance_view_payments') }}">Payment History</a>
+        </div>
+    </div>
+    
+    <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -58,13 +352,20 @@
             {% endif %}
         {% endwith %}
         
-        <div class="nav-links">
-            <a href="{{ url_for('admin_finance') }}">Dashboard</a>
-            <a href="{{ url_for('admin_finance_fee_setup') }}">Fee Setup</a>
-            <a href="{{ url_for('admin_finance_payment') }}">Record Payment</a>
-            <a href="{{ url_for('admin_finance_students') }}">Student Accounts</a>
-            <a href="{{ url_for('admin_finance_expenses') }}">Expenses</a>
+        {% if has_google_sheet %}
+        <div class="sync-notice">
+            <h3>Google Sheets Sync Enabled</h3>
+            <p>Your finance data is automatically synced with Google Sheets.</p>
+            <div style="margin-top: 15px;">
+                <a href="{{ url_for('admin_sync_excel') }}" class="btn btn-sync">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Sync All Data with Google Sheets
+                </a>
+            </div>
         </div>
+        {% endif %}
         
         <!-- Statistics -->
         <div class="stats-grid">
@@ -88,45 +389,88 @@
         
         <!-- Quick Actions -->
         <div class="card">
-            <h2>Quick Actions</h2>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="{{ url_for('admin_finance_payment') }}" class="btn btn-success">Record Payment</a>
-                <a href="{{ url_for('admin_finance_fee_setup') }}" class="btn btn-primary">Setup Fees</a>
-                <a href="{{ url_for('admin_finance_expenses') }}" class="btn btn-warning">Record Expense</a>
-                <a href="{{ url_for('admin_finance_students') }}" class="btn btn-secondary">View Debtors</a>
+            <h2 class="card-title">Quick Actions</h2>
+            <div class="quick-actions">
+                <a href="{{ url_for('admin_finance_collect_payment') }}" class="btn btn-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Record Payment
+                </a>
+                <a href="{{ url_for('admin_finance_fee_setup') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    Setup Fees
+                </a>
+                <a href="{{ url_for('admin_finance_expenses') }}" class="btn btn-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                    </svg>
+                    Record Expense
+                </a>
+                <a href="{{ url_for('admin_finance_students') }}" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    View Debtors
+                </a>
+                <a href="{{ url_for('admin_finance_view_payments') }}" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    View All Payments
+                </a>
             </div>
         </div>
         
         <!-- Recent Payments -->
         <div class="card">
-            <h2>Recent Payments</h2>
+            <h2 class="card-title">Recent Payments</h2>
             {% if recent_payments %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Student</th>
-                            <th>Amount</th>
-                            <th>Method</th>
-                            <th>Reference</th>
-                            <th>Received By</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in recent_payments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <td>{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                <td>{{ payment.student_name }}</td>
-                                <td><strong>GHS {{ payment.amount }}</strong></td>
-                                <td>{{ payment.payment_method }}</td>
-                                <td>{{ payment.reference_number or '-' }}</td>
-                                <td>{{ payment.received_by }}</td>
+                                <th>Receipt No</th>
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Fee Type</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                                <tr>
+                                    <td><strong>{{ payment.get('receipt_number', '-') }}</strong></td>
+                                    <td>{{ payment.get('payment_date', '-') }}</td>
+                                    <td>{{ payment.get('student_name', '-') }}</td>
+                                    <td>{{ payment.get('fee_type', '-') }}</td>
+                                    <td><strong>GHS {{ "%.2f"|format(payment.get('amount', 0)) }}</strong></td>
+                                    <td>{{ payment.get('payment_method', '-') }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ 'success' if payment.get('status') == 'completed' else 'warning' }}">
+                                            {{ payment.get('status', 'pending')|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-                <p style="text-align: center; color: #666; padding: 20px;">No payments recorded yet.</p>
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 80px; height: 80px; opacity: 0.5; margin: 0 auto 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 10 2-10 2 10 2-10" />
+                    </svg>
+                    <h3>No Payments Recorded Yet</h3>
+                    <p>Start by recording your first student payment.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="{{ url_for('admin_finance_collect_payment') }}" class="btn btn-success">Record First Payment</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

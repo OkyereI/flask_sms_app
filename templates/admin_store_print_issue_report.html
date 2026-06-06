@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Issue Report - Store Department</title>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 20px; }
+            .card { box-shadow: none !important; border: 1px solid #ddd; }
+        }
+        
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f4f4; 
+            font-size: 12px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+            text-align: center;
+        }
+        .school-name { font-size: 1.4rem; font-weight: bold; color: #28a745; margin: 0 0 5px 0; }
+        .report-title { font-size: 1.1rem; color: #333; margin: 5px 0; }
+        .report-meta { color: #666; font-size: 0.85rem; }
+        .btn { 
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            text-decoration: none; 
+            display: inline-block; 
+            margin: 2px;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+        .card { 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+            margin-bottom: 20px; 
+        }
+        h1, h2, h3 { color: #333; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #28a745; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:nth-child(odd) { background-color: #fff; }
+        .summary-boxes { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .summary-box { 
+            background-color: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+            flex: 1; 
+            min-width: 150px;
+            text-align: center;
+        }
+        .summary-box h3 { margin: 0 0 5px 0; color: #666; font-size: 0.8rem; text-transform: uppercase; }
+        .summary-box .number { font-size: 1.5rem; font-weight: bold; color: #28a745; }
+        .badge { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+        }
+        .badge-success { background-color: #d4edda; color: #155724; }
+        .filter-form { 
+            background-color: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+        }
+        .filter-form label { font-weight: bold; margin-right: 10px; }
+        .filter-form input { 
+            padding: 6px 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            margin-right: 10px; 
+        }
+        .footer { 
+            text-align: center; 
+            color: #666; 
+            font-size: 0.8rem; 
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .reprint-notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="school-name">Gyedu Technical Institute</h1>
+            <h2 class="report-title">Stock Issue Report - Store Department</h2>
+            <p class="report-meta">
+                Generated: {{ report_date }}<br>
+                {% if start_date or end_date %}
+                Filter: {{ start_date if start_date else 'Beginning' }} to {{ end_date if end_date else 'Present' }}
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="summary-boxes">
+            <div class="summary-box">
+                <h3>Total Items Issued</h3>
+                <div class="number">{{ total_issued }}</div>
+            </div>
+            <div class="summary-box">
+                <h3>Total Issues</h3>
+                <div class="number">{{ transactions|length if transactions else 0 }}</div>
+            </div>
+            <div class="summary-box">
+                <h3>Unique Recipients</h3>
+                <div class="number">{{ unique_recipients }}</div>
+            </div>
+        </div>
+        
+        <div class="filter-form no-print">
+            <form method="GET" action="{{ url_for('admin_store_print_issue_report') }}">
+                <label>Filter by Date:</label>
+                <input type="date" name="start_date" value="{{ start_date }}">
+                <label>to</label>
+                <input type="date" name="end_date" value="{{ end_date }}">
+                <button type="submit" class="btn btn-primary btn-sm">Apply Filter</button>
+                <a href="{{ url_for('admin_store_print_issue_report') }}" class="btn btn-secondary btn-sm">Clear</a>
+                <button onclick="window.print()" class="btn btn-success btn-sm">Print Report</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h3>Issue Records</h3>
+            
+            {% if transactions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%">Date/Time</th>
+                            <th style="width: 8%">Item ID</th>
+                            <th style="width: 18%">Item Name</th>
+                            <th style="width: 8%">Category</th>
+                            <th style="width: 6%">Qty Issued</th>
+                            <th style="width: 6%">Unit</th>
+                            <th style="width: 14%">Recipient</th>
+                            <th style="width: 10%">Recipient Type</th>
+                            <th style="width: 6%">Current Stock</th>
+                            <th style="width: 16%">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn in transactions %}
+                            <tr>
+                                <td>{{ txn.get('created_at', 'N/A')[:16] }}</td>
+                                <td>{{ txn.get('item_id', 'N/A') }}</td>
+                                <td><strong>{{ txn.get('item_name', 'Unknown Item') }}</strong></td>
+                                <td>{{ txn.get('item_category', 'N/A') }}</td>
+                                <td class="text-right"><strong>{{ txn.get('quantity', '0') }}</strong></td>
+                                <td>{{ txn.get('item_unit', '-') }}</td>
+                                <td>{{ txn.get('recipient', 'N/A') }}</td>
+                                <td>{{ txn.get('recipient_type', 'N/A') }}</td>
+                                <td class="text-right">
+                                    {% if txn.get('current_remaining') != 'N/A' %}
+                                        <span class="badge badge-success">{{ txn.get('current_remaining') }}</span>
+                                    {% else %}
+                                        {{ txn.get('current_remaining', 'N/A') }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ txn.get('notes', '-') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #666; padding: 40px;">
+                    No stock issues found for the selected period.
+                </p>
+            {% endif %}
+        </div>
+        
+        <div class="card">
+            <h3>Summary by Recipient</h3>
+            {% if transactions %}
+                {% set recipient_summary = {} %}
+                {% for txn in transactions %}
+                    {% set recipient = txn.get('recipient', 'Unknown') %}
+                    {% if recipient not in recipient_summary %}
+                        {% set _ = recipient_summary.update({recipient: {'count': 0, 'quantity': 0, 'items': []}}) %}
+                    {% endif %}
+                    {% set _ = recipient_summary[recipient].update({'count': recipient_summary[recipient]['count'] + 1}) %}
+                    {% set _ = recipient_summary[recipient].update({'quantity': recipient_summary[recipient]['quantity'] + (txn.get('quantity', 0)|float)}) %}
+                    {% set _ = recipient_summary[recipient].update({'items': recipient_summary[recipient]['items'] + [txn.get('item_name', 'Unknown')]}) %}
+                {% endfor %}
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Recipient</th>
+                            <th>Number of Issues</th>
+                            <th>Total Quantity Received</th>
+                            <th>Items Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipient, data in recipient_summary.items()|sort(attribute='1.count', reverse=true) %}
+                            <tr>
+                                <td><strong>{{ recipient }}</strong></td>
+                                <td class="text-center">{{ data.count }}</td>
+                                <td class="text-right">{{ data.quantity }}</td>
+                                <td>{{ data.items|join(', ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #666; padding: 20px;">No data to summarize.</p>
+            {% endif %}
+        </div>
+        
+        <div class="footer no-print">
+            <a href="{{ url_for('admin_store') }}" class="btn btn-secondary">Back to Store</a>
+            <a href="{{ url_for('admin_store_issue') }}" class="btn btn-primary">New Issue</a>
+        </div>
+        
+        <div class="footer">
+            <p>This is a computer-generated report. No signature is required.</p>
+            <p>Gyedu Technical Institute - Store Management System</p>
+        </div>
+    </div>
+</body>
+</html>

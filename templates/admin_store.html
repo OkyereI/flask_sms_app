@@ -144,13 +144,19 @@
             border-radius: 4px;
         }
         .nav-links a:hover { background-color: #218838; }
+        .nav-links a.sync-btn {
+            background-color: #17a2b8;
+        }
+        .nav-links a.sync-btn:hover {
+            background-color: #138496;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div>
-                <h1 class="school-name">GYEDU TECHNICAL INSTITUTE</h1>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
                 <p style="margin: 5px 0 0 0; color: #666;">Store Management</p>
             </div>
             <div>
@@ -172,6 +178,7 @@
             <a href="{{ url_for('admin_store_add_item') }}">Add Item</a>
             <a href="{{ url_for('admin_store_issue') }}">Issue Item</a>
             <a href="{{ url_for('admin_store_transactions') }}">Transactions</a>
+            <a href="{{ url_for('admin_store_sync') }}" class="sync-btn">Data Sync</a>
         </div>
         
         <!-- Statistics -->
@@ -197,6 +204,7 @@
                 <a href="{{ url_for('admin_store_add_item') }}" class="btn btn-success">Add New Item</a>
                 <a href="{{ url_for('admin_store_restock', item_id=1) }}" class="btn btn-primary">Restock Items</a>
                 <a href="{{ url_for('admin_store_issue') }}" class="btn btn-warning">Issue Items</a>
+                <a href="{{ url_for('admin_store_sync') }}" class="btn btn-info">Sync Data</a>
             </div>
         </div>
         
@@ -217,8 +225,8 @@
                     <tbody>
                         {% for txn in recent_transactions %}
                             <tr>
-                                <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                <td>{{ StoreItem.query.get(txn.item_id).name if StoreItem.query.get(txn.item_id) else 'Unknown' }}</td>
+                                <td>{{ txn.created_at }}</td>
+                                <td>{{ items_dict[txn.item_id].name if txn.item_id in items_dict else 'Unknown' }}</td>
                                 <td>
                                     {% if txn.transaction_type == 'IN' %}
                                         <span class="badge badge-success">Restock</span>

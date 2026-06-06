@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        h1 { color: #28a745; font-size: 1.5rem; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card h2 { color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.95rem; }
+        .form-group input:focus { outline: none; border-color: #28a745; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #28a745; color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .nav-links a { padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }
+        .nav-links a:hover { background: #218838; }
+        .info-box { background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .student-id { font-family: monospace; font-weight: bold; color: #28a745; }
+        .empty-state { text-align: center; color: #666; padding: 40px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #888; font-size: 0.85rem; margin-bottom: 5px; }
+        .stat-card .number { font-size: 1.5rem; font-weight: bold; color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Manage Students</h1>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_manage_forms') }}">Manage Forms</a>
+            <a href="{{ url_for('admin_manage_students') }}">Manage Students</a>
+            <a href="{{ url_for('admin_result_settings') }}">Result Settings</a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <div class="number">{{ students|length }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Current Year</h3>
+                <div class="number">{{ current_year }}</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Add New Student</h2>
+            <div class="info-box">
+                <p><strong>Auto-Generated ID System:</strong></p>
+                <p>Student IDs are automatically generated based on department and year.</p>
+                <p><strong>Format:</strong> [DEPT_CODE]STUATI[YEAR][SEQUENCE]</p>
+                <p><strong>Example:</strong> EETSTUATI26001 (Electrical student, 2026, #1)</p>
+            </div>
+            
+            <form method="POST">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student_name">Student Name *</label>
+                        <input type="text" id="student_name" name="student_name" required placeholder="Enter student full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department *</label>
+                        <select id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Computer">Computer</option>
+                            <option value="ICT">ICT</option>
+                            <option value="Hospitality">Hospitality</option>
+                            <option value="Tourism">Tourism</option>
+                            <option value="Business">Business</option>
+                            <option value="Accounting">Accounting</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student_form">Form/Class</label>
+                        <select id="student_form" name="student_form">
+                            <option value="">Select Form</option>
+                            {% for form in forms %}
+                            <option value="{{ form }}">{{ form }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="parent_phone">Parent Phone</label>
+                        <input type="tel" id="parent_phone" name="parent_phone" placeholder="e.g., +233XXXXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year *</label>
+                        <input type="number" id="year" name="year" value="{{ current_year }}" min="2020" max="2099" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Add Student</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2>All Students</h2>
+            {% if students %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Form</th>
+                        <th>Parent Phone</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="student-id">{{ (student.get('student_id') or '-') }}</td>
+                        <td>{{ (student.get('student_name') or '-') }}</td>
+                        <td>{{ (student.get('department') or '-') }}</td>
+                        <td>{{ (student.get('Form') or '-') }}</td>
+                        <td>{{ (student.get('parent_phone') or '-') }}</td>
+                        <td>{{ (student.get('created_at') or '-') }}</td>
+                        <td>
+                            <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this student?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="student_id" value="{{ student.get('student_id', '') }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-state">No students found. Add your first student above.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

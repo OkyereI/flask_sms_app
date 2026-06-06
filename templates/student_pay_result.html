@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay for Result Access - Student Portal</title>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 90vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .amount-box {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .amount-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #004085;
+            font-size: 1em;
+        }
+        .info-box p {
+            margin: 5px 0;
+            color: #495057;
+            font-size: 0.9em;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .flash-messages li.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-messages li.danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-messages li.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .flash-messages li.info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-align: left;
+        }
+        .form-group select,
+        .form-group input[type="tel"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .network-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .network-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        .network-option:hover {
+            border-color: #28a745;
+        }
+        .network-option.selected {
+            border-color: #28a745;
+            background-color: #e8f5e9;
+        }
+        .network-option input[type="radio"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .network-content {
+            font-size: 0.85em;
+            display: block;
+            margin-top: 5px;
+        }
+        .btn-pay {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .btn-pay:hover {
+            background-color: #218838;
+        }
+        .btn-pay:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .payment-steps {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .payment-steps h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        .payment-steps ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .payment-steps li {
+            margin-bottom: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #28a745;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pay to View Results</h1>
+        <p class="subtitle">Complete payment to access your examination results</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Amount Display -->
+        <div class="amount-box">
+            <div class="amount-label">Examination Result Access Fee</div>
+            <div class="amount">GH₵ {{ "%.2f"|format(amount) }}</div>
+            <div class="amount-label">One-time payment</div>
+        </div>
+        
+        <!-- Student Info -->
+        <div class="info-box">
+            <h3>Student Information</h3>
+            <p><strong>Name:</strong> {{ student_name }}</p>
+            <p><strong>Phone:</strong> {{ student_phone }}</p>
+        </div>
+        
+        <form id="payment-form">
+            <div class="form-group">
+                <label>Select Mobile Network:</label>
+                <div class="network-options">
+                    <label class="network-option selected" id="mtn-option">
+                        <input type="radio" name="mobile_network" value="mtn" checked onclick="selectNetwork('mtn')">
+                        <span>📱</span>
+                        <span class="network-content">MTN MoMo</span>
+                    </label>
+                    <label class="network-option" id="vodafone-option">
+                        <input type="radio" name="mobile_network" value="vodafone" onclick="selectNetwork('vodafone')">
+                        <span>📱</span>
+                        <span class="network-content">Vodafone Cash</span>
+                    </label>
+                    <label class="network-option" id="airteltigo-option">
+                        <input type="radio" name="mobile_network" value="airteltigo" onclick="selectNetwork('airteltigo')">
+                        <span>📱</span>
+                        <span class="network-content">AirtelTigo</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone_number">Mobile Money Number:</label>
+                <input type="tel" id="phone_number" name="phone_number" placeholder="e.g. 0241234567" required>
+                <small style="color: #666; display: block; margin-top: 5px;">Enter your 9-digit mobile money number (without leading 0)</small>
+            </div>
+            
+            <button type="button" class="btn-pay" id="pay-button" onclick="payWithPaystack()">
+                Pay GH₵ {{ "%.2f"|format(amount) }} Now
+            </button>
+        </form>
+        
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing payment...</p>
+        </div>
+        
+        <!-- Payment Steps -->
+        <div class="payment-steps">
+            <h4>How to Pay:</h4>
+            <ol>
+                <li>Select your mobile network (MTN, Vodafone, or AirtelTigo)</li>
+                <li>Enter your mobile money number</li>
+                <li>Click "Pay Now" button</li>
+                <li>A payment popup will appear on your screen</li>
+                <li>Complete the payment in the popup</li>
+                <li>Wait for confirmation, then click "Continue" on the popup</li>
+            </ol>
+        </div>
+        
+        <p class="back-link"><a href="{{ url_for('student_login') }}">Cancel and go back</a></p>
+    </div>
+    
+    <script>
+        // Pass data from Python to JavaScript
+        const publicKey = '{{ public_key }}';
+        const amount = {{ amount }};
+        const studentName = '{{ student_name }}';
+        const studentPhone = '{{ student_phone }}';
+        
+        function selectNetwork(network) {
+            // Update visual selection
+            document.querySelectorAll('.network-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.getElementById(network + '-option').classList.add('selected');
+        }
+        
+        function payWithPaystack() {
+            const phone = document.getElementById('phone_number').value.trim();
+            const network = document.querySelector('input[name="mobile_network"]:checked').value;
+            
+            if (!phone) {
+                alert('Please enter your mobile money number');
+                return;
+            }
+            
+            if (phone.length < 9) {
+                alert('Please enter a valid 9-digit mobile money number');
+                return;
+            }
+            
+            // Format phone number for Ghana
+            let formattedPhone = phone.replace(/\s/g, '').replace(/-/g, '');
+            if (formattedPhone.startsWith('0')) {
+                formattedPhone = '233' + formattedPhone.substring(1);
+            } else if (!formattedPhone.startsWith('233')) {
+                formattedPhone = '233' + formattedPhone;
+            }
+            
+            // Show loading
+            document.getElementById('pay-button').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            
+            // Get email from session or use phone as identifier
+            const email = 'student_' + studentPhone.replace(/\s/g, '') + '@schoolportal.edu.gh';
+            
+            // Map network to Paystack provider code
+            const providerMap = {
+                'mtn': 'mtn',
+                'vodafone': 'vodafone',
+                'airteltigo': 'tigo'
+            };
+            const provider = providerMap[network] || 'mtn';
+            
+            // Initialize Paystack payment
+            const handler = PaystackPop.setup({
+                key: publicKey,
+                email: email,
+                amount: amount * 100, // Convert to kobo
+                currency: 'GHS',
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "Student Name",
+                            variable_name: "student_name",
+                            value: studentName
+                        },
+                        {
+                            display_name: "Phone",
+                            variable_name: "phone",
+                            value: formattedPhone
+                        },
+                        {
+                            display_name: "Network",
+                            variable_name: "network",
+                            value: network
+                        }
+                    ]
+                },
+                label: "Result Viewing Fee",
+                phone: formattedPhone,
+                channels: ['mobile_money'],
+                mobile_money: {
+                    phone: formattedPhone,
+                    provider: provider
+                },
+                callback: function(response) {
+                    // Payment successful
+                    // Send payment reference to server for verification
+                    verifyPayment(response.reference, formattedPhone, network);
+                },
+                onClose: function() {
+                    // User closed the payment popup
+                    document.getElementById('pay-button').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                    alert('Payment window closed. Please try again if you did not complete the payment.');
+                }
+            });
+            
+            handler.openIframe();
+        }
+        
+        function verifyPayment(reference, phone, network) {
+            // Send payment verification request to server
+            fetch('/api/paystack/verify_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reference: reference,
+                    phone: phone,
+                    network: network
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to verification page
+                    window.location.href = '/student/verify_result_payment?ref=' + reference;
+                } else {
+                    alert('Payment verification failed: ' + data.message);
+                    document.getElementById('pay-button').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during payment verification. Please contact support.');
+                document.getElementById('pay-button').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

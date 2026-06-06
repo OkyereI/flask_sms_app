@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results - Gyedu Technical Institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .school-name { font-size: 1.3rem; font-weight: bold; color: #007bff; margin: 0; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2, h3 { color: #333; margin-top: 0; }
+        .info-box { background-color: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .grade-a { color: #28a745; font-weight: bold; }
+        .grade-b { color: #17a2b8; font-weight: bold; }
+        .grade-c { color: #ffc107; font-weight: bold; }
+        .grade-d { color: #fd7e14; font-weight: bold; }
+        .grade-f { color: #dc3545; font-weight: bold; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .badge-success { background-color: #d4edda; color: #155724; }
+        .semester-section { margin-bottom: 30px; border: 2px solid #007bff; border-radius: 8px; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="school-name">Gyedu Technical Institute</h1>
+                <p style="margin: 5px 0 0 0; color: #666;">Student Results - HOD Dashboard</p>
+            </div>
+            <div>
+                <a href="{{ url_for('hod_students') }}" class="btn btn-secondary">Back to Students</a>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <strong>Student:</strong> {{ student_data.student_info.get('Student Name', 'N/A') }} |
+            <strong>ID:</strong> {{ student_data.student_info.get('Student ID', 'N/A') }} |
+            <strong>Department:</strong> {{ student_data.student_info.get('Student Department', 'N/A') }}
+        </div>
+        
+        {% for semester_key, semester_data in student_data.results_by_semester.items() %}
+        <div class="card semester-section">
+            <h2>{{ semester_key }}</h2>
+            
+            {% if semester_data.Core Subjects or semester_data.Elective Subjects %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>Exams Score</th>
+                        <th>Class Score</th>
+                        <th>Total</th>
+                        <th>Grade</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if semester_data.Core Subjects %}
+                        {% for subject in semester_data['Core Subjects'] %}
+                        <tr>
+                            <td><strong>{{ subject.Subject }}</strong></td>
+                            <td><span class="badge badge-success">Core</span></td>
+                            <td>{{ subject['Exams Score'] or '-' }}</td>
+                            <td>{{ subject['Class Score'] or '-' }}</td>
+                            <td><strong>{{ subject['Total Score'] or '-' }}</strong></td>
+                            <td class="grade-{{ subject['Grade']|lower if subject['Grade'] else 'f' }}">{{ subject['Grade'] or '-' }}</td>
+                            <td>{{ subject['Remarks'] or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if semester_data.Elective Subjects %}
+                        {% for subject in semester_data['Elective Subjects'] %}
+                        <tr>
+                            <td><strong>{{ subject.Subject }}</strong></td>
+                            <td><span class="badge badge-info">Elective</span></td>
+                            <td>{{ subject['Exams Score'] or '-' }}</td>
+                            <td>{{ subject['Class Score'] or '-' }}</td>
+                            <td><strong>{{ subject['Total Score'] or '-' }}</strong></td>
+                            <td class="grade-{{ subject['Grade']|lower if subject['Grade'] else 'f' }}">{{ subject['Grade'] or '-' }}</td>
+                            <td>{{ subject['Remarks'] or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #666; text-align: center;">No results available for this semester.</p>
+            {% endif %}
+            
+            <div style="margin-top: 15px; text-align: right;">
+                <a href="{{ url_for('hod_edit_student_results', student_id=student_data.student_info.get('Student ID')) }}" class="btn btn-primary">Add/Edit Remarks</a>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if not student_data.results_by_semester %}
+        <div class="card">
+            <p style="color: #666; text-align: center;">No results available for this student.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

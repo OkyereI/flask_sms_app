@@ -311,7 +311,7 @@
     
     <div class="nav-container">
         <div class="nav">
-            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_estate') }}">Dashboard</a>
             <a href="{{ url_for('admin_store') }}">Store</a>
             <a href="{{ url_for('admin_finance') }}">Finance</a>
             <a href="{{ url_for('admin_estate') }}">Estate</a>
@@ -403,6 +403,7 @@
                             <th>Name</th>
                             <th>Category</th>
                             <th>Value</th>
+                            <th>Location</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -413,14 +414,17 @@
                             <td><strong>{{ asset.get('asset_code', '-') }}</strong></td>
                             <td>{{ asset.get('name', '-') }}</td>
                             <td>{{ asset.get('category', '-') }}</td>
-                            <td>GHS {{ "%.2f"|format(asset.get('purchase_value', 0)) }}</td>
+                            <td>GHS {{ "%.2f"|format(asset.get('purchase_value', 0)|float if asset.get('purchase_value') else 0) }}</td>
+                            <td>{{ asset.get('location_name', '-') }}</td>
                             <td>
                                 <span class="badge badge-{{ asset.get('status', 'Inactive') }}">
                                     {{ asset.get('status', 'Inactive') }}
                                 </span>
                             </td>
                             <td class="actions">
-                                <a href="{{ url_for('admin_estate_move_asset', asset_id=asset.get('id')) }}" class="btn btn-primary">Move</a>
+                                <a href="{{ url_for('admin_estate_edit_asset', asset_id=asset.get('id')) }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ url_for('admin_estate_move_asset', asset_id=asset.get('id')) }}" class="btn btn-secondary">Move</a>
+                                <a href="{{ url_for('admin_estate_delete_asset', asset_id=asset.get('id')) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this asset?')">Delete</a>
                             </td>
                         </tr>
                         {% endfor %}

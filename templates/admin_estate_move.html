@@ -206,7 +206,7 @@
     
     <div class="nav-container">
         <div class="nav">
-            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_estate') }}">Dashboard</a>
             <a href="{{ url_for('admin_store') }}">Store</a>
             <a href="{{ url_for('admin_finance') }}">Finance</a>
             <a href="{{ url_for('admin_estate') }}">Estate</a>
@@ -226,7 +226,7 @@
                 <p><strong>Asset Code:</strong> {{ asset.get('asset_code', '-') }}</p>
                 <p><strong>Asset Name:</strong> {{ asset.get('name', '-') }}</p>
                 <p><strong>Category:</strong> {{ asset.get('category', '-') }}</p>
-                <p><strong>Current Location:</strong> {{ asset.get('location', 'Not assigned') }}</p>
+                <p><strong>Current Location:</strong> {{ asset.get('current_location_name', 'Not assigned') }}</p>
                 <p><strong>Condition:</strong> {{ asset.get('condition', '-') }}</p>
             </div>
             

@@ -25,6 +25,21 @@ def check_finance_access():
     """
     return session.get('admin_logged_in') or session.get('finance_logged_in')
 
+
+def get_login_redirect():
+    """
+    Determine the appropriate login page based on the user's role.
+    Returns the URL for the login page they should be redirected to.
+    """
+    if session.get('estate_logged_in'):
+        return url_for('estate_login')
+    elif session.get('finance_logged_in'):
+        return url_for('finance_login')
+    elif session.get('store_logged_in'):
+        return url_for('store_login')
+    else:
+        return url_for('admin_login')
+
 # Excel-based database - no SQLAlchemy needed
 
 app = Flask(__name__)
@@ -675,6 +690,14 @@ class SchoolStoreItem:
         return ExcelModel.update(cls.data_type, id, **kwargs)
     
     @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
+    
+    @classmethod
     def delete(cls, id):
         return ExcelModel.delete(cls.data_type, id)
 
@@ -709,6 +732,14 @@ class SchoolStoreTransaction:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 class SchoolPayment:
     """Excel-based Payment model"""
@@ -741,6 +772,14 @@ class SchoolPayment:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 class SchoolFeeType:
     """Excel-based Fee Type model"""
@@ -773,6 +812,14 @@ class SchoolFeeType:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 class SchoolAsset:
     """Excel-based Asset model"""
@@ -805,6 +852,56 @@ class SchoolAsset:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
+
+
+class SchoolAssetMovement:
+    """Excel-based Asset Movement model"""
+    data_type = 'asset_movements'
+    
+    @classmethod
+    def query(cls):
+        return cls
+    
+    @classmethod
+    def all(cls):
+        return ExcelModel.get_all(cls.data_type)
+    
+    @classmethod
+    def get_by_id(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def filter_by(cls, **kwargs):
+        return ExcelModel.filter_by(cls.data_type, **kwargs)
+    
+    @classmethod
+    def count(cls):
+        return ExcelModel.count(cls.data_type)
+    
+    @classmethod
+    def add(cls, **kwargs):
+        return ExcelModel.add(cls.data_type, **kwargs)
+    
+    @classmethod
+    def update(cls, id, **kwargs):
+        return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
+
 
 class SchoolLocation:
     """Excel-based Location model"""
@@ -833,6 +930,19 @@ class SchoolLocation:
     @classmethod
     def add(cls, **kwargs):
         return ExcelModel.add(cls.data_type, **kwargs)
+    
+    @classmethod
+    def update(cls, id, **kwargs):
+        return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
+
 
 class SchoolExpense:
     """Excel-based Expense model"""
@@ -861,6 +971,18 @@ class SchoolExpense:
     @classmethod
     def add(cls, **kwargs):
         return ExcelModel.add(cls.data_type, **kwargs)
+    
+    @classmethod
+    def update(cls, id, **kwargs):
+        return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 class SchoolSupplier:
     """Excel-based Supplier model"""
@@ -921,6 +1043,14 @@ class SchoolStudentAccount:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 
 class SchoolStudent:
@@ -958,6 +1088,14 @@ class SchoolStudent:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
     
     @classmethod
     def delete(cls, id):
@@ -1008,6 +1146,14 @@ class SchoolMaintenanceRequest:
     @classmethod
     def update(cls, id, **kwargs):
         return ExcelModel.update(cls.data_type, id, **kwargs)
+    
+    @classmethod
+    def get(cls, id):
+        return ExcelModel.get_by_id(cls.data_type, id)
+    
+    @classmethod
+    def delete(cls, id):
+        return ExcelModel.delete(cls.data_type, id)
 
 # For backwards compatibility, create a db object that handles add and commit
 class FakeDB:
@@ -1260,6 +1406,7 @@ def get_google_sheet_client():
 def sync_payment_to_google_sheet(payment_data):
     """
     Sync a single payment record to Google Sheets Payments worksheet.
+    If the payment already exists (by id or receipt_number), update it. Otherwise, append a new row.
     This ensures payments are saved to Google Sheet for other apps to read.
     Returns True if successful, False otherwise.
     """
@@ -1296,33 +1443,477 @@ def sync_payment_to_google_sheet(payment_data):
             worksheet.append_row(headers)
             print(f"Created new '{worksheet_name}' worksheet with headers")
         
-        # Check if worksheet has headers
-        existing_headers = worksheet.row_values(1) if worksheet.row_count > 0 else []
-        
         # Prepare row data - handle all possible keys
+        payment_id = str(payment_data.get('id', ''))
+        receipt_number = str(payment_data.get('receipt_number', ''))
         row_data = [
-            str(payment_data.get('id', '')),
+            payment_id,
             str(payment_data.get('student_id', '')),
             str(payment_data.get('student_name', '')),
             str(payment_data.get('fee_type', '')),
             str(payment_data.get('amount', 0)),
             str(payment_data.get('payment_date', '')),
             str(payment_data.get('payment_method', '')),
-            str(payment_data.get('receipt_number', '')),
+            receipt_number,
             str(payment_data.get('transaction_ref', '')),
             str(payment_data.get('status', 'completed')),
             str(payment_data.get('notes', '')),
             str(payment_data.get('created_at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         ]
         
-        # Append the payment row
-        worksheet.append_row(row_data)
-        print(f"Synced payment to Google Sheet: Receipt {payment_data.get('receipt_number', 'N/A')}")
+        # Check if this payment already exists in the sheet (by id or receipt_number)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            record_id = str(record.get('id', ''))
+            record_receipt = str(record.get('receipt_number', ''))
+            if record_id == payment_id or record_receipt == receipt_number:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:L{row_num}', [row_data])
+            print(f"✓ Updated payment in Google Sheets: Receipt {receipt_number}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced payment {receipt_number} to Google Sheets")
         
         return True
         
     except Exception as e:
-        print(f"Error syncing payment to Google Sheet: {e}")
+        print(f"Error syncing payment to Google Sheets: {e}")
+        return False
+
+
+def sync_expense_to_google_sheet(expense_data):
+    """
+    Sync a single expense record to Google Sheets Expenses worksheet.
+    If the expense already exists (by id), update it. Otherwise, append a new row.
+    This ensures expenses are saved to Google Sheet for other apps to read.
+    Returns True if successful, False otherwise.
+    """
+    if not UNIFIED_SHEET_ENABLED or not UNIFIED_GOOGLE_SHEET_ID:
+        print("Unified sheet sync is disabled - expense not synced to Google Sheets")
+        return False
+    
+    if 'expenses' not in SHEET_WORKBOOKS:
+        print("Expenses worksheet not configured in SHEET_WORKBOOKS")
+        return False
+    
+    worksheet_name = SHEET_WORKBOOKS['expenses']
+    
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("Failed to get Google Sheets client for expense sync")
+            return False
+        
+        # Open the spreadsheet
+        spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+        
+        # Get or create the worksheet
+        try:
+            worksheet = spreadsheet.worksheet(worksheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # Create the worksheet if it doesn't exist
+            spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=10)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            # Add headers
+            headers = ['id', 'category', 'description', 'amount', 'vendor', 
+                       'approved_by', 'notes', 'status', 'created_at']
+            worksheet.append_row(headers)
+            print(f"Created new '{worksheet_name}' worksheet with headers")
+        
+        # Handle created_at - ensure it's a string
+        created_at = expense_data.get('created_at', '')
+        if hasattr(created_at, 'strftime'):
+            created_at = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            created_at = str(created_at) if created_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Prepare row data - handle all possible keys
+        expense_id = str(expense_data.get('id', ''))
+        row_data = [
+            expense_id,
+            str(expense_data.get('category', '')),
+            str(expense_data.get('description', '')),
+            str(expense_data.get('amount', 0)),
+            str(expense_data.get('vendor', '')),
+            str(expense_data.get('approved_by', '')),
+            str(expense_data.get('notes', '')),
+            str(expense_data.get('status', 'active')),
+            created_at
+        ]
+        
+        # Check if this expense already exists in the sheet (by id)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            if str(record.get('id', '')) == expense_id:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:I{row_num}', [row_data])
+            print(f"✓ Updated expense in Google Sheets: ID {expense_id}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced new expense to Google Sheets: {expense_data.get('description', '')[:30]}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error syncing expense to Google Sheets: {e}")
+        return False
+
+
+def sync_asset_to_google_sheet(asset_data):
+    """
+    Sync a single asset record to Google Sheets Assets worksheet.
+    If the asset already exists (by id), update it. Otherwise, append a new row.
+    This ensures assets are saved to Google Sheet for other apps to read.
+    Returns True if successful, False otherwise.
+    """
+    if not UNIFIED_SHEET_ENABLED or not UNIFIED_GOOGLE_SHEET_ID:
+        print("Unified sheet sync is disabled - asset not synced to Google Sheets")
+        return False
+    
+    if 'assets' not in SHEET_WORKBOOKS:
+        print("Assets worksheet not configured in SHEET_WORKBOOKS")
+        return False
+    
+    worksheet_name = SHEET_WORKBOOKS['assets']
+    
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("Failed to get Google Sheets client for asset sync")
+            return False
+        
+        # Open the spreadsheet
+        spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+        
+        # Get or create the worksheet
+        try:
+            worksheet = spreadsheet.worksheet(worksheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # Create the worksheet if it doesn't exist
+            spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=12)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            # Add headers
+            headers = ['id', 'asset_code', 'name', 'category', 'location_id', 
+                       'purchase_value', 'current_value', 'condition', 'status',
+                       'notes', 'created_at', 'updated_at']
+            worksheet.append_row(headers)
+            print(f"Created new '{worksheet_name}' worksheet with headers")
+        
+        # Handle dates - ensure they're strings
+        created_at = asset_data.get('created_at', '')
+        if hasattr(created_at, 'strftime'):
+            created_at = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            created_at = str(created_at) if created_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        updated_at = asset_data.get('updated_at', '')
+        if hasattr(updated_at, 'strftime'):
+            updated_at = updated_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            updated_at = str(updated_at) if updated_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Prepare row data
+        asset_id = str(asset_data.get('id', ''))
+        row_data = [
+            asset_id,
+            str(asset_data.get('asset_code', '')),
+            str(asset_data.get('name', '')),
+            str(asset_data.get('category', '')),
+            str(asset_data.get('location_id', '')),
+            str(asset_data.get('purchase_value', 0)),
+            str(asset_data.get('current_value', 0)),
+            str(asset_data.get('condition', 'Good')),
+            str(asset_data.get('status', 'Active')),
+            str(asset_data.get('notes', '')),
+            created_at,
+            updated_at
+        ]
+        
+        # Check if this asset already exists in the sheet (by id)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            if str(record.get('id', '')) == asset_id:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:L{row_num}', [row_data])
+            print(f"✓ Updated asset in Google Sheets: {asset_data.get('name', '')}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced new asset to Google Sheets: {asset_data.get('name', '')}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error syncing asset to Google Sheets: {e}")
+        return False
+
+
+def sync_location_to_google_sheet(location_data):
+    """
+    Sync a single location record to Google Sheets Locations worksheet.
+    If the location already exists (by id), update it. Otherwise, append a new row.
+    Returns True if successful, False otherwise.
+    """
+    if not UNIFIED_SHEET_ENABLED or not UNIFIED_GOOGLE_SHEET_ID:
+        print("Unified sheet sync is disabled - location not synced to Google Sheets")
+        return False
+    
+    if 'locations' not in SHEET_WORKBOOKS:
+        print("Locations worksheet not configured in SHEET_WORKBOOKS")
+        return False
+    
+    worksheet_name = SHEET_WORKBOOKS['locations']
+    
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("Failed to get Google Sheets client for location sync")
+            return False
+        
+        # Open the spreadsheet
+        spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+        
+        # Get or create the worksheet
+        try:
+            worksheet = spreadsheet.worksheet(worksheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # Create the worksheet if it doesn't exist
+            spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=5)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            # Add headers
+            headers = ['id', 'name', 'description', 'created_at']
+            worksheet.append_row(headers)
+            print(f"Created new '{worksheet_name}' worksheet with headers")
+        
+        # Handle created_at - ensure it's a string
+        created_at = location_data.get('created_at', '')
+        if hasattr(created_at, 'strftime'):
+            created_at = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            created_at = str(created_at) if created_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Prepare row data
+        location_id = str(location_data.get('id', ''))
+        row_data = [
+            location_id,
+            str(location_data.get('name', '')),
+            str(location_data.get('description', '')),
+            created_at
+        ]
+        
+        # Check if this location already exists in the sheet (by id)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            if str(record.get('id', '')) == location_id:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:D{row_num}', [row_data])
+            print(f"✓ Updated location in Google Sheets: {location_data.get('name', '')}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced new location to Google Sheets: {location_data.get('name', '')}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error syncing location to Google Sheets: {e}")
+        return False
+
+
+def sync_maintenance_request_to_google_sheet(maintenance_data):
+    """
+    Sync a single maintenance request record to Google Sheets Maintenance Requests worksheet.
+    If the request already exists (by id), update it. Otherwise, append a new row.
+    Returns True if successful, False otherwise.
+    """
+    if not UNIFIED_SHEET_ENABLED or not UNIFIED_GOOGLE_SHEET_ID:
+        print("Unified sheet sync is disabled - maintenance request not synced to Google Sheets")
+        return False
+    
+    if 'maintenance_requests' not in SHEET_WORKBOOKS:
+        print("Maintenance Requests worksheet not configured in SHEET_WORKBOOKS")
+        return False
+    
+    worksheet_name = SHEET_WORKBOOKS['maintenance_requests']
+    
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("Failed to get Google Sheets client for maintenance sync")
+            return False
+        
+        # Open the spreadsheet
+        spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+        
+        # Get or create the worksheet
+        try:
+            worksheet = spreadsheet.worksheet(worksheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # Create the worksheet if it doesn't exist
+            spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=12)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            # Add headers
+            headers = ['id', 'asset_id', 'location_id', 'issue_description', 'priority', 
+                       'estimated_cost', 'actual_cost', 'reported_by', 'contractor',
+                       'status', 'notes', 'created_at', 'completed_date']
+            worksheet.append_row(headers)
+            print(f"Created new '{worksheet_name}' worksheet with headers")
+        
+        # Handle dates - ensure they're strings
+        created_at = maintenance_data.get('created_at', '')
+        if hasattr(created_at, 'strftime'):
+            created_at = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            created_at = str(created_at) if created_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        completed_date = maintenance_data.get('completed_date', '')
+        if hasattr(completed_date, 'strftime'):
+            completed_date = completed_date.strftime('%Y-%m-%d')
+        else:
+            completed_date = str(completed_date) if completed_date else ''
+        
+        # Prepare row data
+        request_id = str(maintenance_data.get('id', ''))
+        row_data = [
+            request_id,
+            str(maintenance_data.get('asset_id', '')),
+            str(maintenance_data.get('location_id', '')),
+            str(maintenance_data.get('issue_description', '')),
+            str(maintenance_data.get('priority', 'Medium')),
+            str(maintenance_data.get('estimated_cost', 0)),
+            str(maintenance_data.get('actual_cost', 0)),
+            str(maintenance_data.get('reported_by', '')),
+            str(maintenance_data.get('contractor', '')),
+            str(maintenance_data.get('status', 'Reported')),
+            str(maintenance_data.get('notes', '')),
+            created_at,
+            completed_date
+        ]
+        
+        # Check if this request already exists in the sheet (by id)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            if str(record.get('id', '')) == request_id:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:M{row_num}', [row_data])
+            print(f"✓ Updated maintenance request in Google Sheets: ID {request_id}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced new maintenance request to Google Sheets: {maintenance_data.get('issue_description', '')[:30]}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error syncing maintenance request to Google Sheets: {e}")
+        return False
+
+
+def sync_asset_movement_to_google_sheet(movement_data):
+    """
+    Sync a single asset movement record to Google Sheets Asset Movements worksheet.
+    If the movement already exists (by id), update it. Otherwise, append a new row.
+    Returns True if successful, False otherwise.
+    """
+    if not UNIFIED_SHEET_ENABLED or not UNIFIED_GOOGLE_SHEET_ID:
+        print("Unified sheet sync is disabled - asset movement not synced to Google Sheets")
+        return False
+    
+    if 'asset_movements' not in SHEET_WORKBOOKS:
+        print("Asset Movements worksheet not configured in SHEET_WORKBOOKS")
+        return False
+    
+    worksheet_name = SHEET_WORKBOOKS['asset_movements']
+    
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("Failed to get Google Sheets client for asset movement sync")
+            return False
+        
+        # Open the spreadsheet
+        spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+        
+        # Get or create the worksheet
+        try:
+            worksheet = spreadsheet.worksheet(worksheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # Create the worksheet if it doesn't exist
+            spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=8)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            # Add headers
+            headers = ['id', 'asset_id', 'from_location_id', 'to_location_id', 
+                       'moved_by', 'reason', 'moved_at']
+            worksheet.append_row(headers)
+            print(f"Created new '{worksheet_name}' worksheet with headers")
+        
+        # Handle moved_at - ensure it's a string
+        moved_at = movement_data.get('moved_at', '')
+        if hasattr(moved_at, 'strftime'):
+            moved_at = moved_at.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            moved_at = str(moved_at) if moved_at else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Prepare row data
+        movement_id = str(movement_data.get('id', ''))
+        row_data = [
+            movement_id,
+            str(movement_data.get('asset_id', '')),
+            str(movement_data.get('from_location_id', '')),
+            str(movement_data.get('to_location_id', '')),
+            str(movement_data.get('moved_by', '')),
+            str(movement_data.get('reason', '')),
+            moved_at
+        ]
+        
+        # Check if this movement already exists in the sheet (by id)
+        all_records = worksheet.get_all_records()
+        row_num = None
+        for idx, record in enumerate(all_records, start=2):  # Start at 2 because row 1 is header
+            if str(record.get('id', '')) == movement_id:
+                row_num = idx
+                break
+        
+        if row_num:
+            # Update existing row
+            worksheet.update(f'A{row_num}:G{row_num}', [row_data])
+            print(f"✓ Updated asset movement in Google Sheets: ID {movement_id}")
+        else:
+            # Append new row
+            worksheet.append_row(row_data)
+            print(f"✓ Synced new asset movement to Google Sheets: ID {movement_id}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error syncing asset movement to Google Sheets: {e}")
         return False
 
 
@@ -7026,7 +7617,34 @@ def api_students_search():
 
 @app.route('/api/student/<student_id>')
 def api_student_get(student_id):
-    """API endpoint to get a specific student"""
+    """API endpoint to get a specific student - queries from Google Sheets first, then local database"""
+    
+    # First try to get from Google Sheets
+    try:
+        df = load_results_from_sheet()
+        if not df.empty:
+            # Normalize column names
+            df.columns = df.columns.str.strip()
+            
+            # Find student by ID (case insensitive)
+            student_rows = df[df['Student ID'].astype(str).str.strip() == str(student_id).strip()]
+            
+            if not student_rows.empty:
+                row = student_rows.iloc[0]
+                student_data = {
+                    'student_id': str(row.get('Student ID', '')),
+                    'name': str(row.get('Student Name', '')),
+                    'class': str(row.get('Class', row.get('class', ''))),
+                    'section': str(row.get('Section', '')),
+                    'gender': str(row.get('Gender', '')),
+                    'parent_phone': str(row.get('Parent Phone', row.get('parent_phone', ''))),
+                    'department': str(row.get('Department', row.get('department', '')))
+                }
+                return jsonify(student_data)
+    except Exception as e:
+        print(f"Error fetching student from Google Sheets: {e}")
+    
+    # Fall back to local database
     student = SchoolStudent.get_by_student_id(student_id)
     
     if not student:
@@ -7060,7 +7678,7 @@ def admin_finance():
     """Finance management dashboard."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get statistics
     total_revenue = sum(p.get('amount', 0) for p in SchoolPayment.all())
@@ -7220,7 +7838,7 @@ def admin_finance_fee_setup():
     """Setup fee types and amounts."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -7259,7 +7877,7 @@ def admin_finance_payment():
     """Record payment from student."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     if request.method == 'POST':
         student_id = request.form.get('student_id')
@@ -7319,7 +7937,7 @@ def admin_finance_students():
     """Display student records for payment and history actions with balance tracking."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get search and filter parameters
     search_query = request.args.get('search', '')
@@ -7437,6 +8055,12 @@ def admin_finance_students():
     for student in students:
         student_id = student.get('student_id') or student.get('Student ID') or student.get('id', '')
         
+        # Ensure student_name is always a string to prevent template errors
+        if 'student_name' in student:
+            student['student_name'] = str(student['student_name']) if student['student_name'] else ''
+        if 'Student Name' in student:
+            student['Student Name'] = str(student['Student Name']) if student['Student Name'] else ''
+        
         # Get total_fees (default to 0 if not set)
         total_fees = float(student.get('total_fees', 0) or 0)
         
@@ -7488,7 +8112,7 @@ def admin_student_payment(student_id):
     """Process student payment."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     student = SchoolStudent.get_by_student_id(student_id)
     if not student:
@@ -7529,7 +8153,7 @@ def admin_student_history(student_id):
     """View student payment history."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     student = SchoolStudent.get_by_student_id(student_id)
     if not student:
@@ -7554,7 +8178,7 @@ def admin_finance_student_delete(student_id):
     """Delete a student record."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     student = SchoolStudent.get_by_student_id(student_id)
     if student:
@@ -7572,7 +8196,7 @@ def admin_finance_student_results():
     """View and edit student exam results"""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     search_query = request.args.get('search', '')
     
@@ -7592,7 +8216,7 @@ def admin_finance_student_results_edit(student_id):
     """Edit a student's exam results"""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Try to find student by student_id (string) or id (integer)
     student = SchoolStudent.get_by_student_id(student_id)
@@ -7738,7 +8362,7 @@ def admin_finance_expenses():
     """Record and view expenses."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     if request.method == 'POST':
         category = request.form.get('category')
@@ -7760,14 +8384,136 @@ def admin_finance_expenses():
                 'approved_by': approved_by,
                 'notes': notes
             }
-            SchoolExpense.add(**expense_data)
-            flash(f'Expense of GHS {amount} recorded successfully!', 'success')
+            expense_id = SchoolExpense.add(**expense_data)
+            expense_data['id'] = expense_id
+            
+            # Sync expense to Google Sheets
+            sync_result = sync_expense_to_google_sheet(expense_data)
+            if sync_result:
+                flash(f'Expense of GHS {amount} recorded successfully! (Synced to Google Sheets)', 'success')
+            else:
+                flash(f'Expense of GHS {amount} recorded successfully! (Local only)', 'warning')
             return redirect(url_for('admin_finance_expenses'))
     
-    expenses = sorted(SchoolExpense.all(), key=lambda x: x.get('created_at', ''), reverse=True)[:100]
+    # Get date range filter parameters
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    
+    expenses = SchoolExpense.all()
+    
+    # Apply date range filter if provided
+    if start_date or end_date:
+        filtered_expenses = []
+        for expense in expenses:
+            created_at = expense.get('created_at', '')
+            # Convert created_at to string for comparison
+            if hasattr(created_at, 'strftime'):
+                created_str = created_at.strftime('%Y-%m-%d')
+            else:
+                created_str = str(created_at)[:10] if created_at else ''
+            
+            # Check if expense falls within date range
+            if start_date and created_str < start_date:
+                continue
+            if end_date and created_str > end_date:
+                continue
+            filtered_expenses.append(expense)
+        expenses = filtered_expenses
+    
+    # Sort expenses by created_at
+    expenses = sorted(expenses, key=lambda x: x.get('created_at', ''), reverse=True)[:100]
+    
+    # Ensure all expense values are strings to prevent template errors
+    for expense in expenses:
+        # Convert created_at to string if it's a datetime object
+        if 'created_at' in expense and expense['created_at']:
+            if hasattr(expense['created_at'], 'strftime'):
+                expense['created_at'] = expense['created_at'].strftime('%Y-%m-%d %H:%M')
+            else:
+                expense['created_at'] = str(expense['created_at'])
+        else:
+            expense['created_at'] = 'N/A'
+        
+        # Convert amount to float for template formatting
+        if 'amount' in expense and expense['amount']:
+            try:
+                expense['amount'] = float(expense['amount'])
+            except (ValueError, TypeError):
+                expense['amount'] = 0
+    
     total_expenses = sum(e.get('amount', 0) for e in SchoolExpense.all())
     
-    return render_template('admin_finance_expenses.html', expenses=expenses, total_expenses=total_expenses)
+    return render_template('admin_finance_expenses.html', 
+                           expenses=expenses, 
+                           total_expenses=total_expenses,
+                           start_date=start_date,
+                           end_date=end_date)
+
+
+@app.route('/admin/finance/edit_expense/<int:expense_id>', methods=['GET', 'POST'])
+def admin_finance_edit_expense(expense_id):
+    """Edit an expense record."""
+    if not check_finance_access():
+        flash('Please log in to access this page.', 'warning')
+        return redirect(get_login_redirect())
+    
+    expense = SchoolExpense.get(expense_id)
+    if not expense:
+        flash('Expense not found.', 'danger')
+        return redirect(url_for('admin_finance_expenses'))
+    
+    if request.method == 'POST':
+        category = request.form.get('category')
+        description = request.form.get('description')
+        amount = float(request.form.get('amount', 0))
+        vendor = request.form.get('vendor', '')
+        approved_by = request.form.get('approved_by', '')
+        notes = request.form.get('notes', '')
+        
+        if not category or not description or not amount:
+            flash('Please fill in all required fields.', 'warning')
+        else:
+            # Get current expense data before update
+            current_expense = SchoolExpense.get(expense_id)
+            
+            SchoolExpense.update(expense_id, 
+                category=category,
+                description=description,
+                amount=amount,
+                vendor=vendor,
+                approved_by=approved_by,
+                notes=notes
+            )
+            
+            # Get updated expense data
+            updated_expense = SchoolExpense.get(expense_id)
+            
+            # Sync updated expense to Google Sheets
+            sync_result = sync_expense_to_google_sheet(updated_expense)
+            if sync_result:
+                flash('Expense updated successfully! (Synced to Google Sheets)', 'success')
+            else:
+                flash('Expense updated successfully! (Local only)', 'warning')
+            return redirect(url_for('admin_finance_expenses'))
+    
+    return render_template('admin_finance_edit_expense.html', expense=expense)
+
+
+@app.route('/admin/finance/delete_expense/<int:expense_id>', methods=['POST'])
+def admin_finance_delete_expense(expense_id):
+    """Delete an expense record."""
+    if not check_finance_access():
+        flash('Please log in to access this page.', 'warning')
+        return redirect(get_login_redirect())
+    
+    expense = SchoolExpense.get(expense_id)
+    if not expense:
+        flash('Expense not found.', 'danger')
+        return redirect(url_for('admin_finance_expenses'))
+    
+    SchoolExpense.delete(expense_id)
+    flash('Expense deleted successfully!', 'success')
+    return redirect(url_for('admin_finance_expenses'))
 
 
 @app.route('/admin/finance/collect', methods=['GET', 'POST'])
@@ -7780,7 +8526,7 @@ def admin_finance_collect_payment():
     """Collect payment from student."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get fee categories for dropdown
     fee_categories = SchoolFeeType.all()
@@ -7806,14 +8552,33 @@ def admin_finance_collect_payment():
         if not student_id or not fee_category or not amount or not payment_method or not payment_date:
             flash('Please fill in all required fields.', 'warning')
         else:
-            # VERIFY STUDENT EXISTS IN DATABASE FIRST
-            student = SchoolStudent.get_by_student_id(student_id)
-            if not student:
-                flash(f'Student ID "{student_id}" not found in database. Please contact system admin to register the student first.', 'danger')
-                return redirect(url_for('admin_finance_collect_payment'))
-            
             # Get student name from hidden field
             student_name = request.form.get('student_name_hidden', '')
+            
+            # VERIFY STUDENT EXISTS - Check both local database and Google Sheets
+            student = SchoolStudent.get_by_student_id(student_id)
+            if not student:
+                # Try to get from Google Sheets
+                try:
+                    df = load_results_from_sheet()
+                    if not df.empty:
+                        df.columns = df.columns.str.strip()
+                        student_rows = df[df['Student ID'].astype(str).str.strip() == str(student_id).strip()]
+                        if not student_rows.empty:
+                            row = student_rows.iloc[0]
+                            student = {
+                                'student_id': str(row.get('Student ID', '')),
+                                'student_name': str(row.get('Student Name', ''))
+                            }
+                            # Use Google Sheet student name if hidden field is empty
+                            if not student_name:
+                                student_name = student['student_name']
+                except Exception as e:
+                    print(f"Error checking Google Sheets for student: {e}")
+            
+            if not student and not student_name:
+                flash(f'Student ID "{student_id}" not found in database. Please contact system admin to register the student first.', 'danger')
+                return redirect(url_for('admin_finance_collect_payment'))
             
             # Find fee type by name (not ID)
             fee_type = SchoolFeeType.filter_by(name=fee_category)[0] if SchoolFeeType.filter_by(name=fee_category) else None
@@ -7854,10 +8619,27 @@ def admin_finance_view_payments():
     """View all payment records."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get all payments with related data
     payments = sorted(SchoolPayment.all(), key=lambda x: (x.get('payment_date', ''), x.get('created_at', '')), reverse=True)[:500]
+    
+    # Ensure string fields are properly handled - convert NaN to empty string but keep numbers as numbers
+    string_fields = ['student_id', 'student_name', 'fee_type', 'receipt_number', 'payment_method', 'payment_date', 'transaction_ref', 'notes', 'status']
+    for payment in payments:
+        for key in string_fields:
+            if key in payment and payment[key] is not None:
+                if isinstance(payment[key], float) and str(payment[key]) == 'nan':
+                    payment[key] = ''
+                elif not isinstance(payment[key], str):
+                    payment[key] = str(payment[key])
+        # Ensure amount is always a number
+        if 'amount' in payment and payment['amount'] is not None:
+            try:
+                payment['amount'] = float(payment['amount'])
+            except (ValueError, TypeError):
+                payment['amount'] = 0
+    
     total_collected = sum(p.get('amount', 0) for p in SchoolPayment.all())
     
     return render_template('admin_finance_view_payments.html', 
@@ -7871,7 +8653,7 @@ def admin_finance_student_account():
     """View individual student account details and register new students."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get search query from URL parameter or form data
     search_query = request.args.get('search', '') or request.form.get('search_query', '')
@@ -7969,52 +8751,80 @@ def admin_finance_student_account():
                 # Redirect to show the new student
                 return redirect(url_for('admin_finance_student_account', search=student_id))
     
-    # Get all students from local database and Google Sheet
+    # Get all students - prioritize Google Sheets, fallback to local
     all_students = []
+    google_sheet_students = []
     
-    # First get all students from local Excel database
+    # First get students from Google Sheet
+    try:
+        df = load_results_from_sheet()
+        if not df.empty:
+            df.columns = df.columns.str.strip()
+            sheet_students = df.to_dict('records')
+            for student in sheet_students:
+                student_id = str(student.get('Student ID', student.get('student_id', ''))).strip()
+                if student_id:
+                    student['student_id'] = student_id
+                    student['student_name'] = str(student.get('Student Name', student.get('student_name', '')))
+                    student['department'] = str(student.get('Department', student.get('department', '')))
+                    student['_source'] = 'google_sheet'
+                    student['total_paid'] = 0
+                    student['payment_count'] = 0
+                    google_sheet_students.append(student)
+    except Exception as e:
+        print(f"Error loading Google Sheet students: {e}")
+    
+    # Get all students from local Excel database
     local_students = SchoolStudent.all()
+    local_ids = [str(s.get('student_id', s.get('id', ''))) for s in local_students]
+    
+    # Add Google Sheet students to the list (only those not in local)
+    for student in google_sheet_students:
+        student_id = student.get('student_id', '')
+        if student_id and student_id not in local_ids:
+            all_students.append(student)
+    
+    # Add local students with their payment info
     for student in local_students:
         student['_source'] = 'local'
         # Calculate total paid from payments
         student_payments = [p for p in SchoolPayment.all() if str(p.get('student_id', '')) == str(student.get('student_id', student.get('id', '')))]
         student['total_paid'] = sum(p.get('amount', 0) for p in student_payments)
         student['payment_count'] = len(student_payments)
-    all_students.extend(local_students)
-    
-    # Also get students from Google Sheet if available
-    try:
-        df = load_results_from_sheet()
-        if not df.empty:
-            df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
-            sheet_students = df.to_dict('records')
-            # Add Google Sheet students that are not already in local database
-            existing_ids = [s.get('student_id', s.get('id', '')) for s in local_students]
-            for student in sheet_students:
-                student_id = student.get('student_id', student.get('id', ''))
-                if student_id and student_id not in existing_ids:
-                    student['_source'] = 'google_sheet'
-                    student['total_paid'] = 0
-                    student['payment_count'] = 0
-                    all_students.append(student)
-    except Exception as e:
-        print(f"Error loading Google Sheet students: {e}")
+        all_students.append(student)
     
     # Sort students by name - convert to string to handle None/NaN values
     all_students = sorted(all_students, key=lambda x: str(x.get('student_name', '')))
     
     # Search for students if query provided
+    selected_student = None
+    student_payments = []
     if search_query:
         search_query_lower = search_query.lower()
         all_students = [s for s in all_students 
                        if search_query_lower in str(s.get('student_id', '')).lower() 
                        or search_query_lower in str(s.get('student_name', '')).lower()
                        or search_query_lower in str(s.get('department', '')).lower()]
+        # Set selected_student to the first matching result
+        if len(all_students) >= 1:
+            selected_student = all_students[0]
+            # Ensure string values for template
+            if 'student_name' in selected_student:
+                selected_student['student_name'] = str(selected_student['student_name']) if selected_student['student_name'] else ''
+            if 'student_id' in selected_student:
+                selected_student['student_id'] = str(selected_student['student_id']) if selected_student['student_id'] else ''
+            
+            # Load payments for the selected student
+            selected_student_id = selected_student.get('student_id', '')
+            student_payments = [p for p in SchoolPayment.all() if str(p.get('student_id', '')) == str(selected_student_id)]
     
     return render_template('admin_finance_student_account.html', 
                            search_query=search_query,
                            all_students=all_students,
-                           fee_categories=fee_categories)
+                           selected_student=selected_student,
+                           student_payments=student_payments,
+                           fee_categories=fee_categories,
+                           now=datetime.now())
 
 
 @app.route('/admin/finance/student_account/import/<student_id>', methods=['POST'])
@@ -8022,7 +8832,7 @@ def admin_finance_import_student(student_id):
     """Import a student from Google Sheet to local finance database."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Get student from Google Sheet
     try:
@@ -8062,12 +8872,81 @@ def admin_finance_import_student(student_id):
     return redirect(url_for('admin_finance_student_account', search=student_id))
 
 
+@app.route('/admin/finance/edit_transaction/<int:payment_id>', methods=['GET', 'POST'])
+def admin_finance_edit_transaction(payment_id):
+    """Edit a payment transaction."""
+    if not check_finance_access():
+        flash('Please log in to access this page.', 'warning')
+        return redirect(get_login_redirect())
+    
+    payment = SchoolPayment.get(payment_id)
+    if not payment:
+        flash('Transaction not found.', 'danger')
+        return redirect(url_for('admin_finance_view_payments'))
+    
+    fee_categories = SchoolFeeType.all()
+    
+    if request.method == 'POST':
+        fee_type = request.form.get('fee_type', '').strip()
+        amount = float(request.form.get('payment_amount', 0))
+        payment_method = request.form.get('payment_method', '')
+        payment_date = request.form.get('payment_date', '')
+        transaction_ref = request.form.get('transaction_ref', '')
+        notes = request.form.get('payment_notes', '')
+        
+        if not fee_type or not amount or not payment_method or not payment_date:
+            flash('Please fill in all required fields!', 'danger')
+        else:
+            # Update payment record
+            SchoolPayment.update(payment_id,
+                fee_type=fee_type,
+                amount=amount,
+                payment_method=payment_method,
+                payment_date=payment_date,
+                transaction_ref=transaction_ref,
+                notes=notes
+            )
+            
+            # Get updated payment and sync to Google Sheets
+            updated_payment = SchoolPayment.get(payment_id)
+            sync_payment_to_google_sheet(updated_payment)
+            
+            flash(f'Transaction {payment.get("receipt_number", "")} updated successfully! (Synced to Google Sheets)', 'success')
+            return redirect(url_for('admin_finance_student_account', search=payment.get('student_id', '')))
+    
+    return render_template('admin_finance_edit_transaction.html', 
+                           payment=payment,
+                           fee_categories=fee_categories)
+
+
+@app.route('/admin/finance/delete_transaction/<int:payment_id>', methods=['POST'])
+def admin_finance_delete_transaction(payment_id):
+    """Delete a payment transaction."""
+    if not check_finance_access():
+        flash('Please log in to access this page.', 'warning')
+        return redirect(get_login_redirect())
+    
+    payment = SchoolPayment.get(payment_id)
+    if not payment:
+        flash('Transaction not found.', 'danger')
+        return redirect(url_for('admin_finance_view_payments'))
+    
+    student_id = payment.get('student_id', '')
+    receipt_number = payment.get('receipt_number', '')
+    
+    # Delete payment
+    SchoolPayment.delete(payment_id)
+    
+    flash(f'Transaction {receipt_number} deleted successfully!', 'success')
+    return redirect(url_for('admin_finance_student_account', search=student_id))
+
+
 @app.route('/admin/finance/reports')
 def admin_finance_reports():
     """Financial reports and analytics."""
     if not check_finance_access():
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(get_login_redirect())
     
     # Calculate statistics
     total_revenue = sum(p.get('amount', 0) for p in SchoolPayment.all())
@@ -8458,16 +9337,25 @@ def admin_download_excel(data_type):
 @app.route('/admin/estate')
 def admin_estate():
     """Estate management dashboard."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     # Get statistics
     total_assets = SchoolAsset.count()
-    active_assets = len(SchoolAsset.filter_by(status='Active'))
+    active_assets = len([a for a in SchoolAsset.all() if a.get('status') == 'Active'])
     pending_maintenance = len([m for m in SchoolMaintenanceRequest.all() if m.get('status') in ['Reported', 'In Progress']])
     
-    recent_assets = sorted(SchoolAsset.all(), key=lambda x: x.get('created_at', ''), reverse=True)[:10]
+    # Get recent assets with location names
+    all_assets = SchoolAsset.all()
+    recent_assets = sorted(all_assets, key=lambda x: x.get('created_at', ''), reverse=True)[:10]
+    
+    # Add location names to assets
+    locations = SchoolLocation.all()
+    location_map = {str(loc.get('id')): loc.get('name', 'Unknown') for loc in locations}
+    for asset in recent_assets:
+        location_id = str(asset.get('location_id', ''))
+        asset['location_name'] = location_map.get(location_id, '-')
     
     return render_template('admin_estate.html',
                            total_assets=total_assets,
@@ -8479,9 +9367,9 @@ def admin_estate():
 @app.route('/admin/estate/locations', methods=['GET', 'POST'])
 def admin_estate_locations():
     """Manage school locations."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -8496,6 +9384,12 @@ def admin_estate_locations():
             else:
                 location_data = {'name': name, 'description': description}
                 SchoolLocation.add(**location_data)
+                
+                # Sync to Google Sheets
+                new_location = SchoolLocation.filter_by(name=name)[0] if SchoolLocation.filter_by(name=name) else None
+                if new_location:
+                    sync_location_to_google_sheet(new_location)
+                
                 flash(f'Location "{name}" added successfully!', 'success')
     
     locations = sorted(SchoolLocation.all(), key=lambda x: x.get('name', ''))
@@ -8505,9 +9399,9 @@ def admin_estate_locations():
 @app.route('/admin/estate/assets', methods=['GET', 'POST'])
 def admin_estate_assets():
     """Manage school assets."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -8536,12 +9430,25 @@ def admin_estate_assets():
                     'notes': notes
                 }
                 SchoolAsset.add(**asset_data)
+                
+                # Sync to Google Sheets - get the newly added asset
+                new_asset = SchoolAsset.filter_by(asset_code=asset_code)[0] if SchoolAsset.filter_by(asset_code=asset_code) else None
+                if new_asset:
+                    sync_asset_to_google_sheet(new_asset)
+                
                 flash(f'Asset "{name}" registered successfully!', 'success')
     
     search = request.args.get('search', '')
     category_filter = request.args.get('category', '')
     
     assets = SchoolAsset.all()
+    
+    # Add location names to assets
+    locations = SchoolLocation.all()
+    location_map = {str(loc.get('id')): loc.get('name', 'Unknown') for loc in locations}
+    for asset in assets:
+        location_id = str(asset.get('location_id', ''))
+        asset['location_name'] = location_map.get(location_id, '-')
     
     if search:
         assets = [a for a in assets if search.lower() in a.get('name', '').lower() or search.lower() in a.get('asset_code', '').lower()]
@@ -8550,7 +9457,6 @@ def admin_estate_assets():
         assets = [a for a in assets if a.get('category') == category_filter]
     
     assets = sorted(assets, key=lambda x: x.get('name', ''))
-    locations = SchoolLocation.all()
     
     return render_template('admin_estate_assets.html', assets=assets, locations=locations, 
                            search=search, category_filter=category_filter)
@@ -8559,13 +9465,19 @@ def admin_estate_assets():
 @app.route('/admin/estate/move/<int:asset_id>', methods=['GET', 'POST'])
 def admin_estate_move_asset(asset_id):
     """Move asset to new location."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     asset = SchoolAsset.get_by_id(asset_id)
     if not asset:
         abort(404)
+    
+    # Get location name for display
+    locations = SchoolLocation.all()
+    location_map = {str(loc.get('id')): loc.get('name', 'Unknown') for loc in locations}
+    current_location_id = str(asset.get('location_id', ''))
+    asset['current_location_name'] = location_map.get(current_location_id, 'Not assigned')
     
     if request.method == 'POST':
         new_location_id = request.form.get('location_id')
@@ -8589,19 +9501,30 @@ def admin_estate_move_asset(asset_id):
             }
             SchoolAssetMovement.add(**movement_data)
             
+            # Sync asset movement to Google Sheets
+            new_movement = SchoolAssetMovement.filter_by(asset_id=asset_id)
+            if new_movement:
+                # Get the most recent movement
+                latest_movement = sorted(new_movement, key=lambda x: x.get('created_at', ''), reverse=True)[0]
+                sync_asset_movement_to_google_sheet(latest_movement)
+            
+            # Sync updated asset to Google Sheets
+            updated_asset = SchoolAsset.get_by_id(asset_id)
+            if updated_asset:
+                sync_asset_to_google_sheet(updated_asset)
+            
             flash(f'Asset moved successfully!', 'success')
             return redirect(url_for('admin_estate_assets'))
     
-    locations = SchoolLocation.all()
     return render_template('admin_estate_move.html', asset=asset, locations=locations)
 
 
 @app.route('/admin/estate/maintenance', methods=['GET', 'POST'])
 def admin_estate_maintenance():
     """Report and track maintenance requests."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     if request.method == 'POST':
         asset_id = request.form.get('asset_id')
@@ -8626,6 +9549,17 @@ def admin_estate_maintenance():
             }
             SchoolMaintenanceRequest.add(**maintenance_data)
             
+            # Sync to Google Sheets - find the newly added request
+            all_requests = SchoolMaintenanceRequest.all()
+            new_request = None
+            for r in all_requests:
+                if r.get('issue_description') == issue_description and r.get('status') == 'Reported':
+                    new_request = r
+                    break
+            
+            if new_request:
+                sync_maintenance_request_to_google_sheet(new_request)
+            
             flash('Maintenance request logged successfully!', 'success')
             return redirect(url_for('admin_estate_maintenance'))
     
@@ -8642,6 +9576,17 @@ def admin_estate_maintenance():
     assets = SchoolAsset.all()
     locations = SchoolLocation.all()
     
+    # Create lookup maps for asset and location names
+    asset_map = {str(a.get('id')): a.get('name', 'Unknown') for a in assets}
+    location_map = {str(l.get('id')): l.get('name', 'Unknown') for l in locations}
+    
+    # Add asset and location names to requests
+    for req in requests_list:
+        asset_id = str(req.get('asset_id', ''))
+        location_id = str(req.get('location_id', ''))
+        req['asset_name'] = asset_map.get(asset_id, '-')
+        req['location_name'] = location_map.get(location_id, '-')
+    
     return render_template('admin_estate_maintenance.html', 
                            requests=requests_list, 
                            assets=assets, 
@@ -8652,9 +9597,9 @@ def admin_estate_maintenance():
 @app.route('/admin/estate/maintenance/<int:request_id>/complete', methods=['POST'])
 def admin_estate_complete_maintenance(request_id):
     """Mark maintenance request as completed."""
-    if not session.get('admin_logged_in'):
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
         flash('Please log in to access this page.', 'warning')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('estate_login'))
     
     maintenance = SchoolMaintenanceRequest.get_by_id(request_id)
     if not maintenance:
@@ -8671,10 +9616,218 @@ def admin_estate_complete_maintenance(request_id):
         completed_date=datetime.now().strftime('%Y-%m-%d'),
         notes=notes
     )
-        
     
+    # Sync to Google Sheets
+    updated_maintenance = SchoolMaintenanceRequest.get_by_id(request_id)
+    if updated_maintenance:
+        sync_maintenance_request_to_google_sheet(updated_maintenance)
+        
     flash('Maintenance request marked as completed!', 'success')
     
+    return redirect(url_for('admin_estate_maintenance'))
+
+
+@app.route('/admin/estate/edit/asset/<int:asset_id>', methods=['GET', 'POST'])
+def admin_estate_edit_asset(asset_id):
+    """Edit an existing asset."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    asset = SchoolAsset.get_by_id(asset_id)
+    if not asset:
+        flash('Asset not found.', 'danger')
+        return redirect(url_for('admin_estate_assets'))
+    
+    locations = SchoolLocation.all()
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        asset_code = request.form.get('asset_code')
+        category = request.form.get('category')
+        location_id = request.form.get('location_id')
+        purchase_value = float(request.form.get('purchase_value', 0))
+        condition = request.form.get('condition', 'Good')
+        status = request.form.get('status', 'Active')
+        notes = request.form.get('notes', '')
+        
+        if not name or not asset_code or not category:
+            flash('Please fill in all required fields.', 'warning')
+        else:
+            # Check if asset code is being changed to one that already exists
+            existing = SchoolAsset.filter_by(asset_code=asset_code)
+            if existing and str(existing[0].get('id')) != str(asset_id):
+                flash(f'Asset code "{asset_code}" already exists.', 'warning')
+            else:
+                SchoolAsset.update(asset_id,
+                    name=name,
+                    asset_code=asset_code,
+                    category=category,
+                    location_id=location_id,
+                    purchase_value=purchase_value,
+                    condition=condition,
+                    status=status,
+                    notes=notes,
+                    updated_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                )
+                
+                # Sync to Google Sheets
+                updated_asset = SchoolAsset.get_by_id(asset_id)
+                if updated_asset:
+                    sync_asset_to_google_sheet(updated_asset)
+                
+                flash(f'Asset "{name}" updated successfully!', 'success')
+                return redirect(url_for('admin_estate_assets'))
+    
+    return render_template('admin_estate_edit_asset.html', asset=asset, locations=locations)
+
+
+@app.route('/admin/estate/delete/asset/<int:asset_id>', methods=['GET', 'POST'])
+def admin_estate_delete_asset(asset_id):
+    """Delete an asset."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    asset = SchoolAsset.get_by_id(asset_id)
+    if not asset:
+        flash('Asset not found.', 'danger')
+        return redirect(url_for('admin_estate_assets'))
+    
+    asset_name = asset.get('name', 'Unknown')
+    SchoolAsset.delete(asset_id)
+    
+    flash(f'Asset "{asset_name}" deleted successfully!', 'success')
+    return redirect(url_for('admin_estate_assets'))
+
+
+@app.route('/admin/estate/edit/location/<int:location_id>', methods=['GET', 'POST'])
+def admin_estate_edit_location(location_id):
+    """Edit an existing location."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    location = SchoolLocation.get_by_id(location_id)
+    if not location:
+        flash('Location not found.', 'danger')
+        return redirect(url_for('admin_estate_locations'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description', '')
+        
+        if not name:
+            flash('Please enter location name.', 'warning')
+        else:
+            # Check if name is being changed to one that already exists
+            existing = SchoolLocation.filter_by(name=name)
+            if existing and str(existing[0].get('id')) != str(location_id):
+                flash(f'Location "{name}" already exists.', 'warning')
+            else:
+                SchoolLocation.update(location_id,
+                    name=name,
+                    description=description
+                )
+                
+                # Sync to Google Sheets
+                updated_location = SchoolLocation.get_by_id(location_id)
+                if updated_location:
+                    sync_location_to_google_sheet(updated_location)
+                
+                flash(f'Location "{name}" updated successfully!', 'success')
+                return redirect(url_for('admin_estate_locations'))
+    
+    return render_template('admin_estate_edit_location.html', location=location)
+
+
+@app.route('/admin/estate/delete/location/<int:location_id>', methods=['GET', 'POST'])
+def admin_estate_delete_location(location_id):
+    """Delete a location."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    location = SchoolLocation.get_by_id(location_id)
+    if not location:
+        flash('Location not found.', 'danger')
+        return redirect(url_for('admin_estate_locations'))
+    
+    location_name = location.get('name', 'Unknown')
+    SchoolLocation.delete(location_id)
+    
+    flash(f'Location "{location_name}" deleted successfully!', 'success')
+    return redirect(url_for('admin_estate_locations'))
+
+
+@app.route('/admin/estate/edit/maintenance/<int:request_id>', methods=['GET', 'POST'])
+def admin_estate_edit_maintenance(request_id):
+    """Edit an existing maintenance request."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    maintenance = SchoolMaintenanceRequest.get_by_id(request_id)
+    if not maintenance:
+        flash('Maintenance request not found.', 'danger')
+        return redirect(url_for('admin_estate_maintenance'))
+    
+    assets = SchoolAsset.all()
+    locations = SchoolLocation.all()
+    
+    if request.method == 'POST':
+        asset_id = request.form.get('asset_id')
+        location_id = request.form.get('location_id')
+        issue_description = request.form.get('issue_description')
+        priority = request.form.get('priority', 'Medium')
+        estimated_cost = float(request.form.get('estimated_cost', 0))
+        status = request.form.get('status', 'Reported')
+        notes = request.form.get('notes', '')
+        
+        if not issue_description:
+            flash('Please describe the issue.', 'warning')
+        else:
+            update_data = {
+                'asset_id': asset_id if asset_id else None,
+                'location_id': location_id if location_id else None,
+                'issue_description': issue_description,
+                'priority': priority,
+                'estimated_cost': estimated_cost,
+                'status': status,
+                'notes': notes
+            }
+            
+            SchoolMaintenanceRequest.update(request_id, **update_data)
+            
+            # Sync to Google Sheets
+            updated_maintenance = SchoolMaintenanceRequest.get_by_id(request_id)
+            if updated_maintenance:
+                sync_maintenance_request_to_google_sheet(updated_maintenance)
+            
+            flash('Maintenance request updated successfully!', 'success')
+            return redirect(url_for('admin_estate_maintenance'))
+    
+    return render_template('admin_estate_edit_maintenance.html', 
+                           request=maintenance, 
+                           assets=assets, 
+                           locations=locations)
+
+
+@app.route('/admin/estate/delete/maintenance/<int:request_id>', methods=['GET', 'POST'])
+def admin_estate_delete_maintenance(request_id):
+    """Delete a maintenance request."""
+    if not session.get('admin_logged_in') and not session.get('estate_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('estate_login'))
+    
+    maintenance = SchoolMaintenanceRequest.get_by_id(request_id)
+    if not maintenance:
+        flash('Maintenance request not found.', 'danger')
+        return redirect(url_for('admin_estate_maintenance'))
+    
+    SchoolMaintenanceRequest.delete(request_id)
+    
+    flash('Maintenance request deleted successfully!', 'success')
     return redirect(url_for('admin_estate_maintenance'))
 
 # =============================================================================

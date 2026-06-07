@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Expense - Gyedu Technical Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; color: #333; }
+        
+        .header { background-color: #2c3e50; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-container { background-color: #34495e; padding: 0 40px; }
+        .nav { display: flex; gap: 5px; }
+        .nav a { color: #ecf0f1; text-decoration: none; padding: 15px 20px; font-size: 14px; }
+        
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 30px; }
+        .card-header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
+        .card-header h2 { color: #2c3e50; font-size: 20px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; 
+        }
+        .form-group textarea { height: 100px; resize: vertical; }
+        
+        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-primary { background: #27ae60; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .form-actions { display: flex; gap: 12px; margin-top: 30px; }
+        
+        .flash-messages { margin-bottom: 20px; }
+        .flash { padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; }
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Gyedu Technical Institute</h1>
+        <div>Finance Department</div>
+    </div>
+    
+    <div class="nav-container">
+        <div class="nav">
+            <a href="/admin">Dashboard</a>
+            <a href="/admin/finance/expenses">Expenses</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Edit Expense</h2>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label>Expense Category *</label>
+                    <select name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Utilities" {% if expense.category == 'Utilities' %}selected{% endif %}>Utilities</option>
+                        <option value="Supplies" {% if expense.category == 'Supplies' %}selected{% endif %}>Supplies</option>
+                        <option value="Maintenance" {% if expense.category == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                        <option value="Salaries" {% if expense.category == 'Salaries' %}selected{% endif %}>Salaries</option>
+                        <option value="Equipment" {% if expense.category == 'Equipment' %}selected{% endif %}>Equipment</option>
+                        <option value="Other" {% if expense.category == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Amount (GHS) *</label>
+                    <input type="number" name="amount" step="0.01" min="0" value="{{ expense.amount }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" name="description" value="{{ expense.description }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Vendor / Supplier</label>
+                    <input type="text" name="vendor" value="{{ expense.vendor or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text" name="approved_by" value="{{ expense.approved_by or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea name="notes">{{ expense.notes or '' }}</textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Update Expense
+                    </button>
+                    <a href="{{ url_for('admin_finance_expenses') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

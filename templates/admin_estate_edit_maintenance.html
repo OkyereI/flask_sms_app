@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Management - Gyedu Technical Institute</title>
+    <title>Edit Maintenance Request - Gyedu Technical Institute</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
         
         .header {
-            backgroundc3e50-color: #2;
+            background-color: #2c3e50;
             color: white;
             padding: 20px 40px;
             display: flex;
@@ -73,7 +73,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 30px;
         }
@@ -107,27 +107,22 @@
             padding-bottom: 10px;
         }
         
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 500;
             color: #2c3e50;
         }
         
         .form-group input,
+        .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
@@ -135,6 +130,7 @@
         }
         
         .form-group input:focus,
+        .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #3498db;
@@ -170,15 +166,6 @@
             background-color: #229954;
         }
         
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        
         .btn-secondary {
             background-color: #95a5a6;
             color: white;
@@ -188,71 +175,23 @@
             background-color: #7f8c8d;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        table th,
-        table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #7f8c8d;
-        }
-        
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        .empty-state h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
-        @media (max-width: 900px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div>
-            <h1>Location Management</h1>
+            <h1>Edit Maintenance Request</h1>
             <div class="header-info">Gyedu Technical Institute</div>
         </div>
     </div>
     
     <div class="nav-container">
         <div class="nav">
-            <a href="{{ url_for('admin_estate') }}">Dashboard</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
             <a href="{{ url_for('admin_store') }}">Store</a>
             <a href="{{ url_for('admin_finance') }}">Finance</a>
             <a href="{{ url_for('admin_estate') }}">Estate</a>
@@ -262,53 +201,71 @@
     </div>
     
     <div class="container">
-        <h2 class="page-title">Location Management</h2>
-        <p class="page-subtitle">Manage school locations and buildings</p>
+        <h2 class="page-title">Edit Maintenance Request</h2>
+        <p class="page-subtitle">Update maintenance request information</p>
         
-        <div class="two-column">
-            <div class="card">
-                <h3 class="card-title">Add New Location</h3>
-                <form method="POST" action="{{ url_for('admin_estate_locations') }}">
-                    <div class="form-group">
-                        <label>Location Name *</label>
-                        <input type="text" name="name" required placeholder="e.g., Admin Block, Library">
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea name="description" rows="4" placeholder="Describe this location..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Add Location</button>
-                </form>
-            </div>
+        <div class="card">
+            <h3 class="card-title">Request Information</h3>
             
-            <div class="card">
-                <h3 class="card-title">All Locations</h3>
-                {% if locations %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for location in locations %}
-                        <tr>
-                            <td><strong>{{ location.get('name', '-') }}</strong></td>
-                            <td>{{ location.get('description', '-') }}</td>
-                            <td>{{ location.get('created_at', '-') }}</td>
-                        </tr>
+            <form method="POST" action="{{ url_for('admin_estate_edit_maintenance', request_id=request.get('id')) }}">
+                <div class="form-group">
+                    <label>Asset (Optional)</label>
+                    <select name="asset_id">
+                        <option value="">Select Asset</option>
+                        {% for asset in assets %}
+                        <option value="{{ asset.get('id') }}" {% if request.get('asset_id')|string == asset.get('id')|string %}selected{% endif %}>{{ asset.get('name') }} ({{ asset.get('asset_code') }})</option>
                         {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="empty-state">
-                    <h3>No Locations Yet</h3>
-                    <p>Add your first location using the form on the left.</p>
+                    </select>
                 </div>
-                {% endif %}
-            </div>
+                
+                <div class="form-group">
+                    <label>Location (Optional)</label>
+                    <select name="location_id">
+                        <option value="">Select Location</option>
+                        {% for location in locations %}
+                        <option value="{{ location.get('id') }}" {% if request.get('location_id')|string == location.get('id')|string %}selected{% endif %}>{{ location.get('name') }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Issue Description *</label>
+                    <textarea name="issue_description" rows="4" required placeholder="Describe the maintenance issue...">{{ request.get('issue_description', '') }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        <option value="Low" {% if request.get('priority') == 'Low' %}selected{% endif %}>Low</option>
+                        <option value="Medium" {% if request.get('priority') == 'Medium' %}selected{% endif %}>Medium</option>
+                        <option value="High" {% if request.get('priority') == 'High' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="Reported" {% if request.get('status') == 'Reported' %}selected{% endif %}>Reported</option>
+                        <option value="In Progress" {% if request.get('status') == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Completed" {% if request.get('status') == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Estimated Cost</label>
+                    <input type="number" name="estimated_cost" step="0.01" min="0" value="{{ request.get('estimated_cost', 0) }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2" placeholder="Additional notes...">{{ request.get('notes', '') }}</textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">Update Request</button>
+                    <a href="{{ url_for('admin_estate_maintenance') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
         </div>
     </div>
 </body>

@@ -331,7 +331,7 @@
     
     <div class="nav-container">
         <div class="nav">
-            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_estate') }}">Dashboard</a>
             <a href="{{ url_for('admin_store') }}">Store</a>
             <a href="{{ url_for('admin_finance') }}">Finance</a>
             <a href="{{ url_for('admin_estate') }}">Estate</a>
@@ -423,7 +423,7 @@
                                     {{ request.get('priority') }}
                                 </span>
                             </td>
-                            <td>GHS {{ "%.2f"|format(request.get('estimated_cost', 0)) }}</td>
+                            <td>GHS {{ "%.2f"|format(request.get('estimated_cost', 0)|float if request.get('estimated_cost') else 0) }}</td>
                             <td>
                                 <span class="badge badge-{{ request.get('status') }}">
                                     {{ request.get('status') }}
@@ -438,6 +438,8 @@
                                 {% else %}
                                 <span style="color: #27ae60;">Done</span>
                                 {% endif %}
+                                <a href="{{ url_for('admin_estate_edit_maintenance', request_id=request.get('id')) }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ url_for('admin_estate_delete_maintenance', request_id=request.get('id')) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this request?')">Delete</a>
                             </td>
                         </tr>
                         {% endfor %}

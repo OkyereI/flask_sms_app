@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Print Students - {{ school_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .school-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(30,60,114,0.3);
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .filter-form input,
+        .filter-form select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+        .filter-form input:focus,
+        .filter-form select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .stat-pill {
+            background: #e7f3ff;
+            color: #1e3c72;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.92rem;
+        }
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-primary {
+            background: #e7f3ff;
+            color: #1e3c72;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Print-only styles - clean, professional printout */
+        @media print {
+            .no-print,
+            .header,
+            .filter-card {
+                display: none !important;
+            }
+            body {
+                background: #fff;
+                color: #000;
+            }
+            .container {
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
+            }
+            .card {
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                padding: 0;
+                margin: 0;
+            }
+            .card h2 {
+                color: #000;
+                border-bottom: 1px solid #000;
+                margin-bottom: 10px;
+            }
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 18px;
+            }
+            .print-header .logo {
+                display: block !important;
+                width: 90px;
+                height: 90px;
+                margin: 0 auto 8px auto;
+                object-fit: contain;
+            }
+            .print-header h1 {
+                font-size: 22px;
+                margin-bottom: 2px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .print-header .tagline {
+                font-size: 11px;
+                color: #555;
+                margin-bottom: 4px;
+                font-style: italic;
+            }
+            .print-header .sub {
+                font-size: 12px;
+                color: #555;
+                border-top: 1px solid #000;
+                border-bottom: 1px solid #000;
+                padding: 4px 0;
+                margin-top: 6px;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            th {
+                background: #e0e0e0 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .footer-signature {
+                display: block !important;
+                margin-top: 40px;
+                page-break-inside: avoid;
+            }
+        }
+
+        .print-header {
+            display: none;
+        }
+        .footer-signature {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header no-print">
+        <div class="header-content">
+            <div class="school-name">{{ school_name }} - Print Students</div>
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin_manage_students') }}">Manage Students</a>
+                <a href="{{ url_for('admin_manage_graduated_students') }}">Graduated Students</a>
+                <a href="{{ url_for('admin_logout') }}">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Print-only header -->
+        <div class="print-header">
+            <img src="{{ url_for('static', filename='real-logo.jpg') }}"
+                 alt="School Logo"
+                 class="logo"
+                 onerror="this.style.display='none';">
+            <h1>{{ school_name }}</h1>
+            <div class="tagline">P.O. Box 28, Gyedu - Ghana</div>
+            <div class="sub">Student Information - Generated on {{ current_year if current_year else '' }}</div>
+        </div>
+
+        <!-- Filter Card (screen only) -->
+        <div class="card filter-card no-print">
+            <h2>Filter &amp; Search Students</h2>
+            <form method="get" action="{{ url_for('admin_print_students') }}" class="filter-form">
+                <div>
+                    <input type="text" name="search" value="{{ search_query or '' }}"
+                           placeholder="Search by name, ID, dept...">
+                </div>
+                <div>
+                    <select name="department">
+                        <option value="">All Departments</option>
+                        {% for dept in available_departments %}
+                            <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select name="year">
+                        <option value="">All Years</option>
+                        {% for y in available_years %}
+                            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select name="form">
+                        <option value="">All Forms</option>
+                        {% for f in available_forms %}
+                            <option value="{{ f }}" {% if selected_form == f %}selected{% endif %}>{{ f }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select name="status">
+                        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active (exclude graduated)</option>
+                        <option value="graduated" {% if selected_status == 'graduated' %}selected{% endif %}>Graduated only</option>
+                        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All students</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{{ url_for('admin_print_students') }}" class="btn btn-secondary">Clear</a>
+                    <button type="button" class="btn btn-success" onclick="window.print()">Print This Page</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Students List -->
+        <div class="card">
+            <h2>Student List
+                <span style="float:right; font-size:1rem; color:#555; font-weight:normal;">
+                    Total: <strong>{{ total_count }}</strong>
+                </span>
+            </h2>
+
+            <div class="stats-bar no-print">
+                <span class="stat-pill">Total: {{ total_count }}</span>
+                {% if search_query %}
+                    <span class="stat-pill">Search: "{{ search_query }}"</span>
+                {% endif %}
+                {% if selected_department %}
+                    <span class="stat-pill">Department: {{ selected_department }}</span>
+                {% endif %}
+                {% if selected_year %}
+                    <span class="stat-pill">Year: {{ selected_year }}</span>
+                {% endif %}
+                {% if selected_form %}
+                    <span class="stat-pill">Form: {{ selected_form }}</span>
+                {% endif %}
+                <span class="stat-pill">Status: {{ selected_status|capitalize }}</span>
+            </div>
+
+            {% if students %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Form / Year</th>
+                            <th>Parent Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ s.get('Student ID') or s.get('student_id') or '' }}</td>
+                                <td>{{ s.get('Student Name') or s.get('student_name') or '' }}</td>
+                                <td>
+                                    {% set dept = s.get('Student Department') or s.get('department') or '' %}
+                                    {% if dept %}
+                                        <span class="badge badge-primary">{{ dept }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ s.get('Form') or s.get('form') or s.get('year') or '' }}</td>
+                                <td>{{ s.get('Parent Phone') or s.get('parent_phone') or '' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Print-only signature block -->
+                <div class="footer-signature">
+                    <table style="width:100%; margin-top:40px; border:none;">
+                        <tr style="border:none;">
+                            <td style="border:none; padding-top:40px; width:33%;">
+                                <div style="border-top:1px solid #000; padding-top:6px;">Class Teacher Signature</div>
+                            </td>
+                            <td style="border:none; padding-top:40px; width:33%;">
+                                <div style="border-top:1px solid #000; padding-top:6px;">Head of Department</div>
+                            </td>
+                            <td style="border:none; padding-top:40px; width:33%;">
+                                <div style="border-top:1px solid #000; padding-top:6px;">Headmaster / Principal</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M9 17v-2a4 4 0 014-4h4M5 7h6m-6 4h6m-6 4h6M19 7h2a2 2 0 012 2v10a2 2 0 01-2 2h-2M5 7H3a2 2 0 00-2 2v10a2 2 0 002 2h2"/>
+                    </svg>
+                    <h3>No students found</h3>
+                    <p>Try adjusting your filters or add students to the system first.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Auto-trigger print dialog if ?print=1 is in the URL
+        if (window.location.search.indexOf('print=1') !== -1) {
+            window.addEventListener('load', function() {
+                setTimeout(function() { window.print(); }, 250);
+            });
+        }
+    </script>
+</body>
+</html>

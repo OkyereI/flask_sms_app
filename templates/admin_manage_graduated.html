@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Manage Graduated Students - GYEDU TECHNICAL INSTITUTE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .school-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .card h3 {
+            color: #2a5298;
+            margin-bottom: 15px;
+        }
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.92rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(30,60,114,0.3);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.82rem;
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #138496;
+        }
+        .alert {
+            padding: 14px 18px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info-banner {
+            background: #e7f3ff;
+            color: #1e3c72;
+            padding: 14px 18px;
+            border-left: 4px solid #2a5298;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+        }
+        .info-banner strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .bulk-actions-info {
+            flex: 1;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .badge-primary {
+            background: #e7f3ff;
+            color: #1e3c72;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .modal-header h3 {
+            margin: 0;
+            color: #1e3c72;
+        }
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #dc3545;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        .stat-card.warn {
+            background: linear-gradient(135deg, #b94545 0%, #dc3545 100%);
+        }
+        .stat-card.ok {
+            background: linear-gradient(135deg, #2c7d2c 0%, #28a745 100%);
+        }
+        .checkbox-cell {
+            width: 30px;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="school-name">{{ school_name }} - Graduated Students</div>
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin_manage_students') }}">Manage Students</a>
+                <a href="{{ url_for('admin_print_students') }}">Print Students</a>
+                <a href="{{ url_for('admin_logout') }}">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Info banner explaining how graduation works -->
+        <div class="info-banner">
+            <strong>Graduation Tracking</strong>
+            Students are automatically marked as <strong>Graduated</strong>
+            once <strong>{{ default_graduation_years }} years</strong> have
+            passed since their registration year (or registration year +
+            <em>repeat years</em>). You can also mark/unmark students
+            manually below. Data is saved to the <em>Graduation</em>
+            worksheet in your Google Sheet.
+        </div>
+
+        <!-- Statistics summary -->
+        <div class="card">
+            <div class="stats-grid">
+                <div class="stat-card ok">
+                    <span class="num">{{ active_students|length }}</span>
+                    <span class="label">Active Students</span>
+                </div>
+                <div class="stat-card warn">
+                    <span class="num">{{ graduated_list|length }}</span>
+                    <span class="label">Graduated Students</span>
+                </div>
+                <div class="stat-card">
+                    <span class="num">{{ default_graduation_years }}</span>
+                    <span class="label">Default Program Length (years)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="num">{{ current_year }}</span>
+                    <span class="label">Current Year</span>
+                </div>
+            </div>
+
+            <!-- Recalculate button -->
+            <form method="post" style="display:inline-block; margin-top:8px;">
+                <input type="hidden" name="action" value="recalculate_auto">
+                <button type="submit" class="btn btn-info"
+                        onclick="return confirm('This will re-run auto-graduation. Continue?');">
+                    Recalculate Auto-Graduation
+                </button>
+            </form>
+        </div>
+
+        <!-- Search -->
+        <div class="card">
+            <h2>Find Students</h2>
+            <form method="get" action="{{ url_for('admin_manage_graduated_students') }}" class="search-bar">
+                <input type="text" name="search" value="{{ search_query or '' }}"
+                       placeholder="Search by name, ID, or department...">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if search_query %}
+                    <a href="{{ url_for('admin_manage_graduated_students') }}" class="btn btn-secondary">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Active students - bulk mark as graduated -->
+        <div class="card">
+            <h2>Active Students
+                <span style="float:right; font-size:0.9rem; color:#555; font-weight:normal;">
+                    {{ active_students|length }} student(s)
+                </span>
+            </h2>
+            <p style="color:#666; font-size:0.9rem; margin-bottom:12px;">
+                Tick the students you want to mark as graduated, then click
+                <strong>Mark Selected as Graduated</strong>. You can also
+                adjust the <em>Repeat Years</em> of a student to extend
+                their graduation deadline.
+            </p>
+
+            <form method="post" action="{{ url_for('admin_manage_graduated_students') }}"
+                  id="activeForm">
+                <input type="hidden" name="action" value="mark_graduated">
+                <div class="bulk-actions">
+                    <div class="bulk-actions-info">
+                        <label style="cursor:pointer; font-weight:600;">
+                            <input type="checkbox" id="selectAllActive" style="margin-right:6px;">
+                            Select all
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-success"
+                            onclick="return confirm('Mark all selected students as graduated?');">
+                        Mark Selected as Graduated
+                    </button>
+                </div>
+
+                {% if active_students %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <input type="checkbox" id="selectAllActiveHeader">
+                                </th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Reg. Year</th>
+                                <th>Years Elapsed</th>
+                                <th>Repeat Years</th>
+                                <th>Threshold</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in active_students %}
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" name="student_ids" value="{{ s.student_id }}" class="active-cb">
+                                    </td>
+                                    <td>{{ s.student_id }}</td>
+                                    <td>{{ s.student_name }}</td>
+                                    <td>{{ s.department or '-' }}</td>
+                                    <td>
+                                        {% if s.registration_year %}
+                                            <span class="badge badge-primary">{{ s.registration_year }}</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Unknown</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if s.years_elapsed is not none %}
+                                            {{ s.years_elapsed }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info"
+                                                onclick="openRepeatModal('{{ s.student_id }}', {{ s.repeat_years }})">
+                                            {{ s.repeat_years }}
+                                        </button>
+                                    </td>
+                                    <td>{{ s.threshold }} yrs</td>
+                                    <td>
+                                        <form method="post" style="display:inline;"
+                                              onsubmit="return confirm('Mark {{ s.student_name }} as graduated?');">
+                                            <input type="hidden" name="action" value="mark_graduated">
+                                            <input type="hidden" name="student_ids" value="{{ s.student_id }}">
+                                            <button type="submit" class="btn btn-sm btn-success">Graduate</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 014-4h2a4 4 0 014 4v2zm10-12a4 4 0 11-8 0 4 4 0 018 0zM7 8a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <h3>No active students</h3>
+                        <p>{% if search_query %}No active students match your search.{% else %}There are no active students to display.{% endif %}</p>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Graduated students - bulk unmark -->
+        <div class="card">
+            <h2>Graduated Students
+                <span style="float:right; font-size:0.9rem; color:#555; font-weight:normal;">
+                    {{ graduated_list|length }} student(s)
+                </span>
+            </h2>
+            <p style="color:#666; font-size:0.9rem; margin-bottom:12px;">
+                These students have been marked as graduated. You can
+                unmark them to make them active again, or simply remove
+                them from the graduated list in bulk.
+            </p>
+
+            <form method="post" action="{{ url_for('admin_manage_graduated_students') }}"
+                  id="graduatedForm">
+                <input type="hidden" name="action" value="unmark_graduated">
+                <div class="bulk-actions">
+                    <div class="bulk-actions-info">
+                        <label style="cursor:pointer; font-weight:600;">
+                            <input type="checkbox" id="selectAllGraduated" style="margin-right:6px;">
+                            Select all
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-warning"
+                            onclick="return confirm('Unmark all selected students? They will become active again.');">
+                        Unmark Selected (Make Active)
+                    </button>
+                </div>
+
+                {% if graduated_list %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <input type="checkbox" id="selectAllGraduatedHeader">
+                                </th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Type</th>
+                                <th>Graduated On</th>
+                                <th>Graduated By</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in graduated_list %}
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" name="student_ids" value="{{ s.student_id }}" class="grad-cb">
+                                    </td>
+                                    <td>{{ s.student_id }}</td>
+                                    <td>{{ s.student_name }}</td>
+                                    <td>{{ s.department or '-' }}</td>
+                                    <td>
+                                        {% if s.graduation_type == 'auto' %}
+                                            <span class="badge badge-info">Auto</span>
+                                        {% elif s.graduation_type == 'manual' %}
+                                            <span class="badge badge-warning">Manual</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ s.graduated_at or '-' }}</td>
+                                    <td>{{ s.graduated_by or '-' }}</td>
+                                    <td style="max-width:240px; font-size:0.82rem; color:#666;">
+                                        {{ s.notes or '-' }}
+                                    </td>
+                                    <td>
+                                        <form method="post" style="display:inline;"
+                                              onsubmit="return confirm('Unmark {{ s.student_name }}? They will become active.');">
+                                            <input type="hidden" name="action" value="unmark_one">
+                                            <input type="hidden" name="student_id" value="{{ s.student_id }}">
+                                            <button type="submit" class="btn btn-sm btn-warning">Unmark</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                        <h3>No graduated students yet</h3>
+                        <p>When students are marked as graduated (automatically or manually), they will appear here.</p>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Repeat Years modal -->
+    <div id="repeatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Set Repeat Years</h3>
+                <span class="close" onclick="closeRepeatModal()">&times;</span>
+            </div>
+            <form method="post" action="{{ url_for('admin_manage_graduated_students') }}">
+                <input type="hidden" name="action" value="set_repeat_years">
+                <input type="hidden" name="student_id" id="repeatStudentId">
+                <div class="form-group">
+                    <label>Number of Repeat Years</label>
+                    <input type="number" name="repeat_years" id="repeatYearsValue"
+                           min="0" max="20" value="0" required>
+                    <small style="color:#666; display:block; margin-top:6px;">
+                        Extends the student's graduation threshold. The
+                        student will graduate after
+                        <strong>{{ default_graduation_years }} + repeat_years</strong>
+                        years from their registration year.
+                    </small>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeRepeatModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // "Select all" checkbox handling for the active table
+        (function() {
+            const selAll = document.getElementById('selectAllActive');
+            const selAllHdr = document.getElementById('selectAllActiveHeader');
+            const cbs = document.querySelectorAll('.active-cb');
+            function syncActive() {
+                const checked = (selAll && selAll.checked) || (selAllHdr && selAllHdr.checked);
+                cbs.forEach(cb => { cb.checked = checked; });
+            }
+            if (selAll) selAll.addEventListener('change', function() {
+                if (selAllHdr) selAllHdr.checked = false;
+                syncActive();
+            });
+            if (selAllHdr) selAllHdr.addEventListener('change', function() {
+                if (selAll) selAll.checked = false;
+                syncActive();
+            });
+        })();
+
+        // "Select all" checkbox handling for the graduated table
+        (function() {
+            const selAll = document.getElementById('selectAllGraduated');
+            const selAllHdr = document.getElementById('selectAllGraduatedHeader');
+            const cbs = document.querySelectorAll('.grad-cb');
+            function syncGrad() {
+                const checked = (selAll && selAll.checked) || (selAllHdr && selAllHdr.checked);
+                cbs.forEach(cb => { cb.checked = checked; });
+            }
+            if (selAll) selAll.addEventListener('change', function() {
+                if (selAllHdr) selAllHdr.checked = false;
+                syncGrad();
+            });
+            if (selAllHdr) selAllHdr.addEventListener('change', function() {
+                if (selAll) selAll.checked = false;
+                syncGrad();
+            });
+        })();
+
+        // Repeat years modal
+        function openRepeatModal(studentId, currentRepeat) {
+            document.getElementById('repeatStudentId').value = studentId;
+            document.getElementById('repeatYearsValue').value = currentRepeat || 0;
+            document.getElementById('repeatModal').classList.add('show');
+        }
+        function closeRepeatModal() {
+            document.getElementById('repeatModal').classList.remove('show');
+        }
+        // Close modal on outside click
+        document.getElementById('repeatModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRepeatModal();
+            }
+        });
+        // Close modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRepeatModal();
+            }
+        });
+    </script>
+</body>
+</html>

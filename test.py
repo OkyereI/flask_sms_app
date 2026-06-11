@@ -14,8 +14,249 @@ import uuid # Import for generating unique share tokens
 import hashlib # Import for secure token generation
 import json
 import base64
+import re # Import for regular expressions (used in graduation year parsing)
 from functools import wraps
 from dotenv import load_dotenv
+
+# =============================================================================
+# CTVET MULTI-SCHOOL PLATFORM CONFIGURATION
+# This section adds support for multiple schools with their own Google Sheets
+# =============================================================================
+
+# Super Admin Configuration
+# Default credentials - change in production via environment variables
+SUPER_ADMIN_USERNAME = os.getenv('SUPER_ADMIN_USERNAME', 'superadmin')
+SUPER_ADMIN_PASSWORD = os.getenv('SUPER_ADMIN_PASSWORD', 'ctvet2025')  # Change this in production!
+SUPER_ADMIN_PASSWORD_HASH = generate_password_hash(SUPER_ADMIN_PASSWORD)
+
+# CTVET Schools Database Directory
+CTVED_SCHOOLS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ctvet_schools')
+if not os.path.exists(CTVED_SCHOOLS_DIR):
+    os.makedirs(CTVED_SCHOOLS_DIR)
+    print(f"Created CTVET schools directory: {CTVED_SCHOOLS_DIR}")
+
+# School data file
+SCHOOLS_FILE = os.path.join(CTVED_SCHOOLS_DIR, 'schools.xlsx')
+
+# Initialize schools file if not exists
+def init_schools_db():
+    """Initialize the schools database Excel file"""
+    if not os.path.exists(SCHOOLS_FILE):
+        df = pd.DataFrame(columns=[
+            'school_id', 'school_name', 'school_code', 'region', 'district',
+            'address', 'contact_email', 'contact_phone', 'head_name',
+            'google_sheet_id', 'google_sheet_url', 'created_at', 'updated_at',
+            'status', 'admin_username', 'admin_password_hash',
+            'school_motto', 'logo_filename'
+        ])
+        df.to_excel(SCHOOLS_FILE, index=False)
+        print(f"Created schools database: {SCHOOLS_FILE}")
+
+# Call initialization
+init_schools_db()
+
+# School model for CTVET
+class CTVETSchool:
+    """Model for managing schools in the CTVET platform"""
+    data_type = 'schools'
+    
+    @classmethod
+    def get_all(cls):
+        """Get all registered schools"""
+        try:
+            if os.path.exists(SCHOOLS_FILE):
+                df = pd.read_excel(SCHOOLS_FILE)
+                return df.to_dict('records')
+            return []
+        except Exception as e:
+            print(f"Error getting all schools: {e}")
+            return []
+    
+    @classmethod
+    def get_by_id(cls, school_id):
+        """Get a single school by ID"""
+        try:
+            if os.path.exists(SCHOOLS_FILE):
+                df = pd.read_excel(SCHOOLS_FILE)
+                school = df[df['school_id'].astype(str) == str(school_id)]
+                if not school.empty:
+                    return school.iloc[0].to_dict()
+            return None
+        except Exception as e:
+            print(f"Error getting school by id: {e}")
+            return None
+    
+    @classmethod
+    def get_by_code(cls, school_code):
+        """Get a single school by code"""
+        try:
+            if os.path.exists(SCHOOLS_FILE):
+                df = pd.read_excel(SCHOOLS_FILE)
+                school = df[df['school_code'].astype(str) == str(school_code)]
+                if not school.empty:
+                    return school.iloc[0].to_dict()
+            return None
+        except Exception as e:
+            print(f"Error getting school by code: {e}")
+            return None
+    
+    @classmethod
+    def add(cls, **kwargs):
+        """Add a new school"""
+        try:
+            df = pd.read_excel(SCHOOLS_FILE)
+            new_id = 1 if df.empty else int(df['school_id'].max()) + 1
+            kwargs['school_id'] = new_id
+            kwargs['created_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            kwargs['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            if 'status' not in kwargs:
+                kwargs['status'] = 'active'
+            new_row = pd.DataFrame([kwargs])
+            df = pd.concat([df, new_row], ignore_index=True)
+            df.to_excel(SCHOOLS_FILE, index=False)
+            return new_id
+        except Exception as e:
+            print(f"Error adding school: {e}")
+            return None
+    
+    @classmethod
+    def update(cls, school_id, **kwargs):
+        """Update a school"""
+        try:
+            df = pd.read_excel(SCHOOLS_FILE)
+            kwargs['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            idx = df[df['school_id'].astype(str) == str(school_id)].index
+            if len(idx) > 0:
+                for key, value in kwargs.items():
+                    if key in df.columns:
+                        df.loc[idx[0], key] = value
+                df.to_excel(SCHOOLS_FILE, index=False)
+                return True
+            return False
+        except Exception as e:
+            print(f"Error updating school: {e}")
+            return False
+    
+    @classmethod
+    def delete(cls, school_id):
+        """Delete a school"""
+        try:
+            df = pd.read_excel(SCHOOLS_FILE)
+            df = df[df['school_id'].astype(str) != str(school_id)]
+            df.to_excel(SCHOOLS_FILE, index=False)
+            return True
+        except Exception as e:
+            print(f"Error deleting school: {e}")
+            return False
+    
+    @classmethod
+    def count(cls):
+        """Count total schools"""
+        try:
+            df = pd.read_excel(SCHOOLS_FILE)
+            return len(df)
+        except:
+            return 0
+
+# Function to create Google Sheet for a new school
+def create_school_google_sheet(school_name, school_code):
+    """
+    Creates a new Google Sheet for a school with pre-configured worksheets.
+    Returns the sheet ID and URL.
+    
+    IMPORTANT: You must have:
+    1. A valid service_account_credentials.json file in the project root, OR
+    2. Set the GOOGLE_CREDENTIALS environment variable with base64-encoded JSON credentials
+    
+    The service account email is: ctvetschooldata@ctvetschooldata.iam.gserviceaccount.com
+    """
+    try:
+        gc = get_google_sheet_client()
+        if not gc:
+            print("ERROR: Failed to get Google Sheets client for school sheet creation")
+            print("Please ensure you have:")
+            print("  1. service_account_credentials.json file in project root, OR")
+            print("  2. GOOGLE_CREDENTIALS environment variable set")
+            print("  3. The service account has access to Google Sheets API")
+            return None, None
+        
+        # Create a new spreadsheet
+        sheet_title = f"CTVET - {school_name}"
+        spreadsheet = gc.create(sheet_title)
+        
+        sheet_id = spreadsheet.id
+        sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
+        
+        print(f"Created Google Sheet for {school_name}: {sheet_url}")
+        
+        # Create default worksheets for the school with proper headers
+        worksheets_config = [
+            {'name': 'Students', 'headers': ['student_id', 'student_name', 'gender', 'date_of_birth', 'parent_name', 'parent_phone', 'department', 'year', 'status', 'created_at']},
+            {'name': 'Staff', 'headers': ['staff_id', 'staff_name', 'gender', 'position', 'department', 'phone', 'email', 'status', 'created_at']},
+            {'name': 'Payments', 'headers': ['payment_id', 'student_id', 'student_name', 'amount', 'payment_type', 'receipt_number', 'payment_date', 'status', 'collected_by']},
+            {'name': 'Results', 'headers': ['result_id', 'student_id', 'student_name', 'department', 'year', 'semester', 'subject', 'exam_score', 'class_score', 'total_score', 'grade', 'remarks', 'submitted_by', 'submitted_at']},
+            {'name': 'Attendance', 'headers': ['attendance_id', 'student_id', 'student_name', 'department', 'date', 'status', 'marked_by']},
+            {'name': 'Assets', 'headers': ['asset_id', 'asset_name', 'category', 'location', 'condition', 'acquisition_date', 'value', 'status']},
+            {'name': 'Expenses', 'headers': ['expense_id', 'description', 'amount', 'category', 'date', 'approved_by', 'status']}
+        ]
+        
+        for worksheet_config in worksheets_config:
+            try:
+                worksheet_name = worksheet_config['name']
+                headers = worksheet_config['headers']
+                
+                # Add worksheet
+                worksheet = spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=20)
+                
+                # Add headers
+                worksheet.insert_row(headers, index=1)
+                
+                print(f"  - Created worksheet: {worksheet_name} with headers")
+            except Exception as e:
+                print(f"  - Worksheet {worksheet_name} error: {e}")
+        
+        # Share the sheet with the service account email (for API access)
+        try:
+            # Share with service account for API access
+            spreadsheet.share(SERVICE_ACCOUNT_EMAIL, perm_type='user', role='writer')
+            print(f"  - Sheet shared with service account: {SERVICE_ACCOUNT_EMAIL}")
+        except Exception as e:
+            print(f"  - Could not share with service account: {e}")
+            # Try to share publicly as fallback
+            try:
+                spreadsheet.share('', perm_type='anyone', role='reader')
+                print(f"  - Sheet shared publicly for reading")
+            except Exception as e2:
+                print(f"  - Could not share sheet publicly: {e2}")
+        
+        return sheet_id, sheet_url
+        
+    except Exception as e:
+        print(f"ERROR creating Google Sheet for {school_name}: {e}")
+        import traceback
+        traceback.print_exc()
+        return None, None
+
+# Function to generate unique school code
+def generate_school_code(school_name, region):
+    """Generate a unique school code based on name and region"""
+    # Take first 3 letters of school name (remove spaces)
+    name_part = ''.join([c for c in school_name[:3] if c.isalnum()]).upper()
+    # Take first 2 letters of region
+    region_part = ''.join([c for c in region[:2] if c.isalnum()]).upper()
+    # Add year and random suffix
+    year_part = str(datetime.now().year)[-2:]
+    random_part = str(uuid.uuid4())[:4].upper()
+    
+    school_code = f"CTVET-{name_part}{region_part}{year_part}{random_part}"
+    return school_code
+
+print("\n" + "="*60)
+print("CTVET MULTI-SCHOOL PLATFORM INITIALIZED")
+print("="*60)
+print(f"Schools database: {SCHOOLS_FILE}")
+print(f"Super Admin: {SUPER_ADMIN_USERNAME}")
+print("="*60 + "\n")
 # --- HELPER FUNCTION FOR FINANCE ACCESS ---
 def check_finance_access():
     """
@@ -91,6 +332,213 @@ def inject_excel_config():
     
     return dict(EXCEL_DB_DIR=EXCEL_DB_DIR, EXCEL_FILES=EXCEL_FILES, get_excel_status=get_excel_status)
 
+# =============================================================================
+# MULTI-SCHOOL CONTEXT PROCESSORS AND HELPERS
+# =============================================================================
+
+@app.context_processor
+def inject_school_context():
+    """Inject school context into all templates"""
+    def get_current_school():
+        """Get current school info from session"""
+        if session.get('school_logged_in'):
+            return {
+                'school_id': session.get('school_id'),
+                'school_name': session.get('school_name'),
+                'school_code': session.get('school_code')
+            }
+        return None
+    
+    def is_super_admin():
+        return session.get('super_admin_logged_in', False)
+    
+    def is_school_admin():
+        return session.get('school_logged_in', False)
+    
+    def is_main_admin():
+        return session.get('admin_logged_in', False)
+    
+    return dict(
+        get_current_school=get_current_school,
+        is_super_admin=is_super_admin,
+        is_school_admin=is_school_admin,
+        is_main_admin=is_main_admin
+    )
+
+def get_user_school_id():
+    """
+    Get the current user's school_id from session.
+    Returns None if user is super admin or main admin (they see all schools).
+    Returns school_id if user is a school admin.
+    """
+    if session.get('admin_logged_in') or session.get('super_admin_logged_in'):
+        return None  # Main/Super admin sees all schools
+    return session.get('school_id')
+
+def filter_by_school(df, school_id, column_name='school_id'):
+    """
+    Filter a DataFrame by school_id.
+    If school_id is None (admin), return all records.
+    If school_id is set, return only records matching that school.
+    """
+    if school_id is None:
+        return df  # Return all records for admin
+    if column_name not in df.columns:
+        return df  # No school_id column, return all
+    return df[df[column_name].astype(str) == str(school_id)]
+
+def add_school_filter_to_query(kwargs, school_id):
+    """Add school_id to query kwargs if user is school admin"""
+    if school_id is not None:
+        kwargs['school_id'] = school_id
+    return kwargs
+
+# Initialize Excel files with headers if they don't exist
+def init_excel_db():
+    """Initialize Excel database files with proper headers - NOW WITH SCHOOL_ID SUPPORT"""
+    # Students - Updated with exam results fields and Form column and school_id
+    if not os.path.exists(get_excel_path('students')):
+        df = pd.DataFrame(columns=[
+            'id', 'school_id', 'student_id', 'student_name', 'Form', 'department', 'parent_phone',
+            # Math scores
+            'math_exams_score_2021_1', 'math_class_score_2021_1', 'math_total_score_2021_1', 'math_remarks_2021_1', 'math_grade_2021_1',
+            # Science scores
+            'science_exams_score_2021_1', 'science_class_score_2021_1', 'science_total_score_2021_1', 'science_remarks_2021_1', 'science_grade_2021_1',
+            # Social scores
+            'social_exams_score_2021_1', 'social_class_score_2021_1', 'social_total_score_2021_1', 'social_remarks_2021_1', 'social_grade_2021_1',
+            'created_at'
+        ])
+        df.to_excel(get_excel_path('students'), index=False)
+    else:
+        # Add 'Form' column and 'school_id' if not exist
+        try:
+            df_existing = pd.read_excel(get_excel_path('students'))
+            updated = False
+            if 'Form' not in df_existing.columns:
+                df_existing['Form'] = ''
+                updated = True
+                print("Added 'Form' column to existing students.xlsx")
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'  # Default school for existing data
+                updated = True
+                print("Added 'school_id' column to existing students.xlsx")
+            if updated:
+                df_existing.to_excel(get_excel_path('students'), index=False)
+        except Exception as e:
+            print(f"Error updating students.xlsx: {e}")
+    
+    # Payments - with school_id
+    if not os.path.exists(get_excel_path('payments')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'student_id', 'student_name', 'fee_type', 'amount', 'payment_date', 'payment_method', 'receipt_number', 'created_at'])
+        df.to_excel(get_excel_path('payments'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('payments'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('payments'), index=False)
+                print("Added 'school_id' column to existing payments.xlsx")
+        except Exception as e:
+            print(f"Error updating payments.xlsx: {e}")
+    
+    # Store Items - with school_id
+    if not os.path.exists(get_excel_path('store_items')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'name', 'category', 'quantity', 'unit_price', 'min_threshold', 'created_at'])
+        df.to_excel(get_excel_path('store_items'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('store_items'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('store_items'), index=False)
+                print("Added 'school_id' column to existing store_items.xlsx")
+        except Exception as e:
+            print(f"Error updating store_items.xlsx: {e}")
+    
+    # Store Transactions - with school_id
+    if not os.path.exists(get_excel_path('store_transactions')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'item_id', 'transaction_type', 'quantity', 'recipient', 'recipient_type', 'issued_by', 'notes', 'created_at'])
+        df.to_excel(get_excel_path('store_transactions'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('store_transactions'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('store_transactions'), index=False)
+                print("Added 'school_id' column to existing store_transactions.xlsx")
+        except Exception as e:
+            print(f"Error updating store_transactions.xlsx: {e}")
+    
+    # Assets - with school_id
+    if not os.path.exists(get_excel_path('assets')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'asset_code', 'name', 'description', 'category', 'status', 'location_id', 'purchase_date', 'purchase_price', 'created_at'])
+        df.to_excel(get_excel_path('assets'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('assets'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('assets'), index=False)
+                print("Added 'school_id' column to existing assets.xlsx")
+        except Exception as e:
+            print(f"Error updating assets.xlsx: {e}")
+    
+    # Expenses - with school_id
+    if not os.path.exists(get_excel_path('expenses')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'description', 'amount', 'category', 'date', 'recorded_by', 'created_at'])
+        df.to_excel(get_excel_path('expenses'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('expenses'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('expenses'), index=False)
+                print("Added 'school_id' column to existing expenses.xlsx")
+        except Exception as e:
+            print(f"Error updating expenses.xlsx: {e}")
+    
+    # Locations - with school_id
+    if not os.path.exists(get_excel_path('locations')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'name', 'description', 'created_at'])
+        df.to_excel(get_excel_path('locations'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('locations'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('locations'), index=False)
+                print("Added 'school_id' column to existing locations.xlsx")
+        except Exception as e:
+            print(f"Error updating locations.xlsx: {e}")
+    
+    # Maintenance Requests - with school_id
+    if not os.path.exists(get_excel_path('maintenance_requests')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'asset_id', 'location_id', 'issue_description', 'priority', 'status', 'estimated_cost', 'actual_cost', 'reported_by', 'contractor', 'completed_date', 'notes', 'created_at'])
+        df.to_excel(get_excel_path('maintenance_requests'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('maintenance_requests'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('maintenance_requests'), index=False)
+                print("Added 'school_id' column to existing maintenance_requests.xlsx")
+        except Exception as e:
+            print(f"Error updating maintenance_requests.xlsx: {e}")
+    
+    # Instructors - with school_id
+    if not os.path.exists(get_excel_path('instructors')):
+        df = pd.DataFrame(columns=['id', 'school_id', 'instructor_id', 'name', 'username', 'password_hash', 'assigned_subjects', 'assigned_forms', 'created_at'])
+        df.to_excel(get_excel_path('instructors'), index=False)
+    else:
+        try:
+            df_existing = pd.read_excel(get_excel_path('instructors'))
+            if 'school_id' not in df_existing.columns:
+                df_existing['school_id'] = 'default'
+                df_existing.to_excel(get_excel_path('instructors'), index=False)
+                print("Added 'school_id' column to existing instructors.xlsx")
+        except Exception as e:
+            print(f"Error updating instructors.xlsx: {e}")
+
 # --- Configuration ---
 # IMPORTANT: For Render deployment, use 'google_sheet' mode
 # The database uses SQLite by default which works on Render's filesystem
@@ -136,7 +584,7 @@ UNIFIED_SHEET_ENABLED = True  # Set to False to disable unified sheet sync
 
 # Map data types to worksheet names in the unified Google Sheet
 SHEET_WORKBOOKS = {
-    'students': 'Student',
+    'students': 'Students',
     'payments': 'Payments',
     'store_items': 'Store Items',
     'store_transactions': 'Store Transactions',
@@ -332,23 +780,29 @@ print("="*60 + "\n")
 # =============================================================================
 
 class ExcelModel:
-    """Base class for Excel-based models"""
+    """Base class for Excel-based models with MULTI-SCHOOL support"""
     
     @staticmethod
-    def get_all(data_type):
-        """Get all records from Excel file"""
+    def get_all(data_type, school_id=None):
+        """Get all records from Excel file, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided (for school admins)
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             return df.to_dict('records')
         except Exception as e:
             print(f"Error getting all {data_type}: {e}")
             return []
     
     @staticmethod
-    def get_by_id(data_type, record_id):
-        """Get a single record by ID"""
+    def get_by_id(data_type, record_id, school_id=None):
+        """Get a single record by ID, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             # Handle type mismatch: form sends string, Excel has int/float
             try:
                 record_id_num = int(record_id)
@@ -369,10 +823,13 @@ class ExcelModel:
             return None
     
     @staticmethod
-    def get_one_by(data_type, **kwargs):
-        """Get a single record by any field"""
+    def get_one_by(data_type, school_id=None, **kwargs):
+        """Get a single record by any field, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             for key, value in kwargs.items():
                 if key in df.columns:
                     # Handle type mismatch: convert both to string for comparison
@@ -385,10 +842,13 @@ class ExcelModel:
             return None
     
     @staticmethod
-    def filter_by(data_type, **kwargs):
-        """Filter records by fields"""
+    def filter_by(data_type, school_id=None, **kwargs):
+        """Filter records by fields, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             for key, value in kwargs.items():
                 if key in df.columns:
                     # Handle type mismatch: convert both to string for comparison
@@ -399,23 +859,29 @@ class ExcelModel:
             return []
     
     @staticmethod
-    def count(data_type):
-        """Count total records"""
+    def count(data_type, school_id=None):
+        """Count total records, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             return len(df)
         except:
             return 0
     
     @staticmethod
-    def add(data_type, **kwargs):
-        """Add a new record"""
+    def add(data_type, school_id=None, **kwargs):
+        """Add a new record with school_id if provided"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
-            new_id = 1 if df.empty else df['id'].max() + 1
+            new_id = 1 if df.empty else int(df['id'].max()) + 1
             kwargs['id'] = new_id
             if 'created_at' not in kwargs:
                 kwargs['created_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Add school_id if the column exists and not already provided
+            if school_id is not None and 'school_id' not in kwargs and 'school_id' in df.columns:
+                kwargs['school_id'] = school_id
             new_row = pd.DataFrame([kwargs])
             df = pd.concat([df, new_row], ignore_index=True)
             df.to_excel(get_excel_path(data_type), index=False)
@@ -425,10 +891,13 @@ class ExcelModel:
             return None
     
     @staticmethod
-    def update(data_type, record_id, **kwargs):
+    def update(data_type, record_id, school_id=None, **kwargs):
         """Update a record"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
             # Handle type mismatch: form sends string, Excel has int/float
             try:
                 record_id_num = int(record_id)
@@ -452,10 +921,13 @@ class ExcelModel:
             return False
     
     @staticmethod
-    def delete(data_type, record_id):
-        """Delete a record"""
+    def delete(data_type, record_id, school_id=None):
+        """Delete a record, optionally filtered by school_id"""
         try:
             df = pd.read_excel(get_excel_path(data_type))
+            # Apply school_id filter if provided
+            if school_id is not None and 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) != str(school_id)] if school_id else df
             # Handle type mismatch: form sends string, Excel has int/float
             try:
                 record_id_num = int(record_id)
@@ -1240,14 +1712,26 @@ ARKESEL_API_KEY = "b0FrYkNNVlZGSmdrendVT3hwUHk"
 ARKESEL_SMS_URL = "https://sms.arkesel.com/sms/api"
 # IMPORTANT: Replace with your registered Arkesel Sender ID.
 # Verify this Sender ID is registered and approved in your Arkesel account.
-ARKESEL_SENDER_ID = "GyeduTech" # e.g., "MySchool"
+ARKESEL_SENDER_ID = "CTVETSch" # e.g., "MySchool"
 
 # --- Google Sheets API Configuration for Writing ---
 # Path to your service account credentials JSON file
 # You need to download this from Google Cloud Console
+# 1. Go to https://console.cloud.google.com/
+# 2. Select your project
+# 3. Go to APIs & Services > Credentials
+# 4. Create a service account or use existing one
+# 5. Generate a new key (JSON format)
+# 6. Download and save as 'service_account_credentials.json' in project root
+# 7. Share your Google Sheets with the service account email:
+#    ctvetschooldata@ctvetschooldata.iam.gserviceaccount.com
 SERVICE_ACCOUNT_FILE = 'service_account_credentials.json'
+
+# Service account email (for sharing sheets)
+SERVICE_ACCOUNT_EMAIL = 'ctvetschooldata@ctvetschooldata.iam.gserviceaccount.com'
+
 # Define the scope for Google Sheets API
-SCOPES = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+SCOPES = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets']
 
 # =============================================================================
 # EXCEL DATABASE CONFIGURATION
@@ -2696,11 +3180,20 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx'}
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# School logo upload folder
+SCHOOL_LOGO_FOLDER = 'static/school_logos'
+if not os.path.exists(SCHOOL_LOGO_FOLDER):
+    os.makedirs(SCHOOL_LOGO_FOLDER)
+
+def allowed_image(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'svg'}
 
 # --- Department Share Link Configuration ---
 # Store for share links (in production, use a database)
@@ -3063,34 +3556,44 @@ def load_results():
         return pd.DataFrame()
 
 
-def load_results_from_sheet():
+def load_results_from_sheet(school_id=None):
     """
     Loads the student results from Google Sheets using gspread API.
     Returns a pandas DataFrame with the student data.
+
+    Args:
+        school_id: Optional school ID to filter results for multi-school mode.
+                   If None, checks session for school_id.
     """
+    from flask import session
+
     try:
         print("="*60)
         print("LOADING STUDENTS FROM GOOGLE SHEETS")
         print("="*60)
-        
+
+        # Check for school_id in session if not provided
+        if school_id is None:
+            school_id = session.get('school_id')
+
         # Step 1: Get Google Sheets client
         gc = get_google_sheet_client()
         if not gc:
             print("ERROR: Could not connect to Google Sheets")
             print("Please check if service_account_credentials.json exists")
-            return pd.DataFrame()
-        
+            return _load_students_from_published_csv(school_id)
+
         print(f"✓ Connected to Google Sheets client")
-        
+
         # Step 2: Open the spreadsheet using UNIFIED_GOOGLE_SHEET_ID
         print(f"✓ Opening spreadsheet ID: {UNIFIED_GOOGLE_SHEET_ID}")
         spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
         print(f"✓ Connected to spreadsheet: {spreadsheet.title}")
-        
+
         # Step 3: Get list of all worksheets
         worksheets = spreadsheet.worksheets()
         print(f"✓ Available worksheets: {[ws.title for ws in worksheets]}")
-        
+
         # Step 4: Access the 'Students' worksheet
         try:
             worksheet = spreadsheet.worksheet('Students')
@@ -3098,38 +3601,103 @@ def load_results_from_sheet():
         except gspread.exceptions.WorksheetNotFound:
             print("ERROR: 'Students' worksheet not found")
             print(f"Available worksheets: {[ws.title for ws in worksheets]}")
-            return pd.DataFrame()
-        
+            return _load_students_from_published_csv(school_id)
+
         # Step 5: Get all records (both headers and data)
         records = worksheet.get_all_records()
         print(f"✓ Found {len(records)} student records")
-        
+
         if not records:
             print("WARNING: No records found in Students worksheet")
-            return pd.DataFrame()
-        
+            return _load_students_from_published_csv(school_id)
+
         # Step 6: Convert to DataFrame
         df = pd.DataFrame(records)
-        
+
         # Step 7: Clean up column names - remove leading/trailing spaces
         df.columns = df.columns.str.strip()
-        
+
+        # Step 8: Filter by school_id if in multi-school mode
+        if school_id:
+            print(f"✓ Multi-school mode: Filtering by school_id: {school_id}")
+            if 'school_id' in df.columns:
+                df = df[df['school_id'].astype(str) == str(school_id)]
+                print(f"✓ Filtered to {len(df)} students for school_id: {school_id}")
+            else:
+                print("WARNING: school_id column not found in Google Sheet")
+                print("Please ensure the Students worksheet has a 'school_id' column")
+
         print(f"✓ Loaded {len(df)} students from Google Sheet")
         print(f"✓ Columns found: {list(df.columns)}")
-        
-        # Step 8: Build column mapping dynamically
+
+        # Step 9: Build column mapping dynamically
         build_column_mapping_from_columns(df.columns.tolist())
-        
+
         print("="*60)
         print("SUCCESS: Student data loaded from Google Sheet!")
         print("="*60)
-        
+
         return df
-        
+
     except Exception as e:
         print(f"ERROR loading from Google Sheet: {e}")
-        import traceback
-        traceback.print_exc()
+        # Try published CSV URL as fallback (no authentication required)
+        return _load_students_from_published_csv(school_id)
+
+
+def _load_students_from_published_csv(school_id=None):
+    """
+    Fallback: Load students from the published CSV URL of the Google Sheet.
+    This works WITHOUT authentication and can read public/published sheets.
+
+    Args:
+        school_id: Optional school ID to filter results.
+    """
+    from flask import session
+
+    # Published CSV URL for the Students worksheet
+    # Format: https://docs.google.com/spreadsheets/d/e/<PUB_ID>/pub?output=csv&gid=<GID>
+    # Default to the standard Students worksheet (gid=0)
+    PUBLISHED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QYC30lQNjpJjHPJFUG6XUUZqP5XfnNjBUB4Xrhb7pzFP87-IF_2_iRAdJKCUk5zJThu-ml1hzyFm/pub?output=csv&gid=0"
+
+    try:
+        print("="*60)
+        print("FALLBACK: LOADING STUDENTS FROM PUBLISHED CSV URL")
+        print("="*60)
+
+        # Check for school_id in session if not provided
+        if school_id is None:
+            school_id = session.get('school_id')
+
+        # Read the published CSV directly (no auth needed)
+        df = pd.read_csv(PUBLISHED_CSV_URL)
+
+        if df.empty:
+            print("WARNING: Published CSV returned no data")
+            return pd.DataFrame()
+
+        # Clean up column names
+        df.columns = df.columns.str.strip()
+
+        # Filter by school_id if in multi-school mode
+        if school_id and 'school_id' in df.columns:
+            df = df[df['school_id'].astype(str) == str(school_id)]
+            print(f"✓ Filtered to {len(df)} students for school_id: {school_id}")
+
+        print(f"✓ Loaded {len(df)} students from published CSV")
+        print(f"✓ Columns found: {list(df.columns)}")
+
+        # Build column mapping dynamically
+        build_column_mapping_from_columns(df.columns.tolist())
+
+        print("="*60)
+        print("SUCCESS: Student data loaded from published CSV!")
+        print("="*60)
+
+        return df
+
+    except Exception as e:
+        print(f"ERROR loading from published CSV: {e}")
         return pd.DataFrame()
 
 def build_column_mapping_from_columns(columns):
@@ -3270,7 +3838,9 @@ def save_staff_user(username, password, role):
 @app.route('/')
 def index():
     """School website homepage with login options."""
-    return render_template('index.html')
+    # Get all registered schools for CTVET portal login
+    schools = CTVETSchool.get_all()
+    return render_template('index.html', schools=schools)
 
 @app.route('/ai_assistant')
 def ai_assistant():
@@ -3980,8 +4550,18 @@ def admin_dashboard():
             'Parent Phone': str(parent_phone).strip() if parent_phone else 'N/A',
             'Student Department': str(department).strip() if department else 'N/A'
         })
-
-    return render_template('admin.html', student_data=student_data_for_template, search_query=search_query)
+    
+    # Get school info for multi-school mode
+    school_name = session.get('school_name', 'Gyedu Technical Institute')
+    school_code = session.get('school_code', '')
+    is_multi_school = bool(session.get('school_id'))
+    
+    return render_template('admin.html', 
+                           student_data=student_data_for_template, 
+                           search_query=search_query,
+                           school_name=school_name,
+                           school_code=school_code,
+                           is_multi_school=is_multi_school)
 
 
 @app.route('/admin/logout')
@@ -4396,7 +4976,8 @@ def admin_manage_instructors():
     return render_template('admin_manage_instructors.html',
                            instructors=instructors,
                            core_subjects=CORE_SUBJECTS,
-                           elective_subjects_by_dept=ELECTIVE_SUBJECTS_BY_DEPT)
+                           elective_subjects_by_dept=ELECTIVE_SUBJECTS_BY_DEPT,
+                           school_name=session.get('school_name', 'Gyedu Technical Institute'))
 
 
 # --- Admin SMS Actions Page Route ---
@@ -4828,8 +5409,13 @@ def view_student_full_results(student_id):
         flash(f"Student with ID {student_id} not found or no data available.", 'danger')
         return redirect(url_for('admin_dashboard'))
     
+    # Get school name from session
+    school_name = session.get('school_name', 'Gyedu Technical Institute')
+    
     # Pass the full student data to the new template
-    return render_template('view_student_full_results.html', student_data=student_full_data)
+    return render_template('view_student_full_results.html', 
+                           student_data=student_full_data,
+                           school_name=school_name)
 """
 Student Results Management API Routes
 Handles CRUD operations for student results with online/offline sync.
@@ -4853,7 +5439,9 @@ def admin_manage_students():
     
     return render_template('admin_students_manage.html', 
                            students=students,
-                           AVAILABLE_DEPARTMENTS=AVAILABLE_DEPARTMENTS)
+                           AVAILABLE_DEPARTMENTS=AVAILABLE_DEPARTMENTS,
+                           school_name=session.get('school_name', ''),
+                           school_code=session.get('school_code', ''))
 
 
 @app.route('/admin/student/add', methods=['GET', 'POST'])
@@ -4913,7 +5501,9 @@ def admin_add_student():
     
     return render_template('admin_student_add.html',
                            AVAILABLE_DEPARTMENTS=AVAILABLE_DEPARTMENTS,
-                           current_year=datetime.now().year)
+                           current_year=datetime.now().year,
+                           school_name=session.get('school_name', ''),
+                           school_code=session.get('school_code', ''))
 
 
 @app.route('/admin/student/bulk_upload', methods=['GET', 'POST'])
@@ -5095,7 +5685,9 @@ def admin_edit_student(student_id):
     
     return render_template('admin_student_edit.html',
                            student=student,
-                           AVAILABLE_DEPARTMENTS=AVAILABLE_DEPARTMENTS)
+                           AVAILABLE_DEPARTMENTS=AVAILABLE_DEPARTMENTS,
+                           school_name=session.get('school_name', ''),
+                           school_code=session.get('school_code', ''))
 
 
 @app.route('/admin/student/<student_id>/delete', methods=['POST'])
@@ -5204,7 +5796,9 @@ def admin_edit_student_results(student_id):
     return render_template('admin_student_results_edit.html',
                            student=student,
                            semesters=semesters,
-                           all_columns=df.columns.tolist())
+                           all_columns=df.columns.tolist(),
+                           school_name=session.get('school_name', ''),
+                           school_code=session.get('school_code', ''))
 # ====== END OF UPDATED FUNCTION ======
 
 @app.route('/api/student/<student_id>/results', methods=['GET'])
@@ -9024,6 +9618,178 @@ def admin_sync_excel():
     
     return render_template('admin_sync_excel.html', sync_results=sync_results)
 
+# --- GOOGLE SHEET SETUP ROUTE ---
+@app.route('/admin/google_sheet_setup', methods=['GET', 'POST'])
+def admin_google_sheet_setup():
+    """Setup page to create and manage Google Sheet worksheets"""
+    if not session.get('admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    worksheet_status = []
+    
+    try:
+        gc = get_google_sheet_client()
+        if gc:
+            spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+            
+            # Get list of all required worksheets
+            required_worksheets = {
+                'Students': 'Main student records and results',
+                'Payments': 'Student payment records',
+                'Store Items': 'Inventory items',
+                'Store Transactions': 'Store transaction logs',
+                'Assets': 'School assets and equipment',
+                'Expenses': 'Expense records',
+                'Suppliers': 'Supplier information',
+                'Fee Types': 'Fee type definitions',
+                'Locations': 'School locations/buildings',
+                'Student Accounts': 'Student financial accounts',
+                'Instructors': 'Instructor records',
+                'Staff': 'Staff records',
+                'Forms': 'Class/form definitions'
+            }
+            
+            # Get existing worksheets
+            existing_worksheets = [ws.title for ws in spreadsheet.worksheets()]
+            
+            for worksheet_name, description in required_worksheets.items():
+                exists = worksheet_name in existing_worksheets
+                row_count = 0
+                col_count = 0
+                
+                if exists:
+                    try:
+                        ws = spreadsheet.worksheet(worksheet_name)
+                        row_count = ws.row_count
+                        col_count = ws.col_count
+                    except:
+                        pass
+                
+                worksheet_status.append({
+                    'name': worksheet_name,
+                    'description': description,
+                    'exists': exists,
+                    'row_count': row_count,
+                    'col_count': col_count
+                })
+            
+            # Handle POST - Create missing worksheets
+            if request.method == 'POST':
+                created_count = 0
+                for status in worksheet_status:
+                    if not status['exists']:
+                        try:
+                            spreadsheet.add_worksheet(
+                                title=status['name'],
+                                rows=1000,
+                                cols=20
+                            )
+                            status['exists'] = True
+                            status['row_count'] = 1000
+                            status['col_count'] = 20
+                            created_count += 1
+                        except Exception as e:
+                            flash(f"Error creating {status['name']}: {str(e)}", 'danger')
+                
+                if created_count > 0:
+                    flash(f'Successfully created {created_count} worksheet(s)!', 'success')
+                else:
+                    flash('All required worksheets already exist!', 'info')
+        
+    except Exception as e:
+        flash(f'Error connecting to Google Sheets: {str(e)}', 'danger')
+        print(f"Google Sheet Setup Error: {e}")
+    
+    return render_template('admin_google_sheet_setup.html',
+                           worksheet_status=worksheet_status,
+                           sheet_id=UNIFIED_GOOGLE_SHEET_ID,
+                           school_name=session.get('school_name', ''))
+
+# --- SCHOOL SETTINGS ROUTE ---
+@app.route('/admin/school_settings', methods=['GET', 'POST'])
+def admin_school_settings():
+    """School settings page to configure logo and motto for letterhead"""
+    if not session.get('admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    school_id = session.get('school_id')
+    school_code = session.get('school_code', '')
+    
+    # Get current school data
+    school_data = None
+    if school_id:
+        school_data = CTVETSchool.get_by_id(school_id)
+    elif school_code:
+        school_data = CTVETSchool.get_by_code(school_code)
+    
+    if not school_data:
+        flash('School data not found.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    if request.method == 'POST':
+        school_motto = request.form.get('school_motto', '').strip()
+        logo_filename = school_data.get('logo_filename', '')
+        
+        # Handle logo upload
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename and allowed_image(file.filename):
+                # Delete old logo if exists
+                if logo_filename and os.path.exists(os.path.join(SCHOOL_LOGO_FOLDER, logo_filename)):
+                    try:
+                        os.remove(os.path.join(SCHOOL_LOGO_FOLDER, logo_filename))
+                    except:
+                        pass
+                
+                # Save new logo with school code prefix
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                logo_filename = f"{school_code}_logo.{ext}"
+                filepath = os.path.join(SCHOOL_LOGO_FOLDER, logo_filename)
+                file.save(filepath)
+        
+        # Update school data
+        update_data = {
+            'school_motto': school_motto,
+            'logo_filename': logo_filename
+        }
+        
+        if school_id:
+            CTVETSchool.update(int(school_id), **update_data)
+        elif school_code:
+            # Update by school code
+            try:
+                df = pd.read_excel(SCHOOLS_FILE)
+                mask = df['school_code'].astype(str) == str(school_code)
+                for key, value in update_data.items():
+                    df.loc[mask, key] = value
+                df.to_excel(SCHOOLS_FILE, index=False)
+            except Exception as e:
+                print(f"Error updating school settings: {e}")
+        
+        # Update session with new motto and logo
+        session['school_motto'] = school_motto
+        session['logo_filename'] = logo_filename
+        
+        flash('School settings updated successfully!', 'success')
+        return redirect(url_for('admin_school_settings'))
+    
+    # Pass current settings to template
+    school_motto = school_data.get('school_motto', '')
+    logo_filename = school_data.get('logo_filename', '')
+    
+    # Check if logo file exists
+    logo_url = None
+    if logo_filename and os.path.exists(os.path.join(SCHOOL_LOGO_FOLDER, logo_filename)):
+        logo_url = f'/static/school_logos/{logo_filename}'
+    
+    return render_template('admin_school_settings.html',
+                           school_name=session.get('school_name', ''),
+                           school_motto=school_motto,
+                           logo_url=logo_url,
+                           logo_filename=logo_filename)
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # --- ADMIN: STAFF REGISTRATION ---
@@ -10208,6 +10974,9 @@ def admin_enter_results():
     years = [str(year) for year in range(2020, 2051)]
     semesters = ['Semester 1', 'Semester 2']
     
+    # Get school name from session
+    school_name = session.get('school_name', 'Gyedu Technical Institute')
+    
     return render_template('admin_enter_results.html',
                            student=student,
                            academic_year=academic_year,
@@ -10216,7 +10985,8 @@ def admin_enter_results():
                            core_subjects=core_subjects,
                            department_subjects=department_subjects,
                            years=years,
-                           semesters=semesters)
+                           semesters=semesters,
+                           school_name=school_name)
 
 
 def save_student_results_to_sheet(df):
@@ -10902,11 +11672,14 @@ INSTITUTION_CODE = 'STUGTI'  # Student + Asante Tano Methodist  Technical/Vocati
 
 def generate_student_id(department, year=None):
     """
-    Generate a unique student ID based on department and year.
-    Format: [DEPT_CODE]STUGTI[YEAR][SEQUENCE_NUMBER]
-    Example: EETSTUGTI26001
+    Generate a unique student ID based on department, year, and school code.
+    Format for multi-school: [SCHOOL_CODE]-[DEPT_CODE][YEAR][SEQUENCE_NUMBER]
+    Format for single school: [DEPT_CODE]STUGTI[YEAR][SEQUENCE_NUMBER]
+    Example (multi-school): GYEDU-EET26001
+    Example (single): EETSTUGTI26001
     
     Checks both local Excel file AND Google Sheets to find the next available ID.
+    For multi-school mode, filters by school_id from session.
     
     Args:
         department: The department/student belongs to
@@ -10915,6 +11688,8 @@ def generate_student_id(department, year=None):
     Returns:
         A unique student ID string
     """
+    from flask import session
+    
     if year is None:
         year = datetime.now().year
     
@@ -10930,8 +11705,18 @@ def generate_student_id(department, year=None):
             dept_code = code
             break
     
-    # Prefix for matching
-    prefix = f"{dept_code}{INSTITUTION_CODE}{year_suffix}"
+    # Check if this is multi-school mode (school_code in session)
+    school_code = session.get('school_code', '')
+    
+    if school_code:
+        # Multi-school mode: Use school_code as prefix
+        # Format: GYEDU-EET26001
+        prefix_base = f"{school_code}-{dept_code}"
+        full_prefix = f"{prefix_base}{year_suffix}"
+    else:
+        # Single school mode: Use original format
+        prefix_base = f"{dept_code}{INSTITUTION_CODE}"
+        full_prefix = f"{prefix_base}{year_suffix}"
     
     # Collect all existing IDs from both sources
     existing_ids = set()
@@ -10941,8 +11726,10 @@ def generate_student_id(department, year=None):
         df_local = load_excel_data('students')
         if not df_local.empty and 'student_id' in df_local.columns:
             for sid in df_local['student_id'].astype(str).values:
-                if str(sid).startswith(prefix):
-                    existing_ids.add(str(sid))
+                sid_str = str(sid)
+                # Match if starts with the base prefix (without year)
+                if sid_str.startswith(prefix_base):
+                    existing_ids.add(sid_str)
     except Exception as e:
         print(f"Error checking local students: {e}")
     
@@ -10951,21 +11738,93 @@ def generate_student_id(department, year=None):
         df_sheet = load_results_from_sheet()
         if not df_sheet.empty and 'Student ID' in df_sheet.columns:
             for sid in df_sheet['Student ID'].astype(str).values:
-                if str(sid).startswith(prefix):
-                    existing_ids.add(str(sid))
+                sid_str = str(sid)
+                # Match if starts with the base prefix (without year)
+                if sid_str.startswith(prefix_base):
+                    existing_ids.add(sid_str)
     except Exception as e:
         print(f"Error checking Google Sheets: {e}")
     
     # Find the next available sequence number
     next_seq = 1
     while True:
-        candidate_id = f"{prefix}{next_seq:03d}"
+        if school_code:
+            candidate_id = f"{full_prefix}{next_seq:03d}"
+        else:
+            candidate_id = f"{full_prefix}{next_seq:03d}"
+        
         if candidate_id not in existing_ids:
             break
         next_seq += 1
         # Safety limit to prevent infinite loop
         if next_seq > 99999:
-            print(f"WARNING: Sequence number exceeded limit for {prefix}")
+            print(f"WARNING: Sequence number exceeded limit for {full_prefix}")
+            break
+    
+    return candidate_id
+
+
+def generate_staff_id(position=None):
+    """
+    Generate a unique staff ID based on position and school code.
+    Format for multi-school: [SCHOOL_CODE]-STAFF-[SEQUENCE_NUMBER]
+    Format for single school: STAFF-[SEQUENCE_NUMBER]
+    Example (multi-school): GYEDU-STAFF-001
+    Example (single): STAFF-001
+    
+    Args:
+        position: The staff position (optional, for future use)
+    
+    Returns:
+        A unique staff ID string
+    """
+    from flask import session
+    
+    # Check if this is multi-school mode (school_code in session)
+    school_code = session.get('school_code', '')
+    
+    # Collect all existing IDs
+    existing_ids = set()
+    
+    # Check local Excel file for staff
+    try:
+        df_local = load_excel_data('staff')
+        if not df_local.empty and 'staff_id' in df_local.columns:
+            for sid in df_local['staff_id'].astype(str).values:
+                existing_ids.add(str(sid))
+    except Exception as e:
+        print(f"Error checking local staff: {e}")
+    
+    # Check Google Sheets for staff
+    try:
+        gc = get_google_sheet_client()
+        if gc:
+            sh = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+            try:
+                worksheet = sh.worksheet('Staff')
+                records = worksheet.get_all_records()
+                for record in records:
+                    if 'staff_id' in record:
+                        existing_ids.add(str(record['staff_id']))
+            except:
+                pass
+    except Exception as e:
+        print(f"Error checking Google Sheets for staff: {e}")
+    
+    # Find the next available sequence number
+    next_seq = 1
+    while True:
+        if school_code:
+            candidate_id = f"{school_code}-STAFF-{next_seq:03d}"
+        else:
+            candidate_id = f"STAFF-{next_seq:03d}"
+        
+        if candidate_id not in existing_ids:
+            break
+        next_seq += 1
+        # Safety limit
+        if next_seq > 99999:
+            print(f"WARNING: Staff sequence number exceeded limit")
             break
     
     return candidate_id
@@ -10974,6 +11833,408 @@ def generate_student_id(department, year=None):
 # ============================================
 # INSTRUCTOR PRINT STUDENTS ROUTE
 # ============================================
+# =============================================================================
+# GRADUATION TRACKING - Constants & Helper Functions
+# =============================================================================
+# These functions manage a student's graduation status. They support both
+# auto-graduation (based on registration year + repeat years) and manual
+# mark/unmark by an administrator. Data is stored in the unified Google
+# Sheet's 'Graduation' worksheet (primary) with a local Excel fallback
+# (`graduation_tracking.xlsx`) so the data survives across Render restarts.
+# A legacy `graduated_students.xlsx` is also read for backward compatibility.
+# =============================================================================
+
+# The standard duration of a technical/vocational program (in years).
+# A student must be in school for at least this many years before being
+# eligible for auto-graduation. Admins can extend this per-student using
+# the `repeat_years` field to account for repeated years.
+DEFAULT_GRADUATION_YEARS = 3
+
+# Worksheet name in the unified Google Sheet that stores graduation data.
+GRADUATION_SHEET_NAME = 'Graduation'
+
+# Canonical column order for the Graduation worksheet.
+GRADUATION_SHEET_HEADERS = [
+    'student_id', 'registration_year', 'repeat_years', 'graduation_status',
+    'graduation_type', 'graduated_at', 'graduated_by', 'notes'
+]
+
+
+def parse_graduation_year(student_id, year_column_value=None):
+    """
+    Determine the registration year for a student.
+
+    Tries the `year` column first, then falls back to extracting the year
+    suffix from the student ID. The student ID format is:
+        [SCHOOL_CODE-]DEPT_CODE[YEAR_SUFFIX][SEQ]
+    where YEAR_SUFFIX is 2 digits, e.g. "26" for 2026.
+
+    Returns the year as an integer, or None if it cannot be determined.
+    """
+    # 1) Prefer an explicit year column value
+    if year_column_value is not None and str(year_column_value).strip():
+        try:
+            year_int = int(str(year_column_value).strip())
+            if 1900 <= year_int <= 2100:
+                return year_int
+        except (ValueError, TypeError):
+            pass
+
+    if not student_id:
+        return None
+
+    sid_str = str(student_id).strip()
+    # Try a 4-digit year anywhere in the ID first
+    match = re.search(r'(19|20)\d{2}', sid_str)
+    if match:
+        try:
+            year_int = int(match.group(0))
+            if 1900 <= year_int <= 2100:
+                return year_int
+        except (ValueError, TypeError):
+            pass
+
+    # Fall back: find a 2-digit year suffix and convert to 21st century
+    # The student ID generator places the year suffix just before the
+    # sequence digits at the end. E.g., GYEDU-EET26001 -> "26"
+    match2 = re.search(r'(\d{2})(\d{3})$', sid_str)
+    if match2:
+        try:
+            yy = int(match2.group(1))
+            # Heuristic: 00-79 -> 20xx, 80-99 -> 19xx
+            if yy <= 79:
+                return 2000 + yy
+            else:
+                return 1900 + yy
+        except (ValueError, TypeError):
+            pass
+
+    return None
+
+
+def _graduation_file_path():
+    """Local fallback path for the graduation tracking file."""
+    return os.path.join(EXCEL_DB_DIR, 'graduation_tracking.xlsx')
+
+
+def _legacy_graduated_file_path():
+    """Legacy graduated students file (kept for backward compatibility)."""
+    return os.path.join(EXCEL_DB_DIR, 'graduated_students.xlsx')
+
+
+def load_graduation_data():
+    """
+    Load the graduation tracking data. Tries the Google Sheet first, then
+    falls back to a local Excel file. The legacy `graduated_students.xlsx`
+    is also merged in (for entries created before the migration).
+
+    Returns a list of dicts with the keys defined in GRADUATION_SHEET_HEADERS.
+    """
+    records = []
+    seen_ids = set()
+
+    # 1) Try Google Sheet
+    try:
+        gc = get_google_sheet_client()
+        if gc:
+            spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+            existing_titles = [ws.title for ws in spreadsheet.worksheets()]
+            if GRADUATION_SHEET_NAME in existing_titles:
+                ws = spreadsheet.worksheet(GRADUATION_SHEET_NAME)
+                if ws.row_count > 1:
+                    all_values = ws.get_all_values()
+                    if all_values and len(all_values) >= 2:
+                        headers = all_values[0]
+                        for row in all_values[1:]:
+                            if not any(cell.strip() for cell in row if isinstance(cell, str)):
+                                continue
+                            record = {}
+                            for i, header in enumerate(headers):
+                                record[header] = row[i] if i < len(row) else ''
+                            if record.get('student_id'):
+                                records.append(record)
+                                seen_ids.add(str(record['student_id']))
+    except Exception as e:
+        print(f"[GRADUATION] Could not load from Google Sheet: {e}")
+
+    # 2) Fall back to / merge with local file
+    if not records:
+        try:
+            local_path = _graduation_file_path()
+            if os.path.exists(local_path):
+                df = pd.read_excel(local_path)
+                for _, row in df.iterrows():
+                    rec = {h: row.get(h, '') for h in GRADUATION_SHEET_HEADERS}
+                    if rec.get('student_id') and str(rec['student_id']) not in seen_ids:
+                        records.append(rec)
+                        seen_ids.add(str(rec['student_id']))
+        except Exception as e:
+            print(f"[GRADUATION] Could not load local graduation file: {e}")
+
+    # 3) Merge legacy graduated file entries (for backward compat)
+    try:
+        legacy_path = _legacy_graduated_file_path()
+        if os.path.exists(legacy_path):
+            df_legacy = pd.read_excel(legacy_path)
+            for _, row in df_legacy.iterrows():
+                sid = str(row.get('student_id', ''))
+                if sid and sid not in seen_ids:
+                    records.append({
+                        'student_id': sid,
+                        'registration_year': '',
+                        'repeat_years': 0,
+                        'graduation_status': 'graduated',
+                        'graduation_type': 'manual',
+                        'graduated_at': str(row.get('graduated_at', '')),
+                        'graduated_by': str(row.get('graduated_by', '')),
+                        'notes': 'Imported from legacy graduated list'
+                    })
+                    seen_ids.add(sid)
+    except Exception as e:
+        print(f"[GRADUATION] Could not load legacy graduated file: {e}")
+
+    return records
+
+
+def save_graduation_data(records):
+    """
+    Save the graduation tracking data to the Google Sheet (primary) and
+    the local Excel file (fallback). Returns True on success.
+    """
+    if not isinstance(records, list):
+        return False
+
+    success = False
+
+    # 1) Save to Google Sheet
+    try:
+        gc = get_google_sheet_client()
+        if gc:
+            spreadsheet = gc.open_by_key(UNIFIED_GOOGLE_SHEET_ID)
+            existing_titles = [ws.title for ws in spreadsheet.worksheets()]
+            if GRADUATION_SHEET_NAME not in existing_titles:
+                ws = spreadsheet.add_worksheet(
+                    title=GRADUATION_SHEET_NAME,
+                    rows=1000,
+                    cols=len(GRADUATION_SHEET_HEADERS)
+                )
+                ws.insert_row(GRADUATION_SHEET_HEADERS, index=1)
+            else:
+                ws = spreadsheet.worksheet(GRADUATION_SHEET_NAME)
+
+            # Clear existing rows (keep header)
+            try:
+                ws.delete_rows(2, ws.row_count)
+            except Exception:
+                try:
+                    ws.clear()
+                    ws.insert_row(GRADUATION_SHEET_HEADERS, index=1)
+                except Exception:
+                    pass
+
+            if records:
+                rows = []
+                for rec in records:
+                    rows.append([str(rec.get(h, '')) for h in GRADUATION_SHEET_HEADERS])
+                ws.append_rows(rows, value_input_option='USER_ENTERED')
+            success = True
+    except Exception as e:
+        print(f"[GRADUATION] Could not save to Google Sheet: {e}")
+
+    # 2) Save to local Excel as fallback
+    try:
+        df = pd.DataFrame(records, columns=GRADUATION_SHEET_HEADERS)
+        local_path = _graduation_file_path()
+        df.to_excel(local_path, index=False)
+        if not success:
+            success = True  # local save counts as success if sheet failed
+    except Exception as e:
+        print(f"[GRADUATION] Could not save to local file: {e}")
+
+    return success
+
+
+def calculate_auto_graduation_status(registration_year, repeat_years=0, base_years=None):
+    """
+    Given a registration year and the number of repeat years, return:
+        - 'graduated' if years_elapsed >= base_years + repeat_years
+        - 'active' otherwise
+        - 'unknown' if registration_year is None
+
+    Also returns (status, years_elapsed, threshold) so the UI can show
+    contextual information.
+    """
+    if base_years is None:
+        base_years = DEFAULT_GRADUATION_YEARS
+    if registration_year is None:
+        return ('unknown', None, base_years)
+    try:
+        reg = int(registration_year)
+    except (ValueError, TypeError):
+        return ('unknown', None, base_years)
+    try:
+        rep = int(repeat_years or 0)
+    except (ValueError, TypeError):
+        rep = 0
+    years_elapsed = datetime.now().year - reg
+    threshold = base_years + rep
+    if years_elapsed >= threshold:
+        return ('graduated', years_elapsed, threshold)
+    return ('active', years_elapsed, threshold)
+
+
+def run_auto_graduation(students_df, graduation_records):
+    """
+    Run auto-graduation on the provided students DataFrame.
+    graduation_records: list of dicts (mutated and returned). Existing
+                        manual graduations are preserved.
+    """
+    base_years = DEFAULT_GRADUATION_YEARS
+    by_id = {str(r.get('student_id', '')): dict(r) for r in graduation_records if r.get('student_id')}
+
+    auto_marked = 0
+    if students_df is None or students_df.empty:
+        return graduation_records, auto_marked
+
+    # Build COLUMN_MAPPING-style lookups for student ID and year column
+    student_id_col = COLUMN_MAPPING.get('Student ID', 'Student ID')
+    if student_id_col not in students_df.columns:
+        # Fall back: try to find a column that looks like a student id
+        for col in students_df.columns:
+            if 'student id' in str(col).lower() or str(col).lower() == 'id':
+                student_id_col = col
+                break
+    year_col = 'year' if 'year' in students_df.columns else None
+
+    for _, row in students_df.iterrows():
+        sid = str(row.get(student_id_col, '')).strip()
+        if not sid:
+            continue
+        year_col_val = row.get(year_col) if year_col else None
+        registration_year = parse_graduation_year(sid, year_col_val)
+        if registration_year is None:
+            continue
+        status, years_elapsed, threshold = calculate_auto_graduation_status(
+            registration_year,
+            by_id.get(sid, {}).get('repeat_years', 0),
+            base_years
+        )
+        if status == 'graduated':
+            existing = by_id.get(sid, {})
+            current_status = str(existing.get('graduation_status', '')).lower()
+            if current_status != 'graduated':
+                by_id[sid] = {
+                    'student_id': sid,
+                    'registration_year': str(registration_year),
+                    'repeat_years': int(existing.get('repeat_years', 0) or 0),
+                    'graduation_status': 'graduated',
+                    'graduation_type': 'auto',
+                    'graduated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'graduated_by': 'auto-graduation',
+                    'notes': f"Auto-graduated: {years_elapsed} years elapsed (threshold: {threshold})"
+                }
+                auto_marked += 1
+        else:
+            # If there's no record at all, create an active one
+            if sid not in by_id:
+                by_id[sid] = {
+                    'student_id': sid,
+                    'registration_year': str(registration_year),
+                    'repeat_years': 0,
+                    'graduation_status': 'active',
+                    'graduation_type': '',
+                    'graduated_at': '',
+                    'graduated_by': '',
+                    'notes': ''
+                }
+
+    return list(by_id.values()), auto_marked
+
+
+def is_student_graduated(student_id):
+    """
+    Check if a student is marked as graduated.
+    Returns True if the student is graduated and should be excluded from bulk SMS.
+    Checks both the new `graduation_tracking.xlsx` (which includes auto-graduation)
+    and the legacy `graduated_students.xlsx` for backward compatibility.
+    """
+    try:
+        sid = str(student_id).strip()
+        if not sid:
+            return False
+        # 1) New tracking file (Google Sheet -> local Excel)
+        try:
+            graduation_records = load_graduation_data()
+            for r in graduation_records:
+                if str(r.get('student_id', '')).strip() == sid:
+                    if str(r.get('graduation_status', '')).lower() == 'graduated':
+                        return True
+        except Exception:
+            pass
+        # 2) Legacy graduated students file (backward compatibility)
+        try:
+            graduated_file = _legacy_graduated_file_path()
+            if os.path.exists(graduated_file):
+                df_grad = pd.read_excel(graduated_file)
+                graduated_ids = df_grad['student_id'].astype(str).tolist()
+                return sid in graduated_ids
+        except Exception:
+            pass
+        return False
+    except Exception as e:
+        print(f"Error checking graduation status: {e}")
+        return False
+
+
+def filter_graduated_students(df, student_id_col=None):
+    """
+    Filter out graduated students from a DataFrame.
+    Returns a new DataFrame with only active (non-graduated) students.
+    Checks both the new `graduation_tracking.xlsx` and the legacy
+    `graduated_students.xlsx`.
+    """
+    if df is None or df.empty:
+        return df
+    try:
+        if student_id_col is None:
+            student_id_col = COLUMN_MAPPING.get('Student ID', 'Student ID')
+        if student_id_col not in df.columns:
+            return df
+
+        graduated_ids = set()
+        # 1) New tracking file
+        try:
+            tracking_file = _graduation_file_path()
+            if os.path.exists(tracking_file):
+                df_track = pd.read_excel(tracking_file)
+                if 'student_id' in df_track.columns and 'graduation_status' in df_track.columns:
+                    graduated_ids.update(
+                        df_track.loc[
+                            df_track['graduation_status'].astype(str).str.lower() == 'graduated',
+                            'student_id'
+                        ].astype(str).tolist()
+                    )
+        except Exception:
+            pass
+        # 2) Legacy graduated students file
+        try:
+            graduated_file = _legacy_graduated_file_path()
+            if os.path.exists(graduated_file):
+                df_grad = pd.read_excel(graduated_file)
+                graduated_ids.update(df_grad['student_id'].astype(str).tolist())
+        except Exception:
+            pass
+
+        if graduated_ids:
+            original_count = len(df)
+            df = df[~df[student_id_col].astype(str).isin(graduated_ids)]
+            print(f"Filtered out {len(graduated_ids)} graduated students from {original_count} total")
+        return df
+    except Exception as e:
+        print(f"Error filtering graduated students: {e}")
+        return df
+
+
 @app.route('/instructor/print_students', methods=['GET'])
 def instructor_print_students():
     """Route for instructors to print their student list"""
@@ -10999,6 +12260,1050 @@ def instructor_print_students():
                          assigned_forms=assigned_forms)
 
 
+# =============================================================================
+# ADMIN: PRINT STUDENT INFORMATION
+# =============================================================================
+# Lets the admin view and print a complete list of all students in the
+# school, with optional filtering by department, year, and form. The
+# template is print-friendly and includes a "Print" button.
+# =============================================================================
+
+@app.route('/admin/print_students', methods=['GET'])
+def admin_print_students():
+    """
+    Print student information for the admin. Supports search, department,
+    year, and form filters. Honors multi-school filtering by school_code.
+    """
+    if not session.get('admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    school_code = session.get('school_code', '')
+    school_name = session.get('school_name', 'Gyedu Technical Institute')
+    is_multi_school = bool(session.get('school_id'))
+
+    # --- Filter parameters from query string ---
+    search_query = (request.args.get('search', '') or '').strip().lower()
+    selected_department = (request.args.get('department', '') or '').strip()
+    selected_year = (request.args.get('year', '') or '').strip()
+    selected_form = (request.args.get('form', '') or '').strip()
+    selected_status = (request.args.get('status', 'active') or 'active').strip()
+
+    # --- Load students (try Google Sheet first, fall back to local Excel) ---
+    df = pd.DataFrame()
+    try:
+        df = load_results_from_sheet()
+    except Exception as e:
+        print(f"[admin_print_students] Could not load from Google Sheets: {e}")
+
+    if df.empty:
+        try:
+            df = load_excel_data('students')
+        except Exception as e:
+            print(f"[admin_print_students] Could not load local students.xlsx: {e}")
+
+    if df.empty:
+        flash('No student data found. Please add students or sync from Google Sheets first.', 'warning')
+        return render_template(
+            'admin_print_students.html',
+            school_name=school_name,
+            students=[],
+            available_departments=[],
+            available_years=[],
+            available_forms=[],
+            search_query=search_query,
+            selected_department=selected_department,
+            selected_year=selected_year,
+            selected_form=selected_form,
+            selected_status=selected_status,
+            total_count=0
+        )
+
+    # --- Multi-school filter ---
+    if is_multi_school and school_code and 'school_code' in df.columns:
+        df = df[df['school_code'].astype(str) == str(school_code)]
+
+    # --- Build a list of available filter options (before applying filters) ---
+    dept_col = None
+    for col in df.columns:
+        col_lower = str(col).strip().lower()
+        if 'department' in col_lower or col_lower == 'dept':
+            dept_col = col
+            break
+    available_departments = sorted(df[dept_col].dropna().astype(str).unique().tolist()) if dept_col else []
+
+    year_col = 'year' if 'year' in df.columns else None
+    available_years = sorted(df[year_col].dropna().astype(str).unique().tolist()) if year_col else []
+
+    form_col = 'Form' if 'Form' in df.columns else (
+        'form' if 'form' in df.columns else None
+    )
+    available_forms = sorted(df[form_col].dropna().astype(str).unique().tolist()) if form_col else []
+
+    # --- Apply filters ---
+    if selected_department and dept_col:
+        df = df[df[dept_col].astype(str) == str(selected_department)]
+
+    if selected_year and year_col:
+        df = df[df[year_col].astype(str) == str(selected_year)]
+
+    if selected_form and form_col:
+        df = df[df[form_col].astype(str) == str(selected_form)]
+
+    if search_query:
+        def _matches(row):
+            for col in df.columns:
+                if search_query in str(row.get(col, '')).lower():
+                    return True
+            return False
+        df = df[df.apply(_matches, axis=1)]
+
+    # --- Filter out graduated students when 'active' is selected ---
+    if selected_status == 'active':
+        # Determine the student id column
+        sid_col = COLUMN_MAPPING.get('Student ID', 'Student ID')
+        if sid_col not in df.columns:
+            for col in df.columns:
+                if 'student id' in str(col).lower():
+                    sid_col = col
+                    break
+        if sid_col in df.columns:
+            df = filter_graduated_students(df, student_id_col=sid_col)
+    elif selected_status == 'graduated':
+        # Only show graduated students
+        graduation_records = load_graduation_data()
+        grad_ids = {str(r.get('student_id', '')).strip()
+                    for r in graduation_records
+                    if str(r.get('graduation_status', '')).lower() == 'graduated'}
+        if grad_ids:
+            sid_col = COLUMN_MAPPING.get('Student ID', 'Student ID')
+            if sid_col not in df.columns:
+                for col in df.columns:
+                    if 'student id' in str(col).lower():
+                        sid_col = col
+                        break
+            if sid_col in df.columns:
+                df = df[df[sid_col].astype(str).str.strip().isin(grad_ids)]
+
+    # --- Convert to list of dicts for the template ---
+    students = df.to_dict('records')
+    total_count = len(students)
+
+    return render_template(
+        'admin_print_students.html',
+        school_name=school_name,
+        students=students,
+        available_departments=available_departments,
+        available_years=available_years,
+        available_forms=available_forms,
+        search_query=search_query,
+        selected_department=selected_department,
+        selected_year=selected_year,
+        selected_form=selected_form,
+        selected_status=selected_status,
+        total_count=total_count
+    )
+
+
+# =============================================================================
+# ADMIN: MANAGE GRADUATED STUDENTS
+# =============================================================================
+# Lets the admin view graduated students, mark/unmark students as graduated
+# (individually or in bulk), set per-student repeat years to extend the
+# graduation threshold, and trigger a manual recalculation of auto-graduation.
+# Data is persisted to the unified Google Sheet (Graduation worksheet) with
+# a local Excel fallback so it survives across Render restarts.
+# =============================================================================
+
+@app.route('/admin/manage_graduated_students', methods=['GET', 'POST'])
+def admin_manage_graduated_students():
+    """
+    Manage graduated students.
+
+    Features:
+      - Auto-graduates students whose registration year is more than
+        DEFAULT_GRADUATION_YEARS + repeat_years in the past.
+      - Manual mark/unmark of individual or bulk students.
+      - Per-student "Repeat Years" field to extend graduation deadline.
+      - Search by name, ID, or department.
+      - Recalculate auto-graduation on demand.
+    """
+    if not session.get('admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    school_code = session.get('school_code', '')
+    school_name = session.get('school_name', 'Gyedu Technical Institute')
+    is_multi_school = bool(session.get('school_id'))
+
+    # ----- Handle POST actions -----
+    if request.method == 'POST':
+        action = request.form.get('action')
+        graduation_records = load_graduation_data()
+        by_id = {str(r.get('student_id', '')): dict(r) for r in graduation_records if r.get('student_id')}
+
+        if action == 'mark_graduated':
+            student_ids = request.form.getlist('student_ids')
+            if student_ids:
+                for sid in student_ids:
+                    existing = by_id.get(str(sid), {})
+                    by_id[str(sid)] = {
+                        'student_id': str(sid),
+                        'registration_year': str(existing.get('registration_year', '')),
+                        'repeat_years': int(existing.get('repeat_years', 0) or 0),
+                        'graduation_status': 'graduated',
+                        'graduation_type': 'manual',
+                        'graduated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'graduated_by': session.get('admin_username', 'admin'),
+                        'notes': str(existing.get('notes', ''))
+                    }
+                if save_graduation_data(list(by_id.values())):
+                    flash(f'{len(student_ids)} student(s) marked as graduated.', 'success')
+                else:
+                    flash('Failed to save graduation data. Please try again.', 'danger')
+
+        elif action == 'unmark_graduated':
+            student_ids = request.form.getlist('student_ids')
+            if student_ids:
+                for sid in student_ids:
+                    if str(sid) in by_id:
+                        by_id[str(sid)]['graduation_status'] = 'active'
+                        by_id[str(sid)]['graduation_type'] = ''
+                        by_id[str(sid)]['graduated_at'] = ''
+                        by_id[str(sid)]['graduated_by'] = ''
+                        by_id[str(sid)]['notes'] = (
+                            f"Unmarked by {session.get('admin_username', 'admin')} on "
+                            f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                        )
+                if save_graduation_data(list(by_id.values())):
+                    flash(f'{len(student_ids)} student(s) removed from graduated list.', 'success')
+                else:
+                    flash('Failed to save graduation data. Please try again.', 'danger')
+
+        elif action == 'unmark_one':
+            sid = request.form.get('student_id', '').strip()
+            if sid and sid in by_id:
+                by_id[sid]['graduation_status'] = 'active'
+                by_id[sid]['graduation_type'] = ''
+                by_id[sid]['graduated_at'] = ''
+                by_id[sid]['graduated_by'] = ''
+                by_id[sid]['notes'] = (
+                    f"Individually unmarked by {session.get('admin_username', 'admin')} on "
+                    f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                )
+                if save_graduation_data(list(by_id.values())):
+                    flash(f'Student {sid} has been unmarked and is now active.', 'success')
+                else:
+                    flash('Failed to save graduation data. Please try again.', 'danger')
+
+        elif action == 'set_repeat_years':
+            sid = request.form.get('student_id', '').strip()
+            try:
+                new_repeat = int(request.form.get('repeat_years', 0))
+            except (ValueError, TypeError):
+                new_repeat = 0
+            if new_repeat < 0:
+                new_repeat = 0
+            if sid:
+                existing = by_id.get(sid, {
+                    'student_id': sid,
+                    'registration_year': '',
+                    'graduation_status': 'active',
+                    'graduation_type': '',
+                    'graduated_at': '',
+                    'graduated_by': '',
+                    'notes': ''
+                })
+                existing['repeat_years'] = new_repeat
+                by_id[sid] = existing
+                if save_graduation_data(list(by_id.values())):
+                    flash(
+                        f'Repeat years for student {sid} set to {new_repeat}. '
+                        f'Graduation threshold is now {DEFAULT_GRADUATION_YEARS + new_repeat} years.',
+                        'success'
+                    )
+                else:
+                    flash('Failed to save graduation data. Please try again.', 'danger')
+
+        elif action == 'recalculate_auto':
+            # Force re-run of auto-graduation. The current page-load logic
+            # already does this, but allow manual re-trigger for clarity.
+            df_for_calc = load_results_from_sheet()
+            if is_multi_school and school_code and 'school_code' in df_for_calc.columns:
+                df_for_calc = df_for_calc[df_for_calc['school_code'].astype(str) == str(school_code)]
+            updated_records, auto_marked = run_auto_graduation(df_for_calc, list(by_id.values()))
+            if save_graduation_data(updated_records):
+                flash(f'Recalculated auto-graduation: {auto_marked} student(s) newly auto-graduated.', 'success')
+            else:
+                flash('Recalculation completed but failed to save.', 'warning')
+
+    # ----- Load students -----
+    df = pd.DataFrame()
+    try:
+        df = load_results_from_sheet()
+    except Exception:
+        pass
+    if df.empty:
+        try:
+            df = load_excel_data('students')
+        except Exception:
+            pass
+
+    if df.empty:
+        flash('No student data found.', 'warning')
+        return redirect(url_for('admin_dashboard'))
+
+    # Multi-school filtering
+    if is_multi_school and school_code:
+        if 'school_code' in df.columns:
+            df = df[df['school_code'].astype(str) == str(school_code)]
+
+    # Run auto-graduation (always, on every page load)
+    graduation_records = load_graduation_data()
+    graduation_records, auto_marked = run_auto_graduation(df, graduation_records)
+    if auto_marked > 0:
+        save_graduation_data(graduation_records)
+        flash(
+            f'{auto_marked} student(s) were automatically marked as graduated '
+            f'based on their registration year.',
+            'info'
+        )
+
+    # Build a lookup: student_id -> graduation record
+    grad_by_id = {str(r.get('student_id', '')): r for r in graduation_records if r.get('student_id')}
+
+    # ----- Build the per-student data list -----
+    current_year = datetime.now().year
+    student_id_col = COLUMN_MAPPING.get('Student ID', 'Student ID')
+    if student_id_col not in df.columns:
+        for col in df.columns:
+            if 'student id' in str(col).lower():
+                student_id_col = col
+                break
+    student_name_col = COLUMN_MAPPING.get('Student Name', 'Student Name')
+    if student_name_col not in df.columns:
+        for col in df.columns:
+            if 'student name' in str(col).lower():
+                student_name_col = col
+                break
+    dept_col = COLUMN_MAPPING.get('Student Department', 'Student Department')
+    if dept_col not in df.columns:
+        for col in df.columns:
+            if 'department' in str(col).lower():
+                dept_col = col
+                break
+    year_col = 'year' if 'year' in df.columns else None
+
+    students = []
+    for _, row in df.iterrows():
+        sid = str(row.get(student_id_col, '')).strip()
+        if not sid:
+            continue
+        sname = str(row.get(student_name_col, '')).strip()
+        sdept = str(row.get(dept_col, '')).strip() if dept_col in df.columns else ''
+        year_col_val = row.get(year_col) if year_col else None
+        registration_year = parse_graduation_year(sid, year_col_val)
+
+        grad_info = grad_by_id.get(sid, {})
+        try:
+            repeat_years = int(grad_info.get('repeat_years', 0) or 0)
+        except (ValueError, TypeError):
+            repeat_years = 0
+
+        years_elapsed = (current_year - int(registration_year)) if registration_year else None
+        threshold = DEFAULT_GRADUATION_YEARS + repeat_years
+
+        is_graduated = str(grad_info.get('graduation_status', '')).lower() == 'graduated'
+
+        students.append({
+            'student_id': sid,
+            'student_name': sname,
+            'department': sdept,
+            'parent_phone': str(row.get('Parent Phone', '')).strip(),
+            'is_graduated': is_graduated,
+            'registration_year': registration_year,
+            'years_elapsed': years_elapsed,
+            'threshold': threshold,
+            'repeat_years': repeat_years,
+            'graduation_type': str(grad_info.get('graduation_type', '')),
+            'graduated_at': str(grad_info.get('graduated_at', '')),
+            'graduated_by': str(grad_info.get('graduated_by', '')),
+            'notes': str(grad_info.get('notes', ''))
+        })
+
+    # Sort by name
+    students = sorted(students, key=lambda x: str(x.get('student_name', '')))
+
+    # ----- Search filter -----
+    search_query = (request.args.get('search', '') or request.form.get('search', '')).strip().lower()
+    if search_query:
+        def matches(s):
+            return (
+                search_query in str(s.get('student_name', '')).lower()
+                or search_query in str(s.get('student_id', '')).lower()
+                or search_query in str(s.get('department', '')).lower()
+            )
+        students = [s for s in students if matches(s)]
+
+    # Separate active and graduated
+    active_students = [s for s in students if not s['is_graduated']]
+    graduated_list = [s for s in students if s['is_graduated']]
+
+    return render_template(
+        'admin_manage_graduated.html',
+        school_name=school_name,
+        active_students=active_students,
+        graduated_list=graduated_list,
+        search_query=search_query,
+        default_graduation_years=DEFAULT_GRADUATION_YEARS,
+        current_year=current_year
+    )
+
+
+# =============================================================================
+# STUDENT DASHBOARD ROUTE
+# =============================================================================
+@app.route('/student/dashboard')
+def student_dashboard():
+    """Student dashboard to view personal results and information."""
+    if not session.get('student_logged_in'):
+        flash('Please log in to access the student dashboard.', 'warning')
+        return redirect(url_for('student_login'))
+    
+    student_name = session.get('student_name', 'Student')
+    school_id = session.get('school_id')
+    school_name = session.get('school_name', 'Your School')
+    
+    # Load student's results from Google Sheets
+    df_results = load_results_from_sheet(school_id=school_id)
+    
+    # Filter results for this student if student_id is in session
+    student_id = session.get('student_id', '')
+    if student_id and not df_results.empty:
+        if COLUMN_MAPPING.get('Student ID') and COLUMN_MAPPING['Student ID'] in df_results.columns:
+            df_results = df_results[df_results[COLUMN_MAPPING['Student ID']].astype(str) == str(student_id)]
+    
+    # Convert to list of dicts for template
+    results = []
+    if not df_results.empty:
+        for _, row in df_results.iterrows():
+            result = {}
+            for key, col in COLUMN_MAPPING.items():
+                if col in df_results.columns:
+                    result[key] = row[col]
+                else:
+                    result[key] = ''
+            results.append(result)
+    
+    return render_template('student_dashboard.html',
+                         student_name=student_name,
+                         student_id=student_id,
+                         school_name=school_name,
+                         results=results)
+
+# =============================================================================
+# CTVET MULTI-SCHOOL PLATFORM ROUTES
+# =============================================================================
+
+@app.route('/ctvet')
+def ctvet_home():
+    """CTVET Platform homepage - entry point for multi-school system"""
+    return render_template('ctvet_home.html')
+
+@app.route('/ctvet/super_admin/login', methods=['GET', 'POST'])
+def super_admin_login():
+    """Super Admin login page for CTVET platform management"""
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        if username == SUPER_ADMIN_USERNAME and check_password_hash(SUPER_ADMIN_PASSWORD_HASH, password):
+            session['super_admin_logged_in'] = True
+            session['super_admin_username'] = username
+            flash('Welcome to CTVET Super Admin Dashboard!', 'success')
+            return redirect(url_for('super_admin_dashboard'))
+        else:
+            flash('Invalid credentials. Please try again.', 'danger')
+    
+    return render_template('super_admin_login.html')
+
+@app.route('/ctvet/admin_portal/login', methods=['GET', 'POST'])
+def admin_portal_login():
+    """Administrative portal login - select school and role"""
+    # Get all registered schools
+    schools = CTVETSchool.get_all()
+    
+    selected_school_id = session.get('selected_school_id')
+    
+    if request.method == 'POST':
+        school_id = request.form.get('school_id', '').strip()
+        role = request.form.get('role', '').strip()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        # Validation
+        if not school_id or not role or not username or not password:
+            flash('Please select school, role, and enter credentials.', 'danger')
+            return render_template('admin_portal_login.html', 
+                                   schools=schools,
+                                   selected_school_id=school_id)
+        
+        # Get school details
+        school = CTVETSchool.get_by_id(int(school_id))
+        if not school:
+            flash('Invalid school selection.', 'danger')
+            return render_template('admin_portal_login.html', 
+                                   schools=schools,
+                                   selected_school_id=school_id)
+        
+        # Store school info in session
+        # SINGLE-SCHOOL SYSTEM: Always use "GYEDU TECHNICAL INSTITUTE" regardless of database value
+        session['school_id'] = school_id
+        session['school_name'] = 'GYEDU TECHNICAL INSTITUTE'
+        session['school_code'] = school.get('school_code', 'GYEDU')
+
+        # Route based on role
+        if role == 'admin':
+            # Admin login - verify against stored credentials
+            stored_username = school.get('admin_username', '')
+            stored_password_hash = school.get('admin_password_hash', '')
+
+            if username == stored_username and check_password_hash(stored_password_hash, password):
+                session['admin_logged_in'] = True
+                session['admin_username'] = username
+                session['role'] = 'admin'
+                flash(f'Welcome, GYEDU TECHNICAL INSTITUTE Admin!', 'success')
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash('Invalid admin credentials.', 'danger')
+                return render_template('admin_portal_login.html',
+                                       schools=schools,
+                                       selected_school_id=school_id)
+
+        elif role == 'instructor':
+            # Instructor login
+            session['instructor_logged_in'] = True
+            session['instructor_name'] = username
+            session['role'] = 'instructor'
+            flash(f'Welcome, Instructor {username}!', 'success')
+            return redirect(url_for('instructor_dashboard'))
+
+        elif role == 'student':
+            # Student login - redirect to student login page with school context
+            # Store school info in session for student dashboard
+            session['school_id'] = school_id
+            session['school_name'] = 'GYEDU TECHNICAL INSTITUTE'
+            session['school_code'] = school.get('school_code', 'GYEDU')
+            flash(f'Please login with your student credentials.', 'info')
+            return redirect(url_for('student_login'))
+        
+        elif role == 'finance':
+            # Finance officer login
+            session['finance_logged_in'] = True
+            session['finance_username'] = username
+            session['role'] = 'finance'
+            flash(f'Welcome, Finance Officer!', 'success')
+            return redirect(url_for('finance_dashboard'))
+        
+        elif role == 'estate':
+            # Estate officer login
+            session['estate_logged_in'] = True
+            session['estate_username'] = username
+            session['role'] = 'estate'
+            flash(f'Welcome, Estate Officer!', 'success')
+            return redirect(url_for('estate_dashboard'))
+        
+        elif role == 'store':
+            # Store keeper login
+            session['store_logged_in'] = True
+            session['store_username'] = username
+            session['role'] = 'store'
+            flash(f'Welcome, Store Keeper!', 'success')
+            return redirect(url_for('store_dashboard'))
+        
+        elif role == 'hod':
+            # HOD login
+            session['hod_logged_in'] = True
+            session['hod_username'] = username
+            session['role'] = 'hod'
+            flash(f'Welcome, Head of Department!', 'success')
+            return redirect(url_for('hod_dashboard'))
+        
+        else:
+            flash('Invalid role selected.', 'danger')
+            return render_template('admin_portal_login.html', 
+                                   schools=schools,
+                                   selected_school_id=school_id)
+    
+    return render_template('admin_portal_login.html', 
+                           schools=schools,
+                           selected_school_id=selected_school_id)
+
+@app.route('/ctvet/super_admin/logout')
+def super_admin_logout():
+    """Logout from super admin session"""
+    session.pop('super_admin_logged_in', None)
+    session.pop('super_admin_username', None)
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('super_admin_login'))
+
+@app.route('/ctvet/super_admin/dashboard')
+def super_admin_dashboard():
+    """Super Admin dashboard - manage all registered schools"""
+    if not session.get('super_admin_logged_in'):
+        flash('Please log in to access the dashboard.', 'warning')
+        return redirect(url_for('super_admin_login'))
+    
+    schools = CTVETSchool.get_all()
+    total_schools = len(schools)
+    active_schools = len([s for s in schools if s.get('status') == 'active'])
+    
+    return render_template('super_admin_dashboard.html',
+                           schools=schools,
+                           total_schools=total_schools,
+                           active_schools=active_schools)
+
+@app.route('/ctvet/super_admin/register_school', methods=['GET', 'POST'])
+def super_admin_register_school():
+    """Register a new school - automatically creates Google Sheet"""
+    if not session.get('super_admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('super_admin_login'))
+    
+    if request.method == 'POST':
+        school_name = request.form.get('school_name', '').strip()
+        school_code = request.form.get('school_code', '').strip()
+        school_type = request.form.get('school_type', 'Technical School').strip()
+        region = request.form.get('region', '').strip()
+        district = request.form.get('district', '').strip()
+        address = request.form.get('address', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()
+        admin_username = request.form.get('admin_username', '').strip()
+        admin_password = request.form.get('admin_password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        
+        # Validation
+        if not school_name or not region or not admin_username or not admin_password:
+            flash('School name, region, admin username, and password are required.', 'danger')
+            return render_template('super_admin_register_school.html')
+        
+        # Validate password confirmation
+        if admin_password != confirm_password:
+            flash('Password and confirm password do not match.', 'danger')
+            return render_template('super_admin_register_school.html')
+        
+        # Validate password length
+        if len(admin_password) < 6:
+            flash('Password must be at least 6 characters long.', 'danger')
+            return render_template('super_admin_register_school.html')
+        
+        # Check if username already exists
+        existing_schools = CTVETSchool.get_all()
+        for school in existing_schools:
+            if school.get('admin_username') == admin_username:
+                flash(f'Username "{admin_username}" already exists. Please choose a different username.', 'danger')
+                return render_template('super_admin_register_school.html')
+        
+        # Generate school code if not provided
+        if not school_code:
+            school_code = generate_school_code(school_name, region)
+        
+        # Hash the admin password
+        admin_password_hash = generate_password_hash(admin_password)
+        
+        # Create Google Sheet for the school (optional - can be created later)
+        google_sheet_id = None
+        google_sheet_url = None
+        
+        print(f"Creating Google Sheet for school: {school_name}")
+        google_sheet_id, google_sheet_url = create_school_google_sheet(school_name, school_code)
+        
+        if not google_sheet_id:
+            # Google Sheet creation failed - offer option to continue without it
+            print("WARNING: Google Sheet creation failed. School will be registered without Google Sheet.")
+            # We'll store an empty value - this can be updated later
+            google_sheet_id = ''
+            google_sheet_url = ''
+            # Don't fail the registration - just continue without Google Sheet
+            # flash('Failed to create Google Sheet for this school. Google Sheet can be created later.', 'warning')
+        
+        # Save school to database
+        school_data = {
+            'school_name': school_name,
+            'school_code': school_code,
+            'school_type': school_type,
+            'region': region,
+            'district': district,
+            'address': address,
+            'email': email,
+            'phone': phone,
+            'google_sheet_id': google_sheet_id,
+            'google_sheet_url': google_sheet_url,
+            'status': 'active',
+            'admin_username': admin_username,
+            'admin_password_hash': admin_password_hash
+        }
+        
+        school_id = CTVETSchool.add(**school_data)
+        
+        if school_id:
+            flash(f'School "{school_name}" registered successfully! Google Sheet created automatically.', 'success')
+            return redirect(url_for('super_admin_dashboard'))
+        else:
+            flash('Failed to register school. Please try again.', 'danger')
+    
+    return render_template('super_admin_register_school.html')
+
+@app.route('/ctvet/super_admin/view_school/<int:school_id>')
+def super_admin_view_school(school_id):
+    """View details of a specific school"""
+    if not session.get('super_admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('super_admin_login'))
+    
+    school = CTVETSchool.get_by_id(school_id)
+    if not school:
+        flash('School not found.', 'danger')
+        return redirect(url_for('super_admin_dashboard'))
+    
+    return render_template('super_admin_view_school.html', school=school)
+
+@app.route('/ctvet/super_admin/edit_school/<int:school_id>', methods=['GET', 'POST'])
+def super_admin_edit_school(school_id):
+    """Edit school details"""
+    if not session.get('super_admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('super_admin_login'))
+    
+    school = CTVETSchool.get_by_id(school_id)
+    if not school:
+        flash('School not found.', 'danger')
+        return redirect(url_for('super_admin_dashboard'))
+    
+    if request.method == 'POST':
+        school_name = request.form.get('school_name', '').strip()
+        region = request.form.get('region', '').strip()
+        district = request.form.get('district', '').strip()
+        address = request.form.get('address', '').strip()
+        contact_email = request.form.get('contact_email', '').strip()
+        contact_phone = request.form.get('contact_phone', '').strip()
+        head_name = request.form.get('head_name', '').strip()
+        status = request.form.get('status', 'active')
+        
+        update_data = {
+            'school_name': school_name,
+            'region': region,
+            'district': district,
+            'address': address,
+            'contact_email': contact_email,
+            'contact_phone': contact_phone,
+            'head_name': head_name,
+            'status': status
+        }
+        
+        if CTVETSchool.update(school_id, **update_data):
+            flash(f'School "{school_name}" updated successfully!', 'success')
+            return redirect(url_for('super_admin_dashboard'))
+        else:
+            flash('Failed to update school. Please try again.', 'danger')
+    
+    return render_template('super_admin_edit_school.html', school=school)
+
+@app.route('/ctvet/super_admin/delete_school/<int:school_id>', methods=['GET', 'POST'])
+def super_admin_delete_school(school_id):
+    """Delete a school"""
+    if not session.get('super_admin_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('super_admin_login'))
+    
+    school = CTVETSchool.get_by_id(school_id)
+    if not school:
+        flash('School not found.', 'danger')
+        return redirect(url_for('super_admin_dashboard'))
+    
+    school_name = school.get('school_name', 'Unknown')
+    
+    if request.method == 'POST':
+        if CTVETSchool.delete(school_id):
+            flash(f'School "{school_name}" deleted successfully!', 'success')
+            return redirect(url_for('super_admin_dashboard'))
+        else:
+            flash('Failed to delete school. Please try again.', 'danger')
+    
+    return render_template('super_admin_delete_school.html', school=school)
+
+# =============================================================================
+# SCHOOL LOGIN AND DASHBOARD ROUTES
+# =============================================================================
+
+@app.route('/ctvet/school/login', methods=['GET', 'POST'])
+def school_login():
+    """School admin login page - INTEGRATED with main app"""
+    if request.method == 'POST':
+        school_code = request.form.get('school_code', '').strip()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        if not school_code or not username or not password:
+            flash('School code, username, and password are required.', 'warning')
+            return render_template('school_login.html')
+        
+        # Find the school
+        school = CTVETSchool.get_by_code(school_code)
+        if not school:
+            flash('Invalid school code. Please check and try again.', 'danger')
+            return render_template('school_login.html')
+        
+        # Check if school is active
+        if school.get('status') != 'active':
+            flash('This school account is currently inactive. Contact CTVET support.', 'danger')
+            return render_template('school_login.html')
+        
+        # Verify credentials
+        stored_username = school.get('admin_username', '')
+        stored_password_hash = school.get('admin_password_hash', '')
+        
+        if username == stored_username and check_password_hash(stored_password_hash, password):
+            # Login successful - Set ALL session variables for full system access
+            session['school_logged_in'] = True
+            session['school_id'] = str(school.get('school_id'))
+            # SINGLE-SCHOOL SYSTEM: Always use "GYEDU TECHNICAL INSTITUTE"
+            session['school_name'] = 'GYEDU TECHNICAL INSTITUTE'
+            session['school_code'] = school.get('school_code', 'GYEDU')
+            session['school_sheet_id'] = school.get('google_sheet_id')
+            session['school_sheet_url'] = school.get('google_sheet_url')
+            session['school_admin_username'] = username
+
+            # Also set admin_logged_in so they can access existing routes
+            # This integrates them with the existing admin system
+            session['admin_logged_in'] = True  # Treat school admin as admin for route access
+
+            flash(f'Welcome to GYEDU TECHNICAL INSTITUTE Dashboard!', 'success')
+            return redirect(url_for('school_dashboard'))
+        else:
+            flash('Invalid username or password.', 'danger')
+    
+    return render_template('school_login.html')
+
+@app.route('/ctvet/school/logout')
+def school_logout():
+    """Logout from school session - clear all session variables"""
+    session.pop('school_logged_in', None)
+    session.pop('school_id', None)
+    session.pop('school_name', None)
+    session.pop('school_code', None)
+    session.pop('school_sheet_id', None)
+    session.pop('school_sheet_url', None)
+    session.pop('school_admin_username', None)
+    session.pop('admin_logged_in', None)  # Also clear admin flag
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('school_login'))
+
+@app.route('/ctvet/school/dashboard')
+def school_dashboard():
+    """School admin dashboard - INTEGRATED with all modules"""
+    if not session.get('school_logged_in'):
+        flash('Please log in to access the school dashboard.', 'warning')
+        return redirect(url_for('school_login'))
+    
+    school_id = session.get('school_id')
+    school_name = session.get('school_name')
+    
+    # Get counts from local Excel database with school_id filter
+    try:
+        students_count = ExcelModel.count('students', school_id=school_id)
+        payments_count = ExcelModel.count('payments', school_id=school_id)
+        store_items_count = ExcelModel.count('store_items', school_id=school_id)
+        assets_count = ExcelModel.count('assets', school_id=school_id)
+        expenses_count = ExcelModel.count('expenses', school_id=school_id)
+        locations_count = ExcelModel.count('locations', school_id=school_id)
+        maintenance_count = ExcelModel.count('maintenance_requests', school_id=school_id)
+        instructors_count = ExcelModel.count('instructors', school_id=school_id)
+    except Exception as e:
+        print(f"Error getting counts: {e}")
+        students_count = payments_count = store_items_count = 0
+        assets_count = expenses_count = locations_count = 0
+        maintenance_count = instructors_count = 0
+    
+    # Get recent students
+    try:
+        recent_students = ExcelModel.get_all('students', school_id=school_id)[:5]
+    except:
+        recent_students = []
+    
+    # Get recent payments
+    try:
+        recent_payments = ExcelModel.get_all('payments', school_id=school_id)[:5]
+    except:
+        recent_payments = []
+    
+    return render_template('school_dashboard.html',
+                           school_name=school_name,
+                           students_count=students_count,
+                           payments_count=payments_count,
+                           store_items_count=store_items_count,
+                           assets_count=assets_count,
+                           expenses_count=expenses_count,
+                           locations_count=locations_count,
+                           maintenance_count=maintenance_count,
+                           instructors_count=instructors_count,
+                           recent_students=recent_students,
+                           recent_payments=recent_payments)
+
+@app.route('/ctvet/school/students')
+def school_students():
+    """School students management page"""
+    if not session.get('school_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('school_login'))
+    
+    school_id = session.get('school_id')
+    school_name = session.get('school_name')
+    school_sheet_id = session.get('school_sheet_id')
+    
+    students = []
+    try:
+        gc = get_google_sheet_client()
+        if gc and school_sheet_id:
+            sh = gc.open_by_key(school_sheet_id)
+            ws_students = sh.worksheet('Students')
+            students = ws_students.get_all_records()
+    except Exception as e:
+        print(f"Error loading students: {e}")
+        flash('Could not load students data.', 'warning')
+    
+    return render_template('school_students.html',
+                           school_name=school_name,
+                           students=students)
+
+@app.route('/ctvet/school/staff')
+def school_staff():
+    """School staff management page"""
+    if not session.get('school_logged_in'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('school_login'))
+    
+    school_id = session.get('school_id')
+    school_name = session.get('school_name')
+    school_sheet_id = session.get('school_sheet_id')
+    
+    staff = []
+    try:
+        gc = get_google_sheet_client()
+        if gc and school_sheet_id:
+            sh = gc.open_by_key(school_sheet_id)
+            ws_staff = sh.worksheet('Staff')
+            staff = ws_staff.get_all_records()
+    except Exception as e:
+        print(f"Error loading staff: {e}")
+        flash('Could not load staff data.', 'warning')
+    
+    return render_template('school_staff.html',
+                           school_name=school_name,
+                           staff=staff)
+
+@app.route('/ctvet/school/add_student', methods=['POST'])
+def school_add_student():
+    """Add a new student to the school's Google Sheet"""
+    if not session.get('school_logged_in'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        student_name = request.form.get('student_name', '').strip()
+        student_id = request.form.get('student_id', '').strip()
+        department = request.form.get('department', '').strip()
+        parent_phone = request.form.get('parent_phone', '').strip()
+        form_level = request.form.get('form_level', '').strip()
+        
+        if not student_name or not student_id:
+            return jsonify({'success': False, 'message': 'Student name and ID are required'}), 400
+        
+        school_sheet_id = session.get('school_sheet_id')
+        gc = get_google_sheet_client()
+        
+        if not gc or not school_sheet_id:
+            return jsonify({'success': False, 'message': 'Google Sheet not configured'}), 500
+        
+        sh = gc.open_by_key(school_sheet_id)
+        ws = sh.worksheet('Students')
+        
+        # Get next row number
+        all_records = ws.get_all_records()
+        next_row = len(all_records) + 2  # +2 for header row and 1-based indexing
+        
+        # Add new student
+        new_row_data = [
+            next_row,  # Row number as ID
+            student_id,
+            student_name,
+            department,
+            form_level,
+            parent_phone,
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ]
+        
+        ws.append_row(new_row_data)
+        
+        return jsonify({'success': True, 'message': 'Student added successfully'})
+        
+    except Exception as e:
+        print(f"Error adding student: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/ctvet/school/add_staff', methods=['POST'])
+def school_add_staff():
+    """Add a new staff member to the school's Google Sheet"""
+    if not session.get('school_logged_in'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        staff_name = request.form.get('staff_name', '').strip()
+        staff_id = request.form.get('staff_id', '').strip()
+        position = request.form.get('position', '').strip()
+        department = request.form.get('department', '').strip()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        
+        if not staff_name or not staff_id:
+            return jsonify({'success': False, 'message': 'Staff name and ID are required'}), 400
+        
+        school_sheet_id = session.get('school_sheet_id')
+        gc = get_google_sheet_client()
+        
+        if not gc or not school_sheet_id:
+            return jsonify({'success': False, 'message': 'Google Sheet not configured'}), 500
+        
+        sh = gc.open_by_key(school_sheet_id)
+        ws = sh.worksheet('Staff')
+        
+        # Get next row number
+        all_records = ws.get_all_records()
+        next_row = len(all_records) + 2
+        
+        # Add new staff
+        new_row_data = [
+            next_row,
+            staff_id,
+            staff_name,
+            position,
+            department,
+            phone,
+            email,
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ]
+        
+        ws.append_row(new_row_data)
+        
+        return jsonify({'success': True, 'message': 'Staff added successfully'})
+        
+    except Exception as e:
+        print(f"Error adding staff: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# =============================================================================
+# END OF CTVET MULTI-SCHOOL PLATFORM ROUTES
+# =============================================================================
 
 if __name__ == '__main__':
     # In a production environment, use a production-ready WSGI server like Gunicorn or uWSGI
